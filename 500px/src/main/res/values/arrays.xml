@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="feature_index">
+        <item>popular</item>
+        <item>upcoming</item>
+        <item>editors</item>
+        <item>fresh_today</item>
+        <item>fresh_yesterday</item>
+        <item>fresh_week</item>
+    </string-array>
+    <string-array name="features">
+        <item>@string/popular</item>
+        <item>@string/upcoming</item>
+        <item>@string/editors_choice</item>
+        <item>@string/fresh_today</item>
+        <item>@string/fresh_yesterday</item>
+        <item>@string/fresh_this_week</item>
+    </string-array>
+
+    <string-array name="interval_index">
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+        <item>600</item>
+        <item>900</item>
+        <item>1800</item>
+        <item>3600</item>
+        <item>7200</item>
+        <item>10800</item>
+        <item>21600</item>
+        <item>43200</item>
+        <item>86400</item>
+    </string-array>
+    <string-array name="intervals">
+        <item>@string/one_minute</item>
+        <item>@string/two_minutes</item>
+        <item>@string/five_minutes</item>
+        <item>@string/ten_minutes</item>
+        <item>@string/fifteen_minutes</item>
+        <item>@string/thirty_minutes</item>
+        <item>@string/one_hour</item>
+        <item>@string/two_hours</item>
+        <item>@string/three_hours</item>
+        <item>@string/six_hours</item>
+        <item>@string/twelve_hours</item>
+        <item>@string/twenty_four_hours</item>
+    </string-array>
+
+    <string-array name="category_index">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+    </string-array>
+    <string-array name="categories">
+        <item>@string/uncategorized</item>
+        <item>@string/celebrities</item>
+        <item>@string/film</item>
+        <item>@string/journalism</item>
+        <item>@string/nude</item>
+        <item>@string/black_and_white</item>
+        <item>@string/still_life</item>
+        <item>@string/people</item>
+        <item>@string/landscapes</item>
+        <item>@string/city_and_architecture</item>
+        <item>@string/abstract_category</item>
+        <item>@string/animals</item>
+        <item>@string/macro</item>
+        <item>@string/travel</item>
+        <item>@string/fashion</item>
+        <item>@string/commercial</item>
+        <item>@string/concert</item>
+        <item>@string/sport</item>
+        <item>@string/nature</item>
+        <item>@string/performing_arts</item>
+        <item>@string/family</item>
+        <item>@string/street</item>
+        <item>@string/underwater</item>
+        <item>@string/food</item>
+        <item>@string/fine_art</item>
+        <item>@string/wedding</item>
+        <item>@string/transportation</item>
+        <item>@string/urban_exploration</item>
+    </string-array>
+</resources>

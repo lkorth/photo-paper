@@ -1,0 +1,3 @@
+[submodule "ActiveAndroid"]
+	path = ActiveAndroid
+	url = https://github.com/pardom/ActiveAndroid.git

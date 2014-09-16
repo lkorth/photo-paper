@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <PreferenceCategory android:title="@string/settings_500px">
+
+        <ListPreference
+            android:key="feature"
+            android:title="@string/feature"
+            android:entries="@array/features"
+            android:entryValues="@array/feature_index" />
+
+        <MultiSelectListPreference
+            android:key="categories"
+            android:title="@string/categories"
+            android:entries="@array/categories"
+            android:entryValues="@array/category_index" />
+
+        <CheckBoxPreference
+            android:key="allow_nsfw"
+            android:title="@string/nsfw_title"
+            android:summary="@string/nsfw_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings">
+
+        <CheckBoxPreference
+            android:key="enable"
+            android:title="@string/enable"
+            android:summary="@string/enable_summary"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="use_only_wifi"
+            android:title="@string/update_only_over_wifi"
+            android:summary="@string/update_only_over_wifi_summary"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="update_interval"
+            android:title="@string/update_interval"
+            android:entries="@array/intervals"
+            android:entryValues="@array/interval_index" />
+
+        <CheckBoxPreference
+            android:key="use_parallax"
+            android:title="@string/parallax"
+            android:summary="@string/parallax_summary" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
