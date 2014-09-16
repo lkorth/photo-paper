@@ -91,9 +91,9 @@ public class ApiService extends IntentService {
             ActiveAndroid.setTransactionSuccessful();
         } catch (JSONException e) {
             Log.d("ApiService", e.getMessage());
-            ActiveAndroid.endTransaction();
         } catch (IOException e) {
             Log.d("ApiService", e.getMessage());
+        } finally {
             ActiveAndroid.endTransaction();
         }
     }
