@@ -17,11 +17,19 @@ public class Settings {
         return getPrefs(context).getString("feature", "popular");
     }
 
-    public static Set<String> getCategories(Context context) {
+    public static int[] getCategories(Context context) {
         Set<String> defaultCategory = new HashSet<String>();
         defaultCategory.add("8");
+        Set<String> prefCategories = getPrefs(context).getStringSet("categories", defaultCategory);
 
-        return getPrefs(context).getStringSet("categories", defaultCategory);
+        int[] categories = new int[prefCategories.size()];
+        int i = 0;
+        for (String category : prefCategories) {
+            categories[i] = Integer.parseInt(category);
+            i++;
+        }
+
+        return categories;
     }
 
     public static boolean allowNSFW(Context context) {

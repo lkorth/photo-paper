@@ -22,7 +22,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Set;
 
 public class ApiService extends IntentService {
 
@@ -100,10 +99,10 @@ public class ApiService extends IntentService {
 
     private String getCategoriesForRequest() {
         String[] allCategories = getResources().getStringArray(R.array.categories);
-        Set<String> categories = Settings.getCategories(this);
+        int[] categories = Settings.getCategories(this);
         String filter = "";
-        for (String category : categories) {
-            filter += allCategories[Integer.parseInt(category)] + ",";
+        for (int category : categories) {
+            filter += allCategories[category] + ",";
         }
 
         try {
