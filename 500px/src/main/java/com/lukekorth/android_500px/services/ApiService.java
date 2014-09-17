@@ -59,8 +59,6 @@ public class ApiService extends IntentService {
     }
 
     private void getPhotos() {
-        Log.d("ApiService", "Fetching photos");
-
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .header("User-Agent", "com.lukekorth.android_500px")
@@ -81,7 +79,6 @@ public class ApiService extends IntentService {
             for (int i = 0; i < json.length(); i++) {
                 photo = Photos.create(json.getJSONObject(i), Settings.getFeature(this));
                 if (photo != null) {
-                    Log.d("ApiService", "Photo created: " + photo.id);
                     Picasso.with(this)
                             .load(photo.imageUrl)
                             .fetch();

@@ -1,6 +1,9 @@
 package com.lukekorth.android_500px;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
@@ -9,7 +12,10 @@ import android.preference.PreferenceActivity;
 import android.text.TextUtils;
 
 import com.lukekorth.android_500px.helpers.Utils;
+import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.services.ApiService;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Set;
 
@@ -18,6 +24,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     private ListPreference mFeature;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
+    private Preference mCurrentPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +43,38 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
+        mCurrentPhoto = findPreference("current_photo");
+
         runApiService();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Photos photo = Photos.getCurrentPhoto(this);
+        if (photo != null) {
+            mCurrentPhoto.setTitle(photo.name);
+            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px");
+            Picasso.with(this)
+                    .load(photo.imageUrl)
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            mCurrentPhoto.setIcon(new BitmapDrawable(bitmap));
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        }
+                    });
+        } else {
+            mCurrentPhoto.setTitle(R.string.no_current_photo);
+        }
     }
 
     @Override

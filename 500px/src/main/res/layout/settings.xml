@@ -3,6 +3,13 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
+    <PreferenceCategory android:title="@string/current_photo">
+
+       <Preference
+           android:key="current_photo" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settings_500px">
 
         <ListPreference

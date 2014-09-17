@@ -29,6 +29,9 @@ public class Photos extends Model {
     @Column(name = "description")
     public String description;
 
+    @Column(name = "user_name")
+    public String userName;
+
     @Column(name = "created_at")
     public long createdAt;
 
@@ -66,6 +69,7 @@ public class Photos extends Model {
             photo.id = jsonPhoto.getInt("id");
             photo.name = jsonPhoto.getString("name");
             photo.description = jsonPhoto.getString("description");
+            photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
 
             String createdAt = jsonPhoto.getString("created_at");
             photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
@@ -96,6 +100,13 @@ public class Photos extends Model {
         photo.save();
 
         return photo;
+    }
+
+    public static Photos getCurrentPhoto(Context context) {
+        return new Select().from(Photos.class)
+                .where("seen = ?", true)
+                .orderBy("seen_at DESC")
+                .executeSingle();
     }
 
     public static int unseenPhotoCount(Context context) {
