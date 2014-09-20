@@ -5,6 +5,10 @@
     <!-- Settings -->
     <string name="current_photo">Current Photo</string>
     <string name="no_current_photo">No current photo</string>
+    <string name="next_photo">Next Photo</string>
+    <string name="disabled">Disabled</string>
+    <string name="enable_below">You must enable 500px Wallpaper before wallpapers will be set</string>
+    <string name="loading">Loading...</string>
     <string name="settings_500px">500px Settings</string>
     <string name="feature">Feature</string>
     <string name="categories">Categories</string>

@@ -8,6 +8,9 @@
        <Preference
            android:key="current_photo" />
 
+       <Preference
+           android:key="next_photo" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_500px">

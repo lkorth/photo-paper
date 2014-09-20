@@ -12,10 +12,12 @@ import android.preference.PreferenceActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
+import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.lukekorth.android_500px.services.ApiService;
+import com.lukekorth.android_500px.services.WallpaperService;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -25,12 +27,13 @@ import java.util.Set;
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 
-public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
     private ListPreference mFeature;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
     private Preference mCurrentPhoto;
+    private Preference mNextPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
         mCurrentPhoto = findPreference("current_photo");
+
+        mNextPhoto = findPreference("next_photo");
+        mNextPhoto.setOnPreferenceClickListener(this);
 
         WallpaperApplication.getBus().register(this);
         runApiService();
@@ -103,6 +109,27 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else {
             mCurrentPhoto.setTitle(R.string.no_current_photo);
         }
+
+        long nextPhotoTime = Settings.getNextAlarm(this);
+        if (nextPhotoTime != 0) {
+            CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
+            mNextPhoto.setTitle(getString(R.string.next_photo) + " " + nextTime);
+            mNextPhoto.setSummary("Click to set it now");
+        } else {
+            mNextPhoto.setTitle(R.string.disabled);
+            mNextPhoto.setSummary(R.string.enable_below);
+        }
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        if (preference.getKey().equals(mNextPhoto.getKey())) {
+            mNextPhoto.setTitle(R.string.loading);
+            mNextPhoto.setSummary("");
+            runWallpaperService();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -124,6 +151,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     private void runApiService() {
         startService(new Intent(this, ApiService.class));
+    }
+
+    private void runWallpaperService() {
+        startService(new Intent(this, WallpaperService.class));
     }
 
     private void setFeatureSummary(String index) {
