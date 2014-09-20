@@ -5,11 +5,12 @@ import android.app.WallpaperManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.PowerManager;
-import android.util.Log;
 
+import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -45,8 +46,8 @@ public class WallpaperService extends IntentService {
                         .get();
 
                 wallpaperManager.setBitmap(bitmap);
+                WallpaperApplication.getBus().post(new WallpaperChangedEvent());
             } catch (IOException e) {
-                Log.d("WallpaperService", e.getMessage());
             }
 
             if (Utils.needMorePhotos(this)) {

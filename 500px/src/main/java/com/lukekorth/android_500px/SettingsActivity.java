@@ -13,7 +13,9 @@ import android.text.TextUtils;
 
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.lukekorth.android_500px.services.ApiService;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -34,30 +36,45 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         mFeature = (ListPreference) findPreference("feature");
         mFeature.setOnPreferenceChangeListener(this);
         setFeatureSummary(mFeature.getValue());
+
         mCategories = (MultiSelectListPreference) findPreference("categories");
         mCategories.setOnPreferenceChangeListener(this);
         setCategoriesSummary(mCategories.getValues());
+
         mInterval = (ListPreference) findPreference("update_interval");
         mInterval.setOnPreferenceChangeListener(this);
         setIntervalSummary(mInterval.getValue());
+
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
         mCurrentPhoto = findPreference("current_photo");
 
+        WallpaperApplication.getBus().register(this);
         runApiService();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        onWallpaperChanged(new WallpaperChangedEvent());
+    }
 
+    @Override
+    protected void onDestroy() {
+        WallpaperApplication.getBus().unregister(this);
+        super.onDestroy();
+    }
+
+    @Subscribe
+    public void onWallpaperChanged(WallpaperChangedEvent event) {
         Photos photo = Photos.getCurrentPhoto(this);
         if (photo != null) {
             mCurrentPhoto.setTitle(photo.name);
             mCurrentPhoto.setSummary("© " + photo.userName + " / 500px");
             Picasso.with(this)
                     .load(photo.imageUrl)
+                    .error(android.R.drawable.stat_notify_error)
                     .into(new Target() {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
