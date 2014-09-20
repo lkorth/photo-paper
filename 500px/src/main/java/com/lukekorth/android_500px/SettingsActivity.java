@@ -10,6 +10,7 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
@@ -70,8 +71,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onWallpaperChanged(WallpaperChangedEvent event) {
         Photos photo = Photos.getCurrentPhoto(this);
         if (photo != null) {
+            CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
             mCurrentPhoto.setTitle(photo.name);
-            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px");
+            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\nSet " + timeSet);
             Picasso.with(this)
                     .load(photo.imageUrl)
                     .error(android.R.drawable.stat_notify_error)
