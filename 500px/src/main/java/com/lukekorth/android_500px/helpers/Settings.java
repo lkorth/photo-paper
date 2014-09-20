@@ -1,5 +1,6 @@
 package com.lukekorth.android_500px.helpers;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -58,6 +59,42 @@ public class Settings {
 
     public static void setNextAlarm(Context context, long wakeupTime) {
         getPrefs(context).edit().putLong("next_alarm", wakeupTime).apply();
+    }
+
+    public static int getDesiredHeight(Context context) {
+        int desiredHeight = getPrefs(context).getInt("desired_height", 0);
+        if (desiredHeight == 0) {
+            desiredHeight = getWallpaperManager(context).getDesiredMinimumHeight();
+            setDesiredHeight(context, desiredHeight);
+        }
+
+        return desiredHeight;
+    }
+
+    public static void setDesiredHeight(Context context, int desiredHeight) {
+        getPrefs(context).edit().putInt("desired_height", desiredHeight).apply();
+    }
+
+    public static int getDesiredWidth(Context context) {
+        int desiredWidth = getPrefs(context).getInt("desired_width", 0);
+        if (desiredWidth == 0) {
+            desiredWidth = getWallpaperManager(context).getDesiredMinimumWidth();
+            if (!Settings.useParallax(context)) {
+                desiredWidth = desiredWidth / 2;
+            }
+            setDesiredWidth(context, desiredWidth);
+        }
+
+        return desiredWidth;
+    }
+
+    public static void setDesiredWidth(Context context, int desiredWidth) {
+        getPrefs(context).edit().putInt("desired_width", desiredWidth).apply();
+    }
+
+
+    private static WallpaperManager getWallpaperManager(Context context) {
+        return WallpaperManager.getInstance(context);
     }
 
 }

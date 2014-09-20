@@ -73,7 +73,8 @@ public class ApiService extends IntentService {
 
             Photos photo;
             for (int i = 0; i < json.length(); i++) {
-                photo = Photos.create(json.getJSONObject(i), Settings.getFeature(this));
+                photo = Photos.create(json.getJSONObject(i), Settings.getFeature(this),
+                        Settings.getDesiredHeight(this), Settings.getDesiredWidth(this));
                 if (photo != null) {
                     Picasso.with(this)
                             .load(photo.imageUrl)

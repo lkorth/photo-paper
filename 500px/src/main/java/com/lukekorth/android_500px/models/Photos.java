@@ -63,29 +63,33 @@ public class Photos extends Model {
         super();
     }
 
-    public static Photos create(JSONObject jsonPhoto, String feature) {
+    public static Photos create(JSONObject jsonPhoto, String feature, int desiredHeight, int desiredWidth) {
         try {
-            Photos photo = new Photos();
-            photo.id = jsonPhoto.getInt("id");
-            photo.name = jsonPhoto.getString("name");
-            photo.description = jsonPhoto.getString("description");
-            photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
+            int actualHeight = jsonPhoto.getInt("height");
+            int actualWidth = jsonPhoto.getInt("width");
+            if (isAcceptableSize(desiredHeight, desiredWidth, actualHeight, actualWidth)) {
+                Photos photo = new Photos();
+                photo.id = jsonPhoto.getInt("id");
+                photo.name = jsonPhoto.getString("name");
+                photo.description = jsonPhoto.getString("description");
+                photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
 
-            String createdAt = jsonPhoto.getString("created_at");
-            photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+                String createdAt = jsonPhoto.getString("created_at");
+                photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
-            photo.feature = feature;
-            photo.category = jsonPhoto.getInt("category");
-            photo.nsfw = jsonPhoto.getBoolean("nsfw");
-            photo.imageUrl = jsonPhoto.getString("image_url");
-            photo.urlPath = jsonPhoto.getString("url");
-            photo.seen = false;
-            photo.seenAt = 0;
-            photo.addedAt = System.currentTimeMillis();
+                photo.feature = feature;
+                photo.category = jsonPhoto.getInt("category");
+                photo.nsfw = jsonPhoto.getBoolean("nsfw");
+                photo.imageUrl = jsonPhoto.getString("image_url");
+                photo.urlPath = jsonPhoto.getString("url");
+                photo.seen = false;
+                photo.seenAt = 0;
+                photo.addedAt = System.currentTimeMillis();
 
-            photo.save();
+                photo.save();
 
-            return photo;
+                return photo;
+            }
         } catch (JSONException e) {
         } catch (ParseException e) {
         }
@@ -135,4 +139,29 @@ public class Photos extends Model {
                 .orderBy("created_at DESC");
     }
 
+    private static boolean isAcceptableSize(int desiredHeight, int desiredWidth, int actualHeight, int actualWidth) {
+        boolean scale;
+        if (actualHeight >= desiredHeight && actualWidth >= desiredWidth) {
+            scale = true;
+        } else {
+            double scaleHeight = 0;
+            if (actualHeight < desiredHeight) {
+                scaleHeight = (double) desiredHeight / actualHeight;
+            }
+
+            double scaleWidth = 0;
+            if (actualWidth < desiredWidth) {
+                scaleWidth = (double) desiredWidth / actualWidth;
+            }
+
+            scale = Math.max(scaleHeight, scaleWidth) <= 1.5;
+        }
+
+        double desiredAspectRatio = (double) desiredHeight / desiredWidth;
+        double actualAspectRatio = (double) actualHeight / actualWidth;
+        double percentDifference = (Math.abs(desiredAspectRatio - actualAspectRatio) / desiredAspectRatio) * 100;
+        boolean aspectRatio = percentDifference < 30;
+
+        return scale && aspectRatio;
+    }
 }

@@ -55,6 +55,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
+        findPreference("use_parallax").setOnPreferenceChangeListener(this);
 
         mCurrentPhoto = findPreference("current_photo");
 
@@ -146,6 +147,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else if (key.equals("enable")) {
             Utils.cancelAlarm(this);
             Settings.setNextAlarm(this, 0);
+        } else if (key.equals("use_parallax")) {
+            Settings.setDesiredWidth(this, 0);
         }
 
         runApiService();
