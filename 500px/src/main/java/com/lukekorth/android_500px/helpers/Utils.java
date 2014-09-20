@@ -12,6 +12,11 @@ import com.lukekorth.android_500px.services.WallpaperService;
 
 public class Utils {
 
+    public static boolean shouldGetPhotos(Context context) {
+        return (Settings.isEnabled(context) && Utils.needMorePhotos(context) &&
+                (!Settings.useOnlyWifi(context) || (Settings.useOnlyWifi(context) && Utils.isConnectedToWifi(context))));
+    }
+
     public static boolean needMorePhotos(Context context) {
         return (Photos.unseenPhotoCount(context) == 0 ||
                 (86400 / Photos.unseenPhotoCount(context)) > Settings.getUpdateInterval(context));

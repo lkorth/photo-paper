@@ -3,7 +3,6 @@ package com.lukekorth.android_500px.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.PowerManager;
-import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.R;
@@ -28,6 +27,7 @@ public class ApiService extends IntentService {
     private static final String API_BASE_URL = "https://api.500px.com/v1/";
     private static final String CONSUMER_KEY = "3JkjLiYvQN9bYufEc9h9OxdjUmYG26FlEFmOM9G9";
 
+    private OkHttpClient mOkHttpClient;
     private int mPage = 1;
 
     public ApiService() {
@@ -36,10 +36,12 @@ public class ApiService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (shouldGetPhotos() && Settings.isEnabled(this)) {
+        if (Utils.shouldGetPhotos(this)) {
             PowerManager.WakeLock wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
             wakeLock.acquire();
+
+            mOkHttpClient = new OkHttpClient();
 
             while (Utils.needMorePhotos(this)) {
                 getPhotos();
@@ -53,13 +55,7 @@ public class ApiService extends IntentService {
         }
     }
 
-    private boolean shouldGetPhotos() {
-        return (Utils.needMorePhotos(this) &&
-                (!Settings.useOnlyWifi(this) || (Settings.useOnlyWifi(this) && Utils.isConnectedToWifi(this))));
-    }
-
     private void getPhotos() {
-        OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .header("User-Agent", "com.lukekorth.android_500px")
                 .url(API_BASE_URL + "photos?feature=" + Settings.getFeature(this) + "&only=" +
@@ -72,7 +68,7 @@ public class ApiService extends IntentService {
 
         ActiveAndroid.beginTransaction();
         try {
-            Response response = client.newCall(request).execute();
+            Response response = mOkHttpClient.newCall(request).execute();
             JSONArray json = new JSONObject(response.body().string()).getJSONArray("photos");
 
             Photos photo;
@@ -86,9 +82,7 @@ public class ApiService extends IntentService {
             }
             ActiveAndroid.setTransactionSuccessful();
         } catch (JSONException e) {
-            Log.d("ApiService", e.getMessage());
         } catch (IOException e) {
-            Log.d("ApiService", e.getMessage());
         } finally {
             ActiveAndroid.endTransaction();
         }
