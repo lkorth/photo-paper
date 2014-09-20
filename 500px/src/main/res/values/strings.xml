@@ -18,6 +18,7 @@
     <string name="update_interval">Update Interval</string>
     <string name="parallax">Scroll Wallpaper</string>
     <string name="parallax_summary">Scroll wallpaper when swiping through home screens</string>
+    <string name="rate_app">Rate 500px Wallpaper</string>
 
     <!-- Features -->
     <string name="popular">Popular</string>

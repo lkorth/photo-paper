@@ -22,6 +22,9 @@ import com.squareup.picasso.Target;
 
 import java.util.Set;
 
+import fr.nicolaspomepuy.discreetapprate.AppRate;
+import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
+
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
 
     private ListPreference mFeature;
@@ -53,6 +56,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
         WallpaperApplication.getBus().register(this);
         runApiService();
+
+        AppRate.with(this)
+                .text(R.string.rate_app)
+                .initialLaunchCount(3)
+                .retryPolicy(RetryPolicy.EXPONENTIAL)
+                .checkAndShow();
     }
 
     @Override
