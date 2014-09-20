@@ -52,6 +52,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         mInterval.setOnPreferenceChangeListener(this);
         setIntervalSummary(mInterval.getValue());
 
+        findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
@@ -142,6 +143,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else if (key.equals(mInterval.getKey())) {
             setIntervalSummary((String) newValue);
             Utils.setAlarm(this);
+        } else if (key.equals("enable")) {
+            Utils.cancelAlarm(this);
+            Settings.setNextAlarm(this, 0);
         }
 
         runApiService();

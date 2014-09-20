@@ -29,13 +29,16 @@ public class Utils {
         long wakeupTime = System.currentTimeMillis() + (Settings.getUpdateInterval(context) * 1000);
         Settings.setNextAlarm(context, wakeupTime);
 
-        PendingIntent wakeupIntent = PendingIntent.getService(context,
-                WallpaperService.WALLPAPER_REQUEST_CODE,
-                new Intent(context, WallpaperService.class),
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
-                .set(AlarmManager.RTC_WAKEUP, wakeupTime, wakeupIntent);
+                .set(AlarmManager.RTC_WAKEUP, wakeupTime, getAlarmIntent(context));
     }
 
+    public static void cancelAlarm(Context context) {
+        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(getAlarmIntent(context));
+    }
+
+    private static PendingIntent getAlarmIntent(Context context) {
+        return PendingIntent.getService(context, WallpaperService.WALLPAPER_REQUEST_CODE,
+                new Intent(context, WallpaperService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+    }
 }
