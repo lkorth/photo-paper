@@ -38,7 +38,7 @@ public class Settings {
     }
 
     public static boolean isEnabled(Context context) {
-        return getPrefs(context).getBoolean("enable", true);
+        return getPrefs(context).getBoolean("enable", false);
     }
 
     public static int getUpdateInterval(Context context) {

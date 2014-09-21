@@ -31,7 +31,11 @@ public class Utils {
     }
 
     public static void setAlarm(Context context) {
-        long wakeupTime = System.currentTimeMillis() + (Settings.getUpdateInterval(context) * 1000);
+        setAlarm(context, Settings.getUpdateInterval(context));
+    }
+
+    public static void setAlarm(Context context, int updateInterval) {
+        long wakeupTime = System.currentTimeMillis() + (updateInterval * 1000);
         Settings.setNextAlarm(context, wakeupTime);
 
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))

@@ -106,7 +106,7 @@ public class Photos extends Model {
         return photo;
     }
 
-    public static Photos getCurrentPhoto(Context context) {
+    public static Photos getCurrentPhoto() {
         return new Select().from(Photos.class)
                 .where("seen = ?", true)
                 .orderBy("seen_at DESC")

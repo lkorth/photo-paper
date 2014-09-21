@@ -40,7 +40,7 @@
             android:key="enable"
             android:title="@string/enable"
             android:summary="@string/enable_summary"
-            android:defaultValue="true" />
+            android:defaultValue="false" />
 
         <CheckBoxPreference
             android:key="use_only_wifi"

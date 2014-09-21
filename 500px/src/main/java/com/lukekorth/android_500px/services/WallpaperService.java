@@ -46,7 +46,6 @@ public class WallpaperService extends IntentService {
                         .get();
 
                 wallpaperManager.setBitmap(bitmap);
-                WallpaperApplication.getBus().post(new WallpaperChangedEvent());
             } catch (IOException e) {
             }
 
@@ -55,6 +54,7 @@ public class WallpaperService extends IntentService {
             }
 
             Utils.setAlarm(this);
+            WallpaperApplication.getBus().post(new WallpaperChangedEvent());
 
             wakeLock.release();
         }

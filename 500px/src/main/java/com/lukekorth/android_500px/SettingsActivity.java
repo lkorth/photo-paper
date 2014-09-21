@@ -75,7 +75,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onResume() {
         super.onResume();
-        onWallpaperChanged(new WallpaperChangedEvent());
+        onWallpaperChanged(null);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Subscribe
     public void onWallpaperChanged(WallpaperChangedEvent event) {
-        Photos photo = Photos.getCurrentPhoto(this);
+        Photos photo = Photos.getCurrentPhoto();
         if (photo != null) {
             CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
             mCurrentPhoto.setTitle(photo.name);
@@ -94,20 +94,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             Picasso.with(this)
                     .load(photo.imageUrl)
                     .error(android.R.drawable.stat_notify_error)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            mCurrentPhoto.setIcon(new BitmapDrawable(bitmap));
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        }
-                    });
+                    .into(currentImageCallback);
         } else {
             mCurrentPhoto.setTitle(R.string.no_current_photo);
         }
@@ -122,6 +109,21 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             mNextPhoto.setSummary(R.string.enable_below);
         }
     }
+
+    private Target currentImageCallback = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            mCurrentPhoto.setIcon(new BitmapDrawable(bitmap));
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+    };
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
@@ -142,8 +144,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else if (key.equals(mCategories.getKey())) {
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
+            Utils.setAlarm(this, Integer.parseInt((String) newValue));
             setIntervalSummary((String) newValue);
-            Utils.setAlarm(this);
+            onWallpaperChanged(null);
         } else if (key.equals("enable")) {
             Utils.cancelAlarm(this);
             Settings.setNextAlarm(this, 0);
