@@ -60,8 +60,7 @@ public class ApiService extends IntentService {
                 .header("User-Agent", "com.lukekorth.android_500px")
                 .url(API_BASE_URL + "photos?feature=" + Settings.getFeature(this) + "&only=" +
                         getCategoriesForRequest() + "&page=" + mPage +
-                        "&sort=created_at&image_size=5&rpp=100&consumer_key=" +
-                        CONSUMER_KEY)
+                        "&image_size=5&rpp=100&consumer_key=" + CONSUMER_KEY)
                 .build();
 
         mPage++;
