@@ -91,7 +91,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
             mCurrentPhoto.setTitle(photo.name);
             mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\nSet " + timeSet);
-            Picasso.with(this)
+            WallpaperApplication.getPicasso(this)
                     .load(photo.imageUrl)
                     .error(android.R.drawable.stat_notify_error)
                     .into(currentImageCallback);

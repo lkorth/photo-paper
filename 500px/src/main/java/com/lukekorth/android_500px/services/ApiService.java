@@ -6,13 +6,13 @@ import android.os.PowerManager;
 
 import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.R;
+import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,7 +76,7 @@ public class ApiService extends IntentService {
                 photo = Photos.create(json.getJSONObject(i), Settings.getFeature(this),
                         Settings.getDesiredHeight(this), Settings.getDesiredWidth(this));
                 if (photo != null) {
-                    Picasso.with(this)
+                    WallpaperApplication.getPicasso(this)
                             .load(photo.imageUrl)
                             .fetch();
                 }

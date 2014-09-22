@@ -11,7 +11,6 @@ import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -39,7 +38,7 @@ public class WallpaperService extends IntentService {
             }
 
             try {
-                Bitmap bitmap = Picasso.with(this)
+                Bitmap bitmap = WallpaperApplication.getPicasso(this)
                         .load(Photos.getNextPhoto(this).imageUrl)
                         .centerCrop()
                         .resize(width, height)
