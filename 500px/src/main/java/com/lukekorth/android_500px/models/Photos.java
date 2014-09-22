@@ -68,27 +68,30 @@ public class Photos extends Model {
             int actualHeight = jsonPhoto.getInt("height");
             int actualWidth = jsonPhoto.getInt("width");
             if (isAcceptableSize(desiredHeight, desiredWidth, actualHeight, actualWidth)) {
-                Photos photo = new Photos();
-                photo.id = jsonPhoto.getInt("id");
-                photo.name = jsonPhoto.getString("name");
-                photo.description = jsonPhoto.getString("description");
-                photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
+                int id = jsonPhoto.getInt("id");
+                if (!new Select().from(Photos.class).where("id = ?", id).exists()) {
+                    Photos photo = new Photos();
+                    photo.id = id;
+                    photo.name = jsonPhoto.getString("name");
+                    photo.description = jsonPhoto.getString("description");
+                    photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
 
-                String createdAt = jsonPhoto.getString("created_at");
-                photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+                    String createdAt = jsonPhoto.getString("created_at");
+                    photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
-                photo.feature = feature;
-                photo.category = jsonPhoto.getInt("category");
-                photo.nsfw = jsonPhoto.getBoolean("nsfw");
-                photo.imageUrl = jsonPhoto.getString("image_url");
-                photo.urlPath = jsonPhoto.getString("url");
-                photo.seen = false;
-                photo.seenAt = 0;
-                photo.addedAt = System.currentTimeMillis();
+                    photo.feature = feature;
+                    photo.category = jsonPhoto.getInt("category");
+                    photo.nsfw = jsonPhoto.getBoolean("nsfw");
+                    photo.imageUrl = jsonPhoto.getString("image_url");
+                    photo.urlPath = jsonPhoto.getString("url");
+                    photo.seen = false;
+                    photo.seenAt = 0;
+                    photo.addedAt = System.currentTimeMillis();
 
-                photo.save();
+                    photo.save();
 
-                return photo;
+                    return photo;
+                }
             }
         } catch (JSONException e) {
         } catch (ParseException e) {
