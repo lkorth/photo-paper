@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.PowerManager;
 
-import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
@@ -65,7 +64,6 @@ public class ApiService extends IntentService {
 
         mPage++;
 
-        ActiveAndroid.beginTransaction();
         try {
             Response response = mOkHttpClient.newCall(request).execute();
             JSONArray json = new JSONObject(response.body().string()).getJSONArray("photos");
@@ -80,11 +78,8 @@ public class ApiService extends IntentService {
                             .fetch();
                 }
             }
-            ActiveAndroid.setTransactionSuccessful();
         } catch (JSONException e) {
         } catch (IOException e) {
-        } finally {
-            ActiveAndroid.endTransaction();
         }
     }
 
