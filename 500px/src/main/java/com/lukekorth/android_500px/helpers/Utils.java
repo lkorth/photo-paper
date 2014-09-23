@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.services.WallpaperService;
@@ -33,6 +34,10 @@ public class Utils {
                 activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
     }
 
+    public static int dpToPx(Context context, int dp) {
+        return Math.round(dp * (context.getResources().getDisplayMetrics().xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
     public static void setAlarm(Context context) {
         setAlarm(context, Settings.getUpdateInterval(context));
     }
@@ -53,4 +58,5 @@ public class Utils {
         return PendingIntent.getService(context, WallpaperService.WALLPAPER_REQUEST_CODE,
                 new Intent(context, WallpaperService.class), PendingIntent.FLAG_CANCEL_CURRENT);
     }
+
 }

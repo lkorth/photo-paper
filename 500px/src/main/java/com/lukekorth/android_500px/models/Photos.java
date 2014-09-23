@@ -14,9 +14,12 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Table(name = "Photos")
 public class Photos extends Model {
+
+    public static final String BASE_URL_500PX = "http://500px.com";
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -110,10 +113,11 @@ public class Photos extends Model {
     }
 
     public static Photos getCurrentPhoto() {
-        return new Select().from(Photos.class)
-                .where("seen = ?", true)
-                .orderBy("seen_at DESC")
-                .executeSingle();
+        return getSeenQuery().executeSingle();
+    }
+
+    public static List<Photos> getSeenPhotos() {
+        return getSeenQuery().execute();
     }
 
     public static int unseenPhotoCount(Context context) {
@@ -142,6 +146,12 @@ public class Photos extends Model {
                 .orderBy("created_at DESC");
     }
 
+    private static From getSeenQuery() {
+        return new Select().from(Photos.class)
+                .where("seen = ?", true)
+                .orderBy("seen_at DESC");
+    }
+
     private static boolean isAcceptableSize(int desiredHeight, int desiredWidth, int actualHeight, int actualWidth) {
         boolean scale;
         if (actualHeight >= desiredHeight && actualWidth >= desiredWidth) {
@@ -167,4 +177,5 @@ public class Photos extends Model {
 
         return scale && aspectRatio;
     }
+
 }

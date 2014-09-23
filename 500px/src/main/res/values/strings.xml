@@ -24,6 +24,9 @@
     <string name="parallax_summary">Scroll wallpaper when swiping through home screens</string>
     <string name="rate_app">Rate 500px Wallpaper</string>
 
+    <!-- History -->
+    <string name="history">History</string>
+
     <!-- Features -->
     <string name="popular">Popular</string>
     <string name="upcoming">Upcoming</string>

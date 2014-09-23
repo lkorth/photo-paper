@@ -58,6 +58,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         findPreference("use_parallax").setOnPreferenceChangeListener(this);
 
         mCurrentPhoto = findPreference("current_photo");
+        mCurrentPhoto.setOnPreferenceClickListener(this);
 
         mNextPhoto = findPreference("next_photo");
         mNextPhoto.setOnPreferenceClickListener(this);
@@ -127,7 +128,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        if (preference.getKey().equals(mNextPhoto.getKey())) {
+        if (preference.getKey().equals(mCurrentPhoto.getKey())) {
+            startActivity(new Intent(this, HistoryActivity.class));
+            return true;
+        } else if (preference.getKey().equals(mNextPhoto.getKey())) {
             mNextPhoto.setTitle(R.string.loading);
             mNextPhoto.setSummary("");
             runWallpaperService();
