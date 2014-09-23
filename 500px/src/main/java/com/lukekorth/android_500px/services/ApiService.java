@@ -3,6 +3,7 @@ package com.lukekorth.android_500px.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
@@ -12,6 +13,7 @@ import com.lukekorth.android_500px.models.Photos;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,14 +70,16 @@ public class ApiService extends IntentService {
             Response response = mOkHttpClient.newCall(request).execute();
             JSONArray json = new JSONObject(response.body().string()).getJSONArray("photos");
 
+            String feature = Settings.getFeature(this);
+            int desiredHeight = Settings.getDesiredHeight(this);
+            int desiredWidth = Settings.getDesiredWidth(this);
             Photos photo;
+            Picasso picasso = WallpaperApplication.getPicasso(this);
             for (int i = 0; i < json.length(); i++) {
-                photo = Photos.create(json.getJSONObject(i), Settings.getFeature(this),
-                        Settings.getDesiredHeight(this), Settings.getDesiredWidth(this));
+                photo = Photos.create(json.getJSONObject(i), feature, desiredHeight, desiredWidth);
                 if (photo != null) {
-                    WallpaperApplication.getPicasso(this)
-                            .load(photo.imageUrl)
-                            .fetch();
+                    picasso.load(photo.imageUrl).fetch();
+                    SystemClock.sleep(200);
                 }
             }
         } catch (JSONException e) {
