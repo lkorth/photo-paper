@@ -1,7 +1,10 @@
 package com.lukekorth.android_500px.services;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.os.SystemClock;
 
@@ -28,6 +31,8 @@ public class ApiService extends IntentService {
     private static final String API_BASE_URL = "https://api.500px.com/v1/";
     private static final String CONSUMER_KEY = "3JkjLiYvQN9bYufEc9h9OxdjUmYG26FlEFmOM9G9";
 
+    private BroadcastReceiver mWifiReceiver;
+    private boolean mIsCurrentNetworkOk;
     private OkHttpClient mOkHttpClient;
     private int mPage = 1;
 
@@ -42,9 +47,11 @@ public class ApiService extends IntentService {
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
             wakeLock.acquire();
 
-            mOkHttpClient = new OkHttpClient();
+            mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
+            registerWifiReceiver();
 
-            while (Utils.needMorePhotos(this)) {
+            mOkHttpClient = new OkHttpClient();
+            while (Utils.needMorePhotos(this) && mIsCurrentNetworkOk) {
                 getPhotos();
             }
 
@@ -52,6 +59,7 @@ public class ApiService extends IntentService {
                 startService(new Intent(this, WallpaperService.class));
             }
 
+            unregisterReceiver(mWifiReceiver);
             wakeLock.release();
         }
     }
@@ -76,6 +84,10 @@ public class ApiService extends IntentService {
             Photos photo;
             Picasso picasso = WallpaperApplication.getPicasso(this);
             for (int i = 0; i < json.length(); i++) {
+                if (!mIsCurrentNetworkOk) {
+                    break;
+                }
+
                 photo = Photos.create(json.getJSONObject(i), feature, desiredHeight, desiredWidth);
                 if (photo != null) {
                     picasso.load(photo.imageUrl).fetch();
@@ -85,6 +97,19 @@ public class ApiService extends IntentService {
         } catch (JSONException e) {
         } catch (IOException e) {
         }
+    }
+
+    private void registerWifiReceiver() {
+        mWifiReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(context);
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(mWifiReceiver, filter);
     }
 
     private String getCategoriesForRequest() {
