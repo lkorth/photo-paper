@@ -33,7 +33,7 @@ public class WallpaperService extends IntentService {
 
             int width = wallpaperManager.getDesiredMinimumWidth();
             int height = wallpaperManager.getDesiredMinimumHeight();
-            if (!Settings.useParallax(this)) {
+            if (Utils.supportsParallax(this) && !Settings.useParallax(this)) {
                 width = width / 2;
             }
 

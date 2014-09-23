@@ -34,7 +34,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/settings">
+    <PreferenceCategory android:key="settings" android:title="@string/settings">
 
         <CheckBoxPreference
             android:key="enable"

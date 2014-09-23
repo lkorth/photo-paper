@@ -9,6 +9,7 @@ import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
@@ -55,7 +56,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
-        findPreference("use_parallax").setOnPreferenceChangeListener(this);
+
+        if (Utils.supportsParallax(this)) {
+            findPreference("use_parallax").setOnPreferenceChangeListener(this);
+        } else {
+            ((PreferenceCategory) findPreference("settings")).removePreference(findPreference("use_parallax"));
+        }
 
         mCurrentPhoto = findPreference("current_photo");
         mCurrentPhoto.setOnPreferenceClickListener(this);
