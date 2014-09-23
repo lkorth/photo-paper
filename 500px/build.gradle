@@ -11,6 +11,21 @@ android {
         versionCode 1
         versionName "0.1"
     }
+
+    signingConfigs {
+        release {
+            storeFile System.getenv().containsKey('ANDROID_KEYSTORE') ? file(System.getenv('ANDROID_KEYSTORE')) : file(".")
+            storePassword ""
+            keyAlias System.getenv().containsKey('ANDROID_KEYSTORE_ALIAS') ? System.getenv('ANDROID_KEYSTORE_ALIAS').replace("\"", "") : ""
+            keyPassword ""
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
 }
 
 dependencies {
@@ -24,4 +39,23 @@ dependencies {
     compile 'com.squareup:otto:1.3.5'
 
     compile 'fr.nicolaspomepuy:discreetapprate:2.0@aar'
+}
+
+// borrowed from https://www.timroes.de/2014/01/19/using-password-prompts-with-gradle-build-files/
+// and https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
+gradle.taskGraph.whenReady { taskGraph ->
+    // Only execute when we are trying to assemble a release build
+    if (taskGraph.hasTask(':500px:assembleRelease') || taskGraph.hasTask(':500px:installRelease')) {
+        def password = System.console().readPassword("\nPlease enter key passphrase: ")
+        if (password.size() <= 0) {
+            throw new InvalidUserDataException("You must enter a password to proceed.")
+        }
+
+        // Must create String because System.readPassword() returns char[]
+        // (and assigning that below fails silently)
+        password = new String(password)
+
+        android.signingConfigs.release.storePassword = password
+        android.signingConfigs.release.keyPassword = password
+    }
 }
