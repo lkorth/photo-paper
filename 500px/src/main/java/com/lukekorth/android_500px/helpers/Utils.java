@@ -77,7 +77,7 @@ public class Utils {
         Settings.setNextAlarm(context, wakeupTime);
 
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
-                .set(AlarmManager.RTC_WAKEUP, wakeupTime, getAlarmIntent(context));
+                .set(AlarmManager.RTC, wakeupTime, getAlarmIntent(context));
     }
 
     public static void cancelAlarm(Context context) {
