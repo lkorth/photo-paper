@@ -73,7 +73,7 @@ public class HistoryActivity extends ListActivity {
 
         @Override
         public long getItemId(int position) {
-            return mPhotos.get(position).id;
+            return mPhotos.get(position).photo_id;
         }
 
         @Override

@@ -24,7 +24,7 @@ public class Photos extends Model {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     @Column(name = "photo_id")
-    public int id;
+    public int photo_id;
 
     @Column(name = "name")
     public String name;
@@ -72,9 +72,9 @@ public class Photos extends Model {
             int actualWidth = jsonPhoto.getInt("width");
             if (isAcceptableSize(desiredHeight, desiredWidth, actualHeight, actualWidth)) {
                 int id = jsonPhoto.getInt("id");
-                if (!new Select().from(Photos.class).where("id = ?", id).exists()) {
+                if (!new Select().from(Photos.class).where("photo_id = ?", id).exists()) {
                     Photos photo = new Photos();
-                    photo.id = id;
+                    photo.photo_id = id;
                     photo.name = jsonPhoto.getString("name");
                     photo.description = jsonPhoto.getString("description");
                     photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
