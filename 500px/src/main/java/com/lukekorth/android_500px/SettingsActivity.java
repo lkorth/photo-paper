@@ -13,6 +13,7 @@ import android.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
+import com.lukekorth.android_500px.helpers.LogReporting;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
@@ -41,6 +42,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.layout.settings);
 
+        mCurrentPhoto = findPreference("current_photo");
+        mCurrentPhoto.setOnPreferenceClickListener(this);
+
+        mNextPhoto = findPreference("next_photo");
+        mNextPhoto.setOnPreferenceClickListener(this);
+
         mFeature = (ListPreference) findPreference("feature");
         mFeature.setOnPreferenceChangeListener(this);
         setFeatureSummary(mFeature.getValue());
@@ -63,11 +70,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             ((PreferenceCategory) findPreference("settings")).removePreference(findPreference("use_parallax"));
         }
 
-        mCurrentPhoto = findPreference("current_photo");
-        mCurrentPhoto.setOnPreferenceClickListener(this);
-
-        mNextPhoto = findPreference("next_photo");
-        mNextPhoto.setOnPreferenceClickListener(this);
+        findPreference("contact").setOnPreferenceClickListener(this);
+        findPreference("version").setSummary(BuildConfig.VERSION_NAME);
 
         WallpaperApplication.getBus().register(this);
         runApiService();
@@ -142,7 +146,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             mNextPhoto.setSummary("");
             runWallpaperService();
             return true;
+        } else if (preference.getKey().equals("contact")) {
+            new LogReporting(this).collectAndSendLogs();
+            return true;
         }
+
         return false;
     }
 

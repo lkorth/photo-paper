@@ -23,6 +23,13 @@
     <string name="parallax">Scroll Wallpaper</string>
     <string name="parallax_summary">Scroll wallpaper when swiping through home screens</string>
     <string name="rate_app">Rate 500px Wallpaper</string>
+    <string name="help">Help</string>
+    <string name="contact">Contact Developer</string>
+    <string name="contact_summary">If you are having problems, click here to contact the developer</string>
+    <string name="version">Version</string>
+
+    <!-- Log Reporting -->
+    <string name="send_email_via">Send email via</string>
 
     <!-- History -->
     <string name="history">History</string>
