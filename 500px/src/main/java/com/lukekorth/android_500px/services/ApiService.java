@@ -31,7 +31,7 @@ import java.net.URLEncoder;
 public class ApiService extends IntentService {
 
     private static final String API_BASE_URL = "https://api.500px.com/v1/";
-    private static final String CONSUMER_KEY = "3JkjLiYvQN9bYufEc9h9OxdjUmYG26FlEFmOM9G9";
+    private static final String CONSUMER_KEY = "INSERT_CONSUMER_KEY_HERE";
 
     private Logger mLogger;
     private BroadcastReceiver mWifiReceiver;
