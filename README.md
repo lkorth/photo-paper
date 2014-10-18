@@ -1,6 +1,6 @@
-# 500px Wallpaper for Android
-
 ![](images/banner.png)
+
+# 500px Wallpaper for Android
 
 ## Why
 
