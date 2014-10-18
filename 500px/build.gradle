@@ -28,6 +28,10 @@ android {
     }
 }
 
+android.buildTypes.each { type ->
+    type.buildConfigField 'String', 'CONSUMER_KEY', System.properties['consumer_key'] ?: '""'
+}
+
 dependencies {
     compile project(':ActiveAndroid')
 

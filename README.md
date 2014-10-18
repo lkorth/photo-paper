@@ -1,8 +1,5 @@
 # 500px Wallpaper for Android
 
-500px Wallpaper was released to Google Play, however it was found to violate the [500px terms](https://500px.com/terms).
-API access was revoked and it was unpublished on Google Play.
-
 ## Why
 
 There weren't any free/open source 500px wallpapers so I decided to make one.
@@ -15,7 +12,7 @@ This mean one less service running and eating resources.
 
 ## API Key
 
-When compiling you need to set a consumer key in the [`ApiService`](https://github.com/lkorth/500px-wallpaper-android/blob/master/500px/src/main/java/com/lukekorth/android_500px/services/ApiService.java#L34), to access the 500px API. API keys can generated with an account from [500px's developer page](http://developers.500px.com/).
+When running the app you need to set a consumer key in the `gradle.properties` file by adding the line `systemProp.consumer_key=KEY` to access the 500px API. API keys can generated with an account from [500px's developer page](http://developers.500px.com/).
 
 ## License
 

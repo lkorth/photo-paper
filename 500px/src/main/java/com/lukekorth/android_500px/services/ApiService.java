@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.os.SystemClock;
 
+import com.lukekorth.android_500px.BuildConfig;
 import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
@@ -31,7 +32,7 @@ import java.net.URLEncoder;
 public class ApiService extends IntentService {
 
     private static final String API_BASE_URL = "https://api.500px.com/v1/";
-    private static final String CONSUMER_KEY = "INSERT_CONSUMER_KEY_HERE";
+    private static final String CONSUMER_KEY = BuildConfig.CONSUMER_KEY;
 
     private Logger mLogger;
     private BroadcastReceiver mWifiReceiver;
