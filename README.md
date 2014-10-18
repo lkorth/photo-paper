@@ -1,5 +1,7 @@
 # 500px Wallpaper for Android
 
+![](images/banner.png)
+
 ## Why
 
 There weren't any free/open source 500px wallpapers so I decided to make one.
