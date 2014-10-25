@@ -26,12 +26,16 @@ public class HistoryActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new PhotoAdapter(this, Photos.getSeenPhotos()));
-
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setListAdapter(new PhotoAdapter(this, Photos.getSeenPhotos()));
     }
 
     @Override
@@ -116,7 +120,6 @@ public class HistoryActivity extends ListActivity {
             TextView mPhotographer;
             TextView mSeenAt;
         }
-
     }
 
 }
