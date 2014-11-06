@@ -11,6 +11,8 @@ import com.lukekorth.android_500px.helpers.Settings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,6 +69,7 @@ public class Photos extends Model {
     }
 
     public static Photos create(JSONObject jsonPhoto, String feature, int desiredHeight, int desiredWidth) {
+        Logger logger = LoggerFactory.getLogger("Photos");
         try {
             int actualHeight = jsonPhoto.getInt("height");
             int actualWidth = jsonPhoto.getInt("width");
@@ -94,10 +97,16 @@ public class Photos extends Model {
                     photo.save();
 
                     return photo;
+                } else {
+                    logger.debug("Photo already exists");
                 }
+            } else {
+                logger.debug("Photo was not an acceptable size");
             }
         } catch (JSONException e) {
+            logger.error(e.getMessage());
         } catch (ParseException e) {
+            logger.error(e.getMessage());
         }
 
         return null;
@@ -143,7 +152,7 @@ public class Photos extends Model {
         }
 
         return query.where("seen = ?", false)
-                .orderBy("created_at DESC");
+                .orderBy("created_at ASC");
     }
 
     private static From getSeenQuery() {

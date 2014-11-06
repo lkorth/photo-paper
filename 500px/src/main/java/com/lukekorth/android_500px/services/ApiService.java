@@ -48,25 +48,23 @@ public class ApiService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         mLogger = LoggerFactory.getLogger("ApiService");
         if (Utils.shouldGetPhotos(this)) {
+            mLogger.debug("Attempting to fetch new photos");
+
             PowerManager.WakeLock wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
             wakeLock.acquire();
 
-            mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
             registerWifiReceiver();
+            mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
 
             mOkHttpClient = new OkHttpClient();
             while (Utils.needMorePhotos(this) && mIsCurrentNetworkOk) {
                 getPhotos();
             }
 
-            if (Settings.getNextAlarm(this) == 0) {
-                mLogger.debug("No alarm present, setting");
-                startService(new Intent(this, WallpaperService.class));
-            }
-
             unregisterReceiver(mWifiReceiver);
             wakeLock.release();
+            mLogger.debug("Done fetching photos");
         } else {
             mLogger.debug("Not getting photos at this time");
         }
@@ -104,6 +102,8 @@ public class ApiService extends IntentService {
                     mLogger.debug("Photo added, caching");
                     picasso.load(photo.imageUrl).fetch();
                     SystemClock.sleep(200);
+                } else {
+                    mLogger.debug("Photos.create returned null");
                 }
             }
         } catch (JSONException e) {

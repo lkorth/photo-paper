@@ -67,7 +67,7 @@ public class WallpaperService extends IntentService {
                 startService(new Intent(this, ApiService.class));
             }
 
-            Utils.setAlarm(this);
+            Settings.setUpdated(this);
             WallpaperApplication.getBus().post(new WallpaperChangedEvent());
 
             wakeLock.release();

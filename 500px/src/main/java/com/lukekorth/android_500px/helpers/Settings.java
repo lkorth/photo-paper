@@ -53,12 +53,12 @@ public class Settings {
         return getPrefs(context).getBoolean("use_only_wifi", true);
     }
 
-    public static long getNextAlarm(Context context) {
-        return getPrefs(context).getLong("next_alarm", 0);
+    public static long getLastUpdated(Context context) {
+        return getPrefs(context).getLong("last_updated", 0);
     }
 
-    public static void setNextAlarm(Context context, long wakeupTime) {
-        getPrefs(context).edit().putLong("next_alarm", wakeupTime).apply();
+    public static void setUpdated(Context context) {
+        getPrefs(context).edit().putLong("last_updated", System.currentTimeMillis()).apply();
     }
 
     public static int getDesiredHeight(Context context) {
@@ -91,7 +91,6 @@ public class Settings {
     public static void setDesiredWidth(Context context, int desiredWidth) {
         getPrefs(context).edit().putInt("desired_width", desiredWidth).apply();
     }
-
 
     private static WallpaperManager getWallpaperManager(Context context) {
         return WallpaperManager.getInstance(context);

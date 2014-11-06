@@ -1,10 +1,7 @@
 package com.lukekorth.android_500px.helpers;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,16 +9,22 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.lukekorth.android_500px.models.Photos;
-import com.lukekorth.android_500px.services.WallpaperService;
 
 public class Utils {
 
     public static boolean shouldGetPhotos(Context context) {
-        return Settings.isEnabled(context) && Utils.needMorePhotos(context) && isCurrentNetworkOk(context);
+        return Settings.isEnabled(context) && Utils.needMorePhotos(context) &&
+                isCurrentNetworkOk(context);
+    }
+
+    public static boolean shouldUpdateWallpaper(Context context) {
+        return Settings.isEnabled(context) && (Settings.getLastUpdated(context) +
+                 (Settings.getUpdateInterval(context) * 1000) < System.currentTimeMillis());
     }
 
     public static boolean isCurrentNetworkOk(Context context) {
-        return !Settings.useOnlyWifi(context) || (Settings.useOnlyWifi(context) && Utils.isConnectedToWifi(context));
+        return !Settings.useOnlyWifi(context) ||
+                (Settings.useOnlyWifi(context) && Utils.isConnectedToWifi(context));
     }
 
     public static boolean needMorePhotos(Context context) {
@@ -66,27 +69,6 @@ public class Utils {
 
     public static boolean supportsParallax(Context context) {
         return ((double) getWallpaperWidth(context) / getScreenWidth(context)) >= 2;
-    }
-
-    public static void setAlarm(Context context) {
-        setAlarm(context, Settings.getUpdateInterval(context));
-    }
-
-    public static void setAlarm(Context context, int updateInterval) {
-        long wakeupTime = System.currentTimeMillis() + (updateInterval * 1000);
-        Settings.setNextAlarm(context, wakeupTime);
-
-        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
-                .set(AlarmManager.RTC, wakeupTime, getAlarmIntent(context));
-    }
-
-    public static void cancelAlarm(Context context) {
-        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(getAlarmIntent(context));
-    }
-
-    private static PendingIntent getAlarmIntent(Context context) {
-        return PendingIntent.getService(context, WallpaperService.WALLPAPER_REQUEST_CODE,
-                new Intent(context, WallpaperService.class), PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
 }

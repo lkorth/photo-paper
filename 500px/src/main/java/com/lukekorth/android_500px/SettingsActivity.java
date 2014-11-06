@@ -29,7 +29,8 @@ import java.util.Set;
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 
-public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+public class SettingsActivity extends PreferenceActivity implements
+        Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
     private ListPreference mFeature;
     private MultiSelectListPreference mCategories;
@@ -43,35 +44,33 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         addPreferencesFromResource(R.layout.settings);
 
         mCurrentPhoto = findPreference("current_photo");
-        mCurrentPhoto.setOnPreferenceClickListener(this);
-
         mNextPhoto = findPreference("next_photo");
-        mNextPhoto.setOnPreferenceClickListener(this);
-
         mFeature = (ListPreference) findPreference("feature");
-        mFeature.setOnPreferenceChangeListener(this);
-        setFeatureSummary(mFeature.getValue());
-
         mCategories = (MultiSelectListPreference) findPreference("categories");
-        mCategories.setOnPreferenceChangeListener(this);
-        setCategoriesSummary(mCategories.getValues());
-
         mInterval = (ListPreference) findPreference("update_interval");
-        mInterval.setOnPreferenceChangeListener(this);
-        setIntervalSummary(mInterval.getValue());
 
+        mNextPhoto.setOnPreferenceClickListener(this);
+        mCurrentPhoto.setOnPreferenceClickListener(this);
+        findPreference("contact").setOnPreferenceClickListener(this);
+
+        mFeature.setOnPreferenceChangeListener(this);
+        mCategories.setOnPreferenceChangeListener(this);
+        mInterval.setOnPreferenceChangeListener(this);
         findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
+        setFeatureSummary(mFeature.getValue());
+        setCategoriesSummary(mCategories.getValues());
+        setIntervalSummary(mInterval.getValue());
+        findPreference("version").setSummary(BuildConfig.VERSION_NAME);
+
         if (Utils.supportsParallax(this)) {
             findPreference("use_parallax").setOnPreferenceChangeListener(this);
         } else {
-            ((PreferenceCategory) findPreference("settings")).removePreference(findPreference("use_parallax"));
+            ((PreferenceCategory) findPreference("settings"))
+                    .removePreference(findPreference("use_parallax"));
         }
-
-        findPreference("contact").setOnPreferenceClickListener(this);
-        findPreference("version").setSummary(BuildConfig.VERSION_NAME);
 
         WallpaperApplication.getBus().register(this);
         runApiService();
@@ -87,6 +86,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     protected void onResume() {
         super.onResume();
         onWallpaperChanged(null);
+
+        if (Settings.getLastUpdated(this) <= System.currentTimeMillis()) {
+            runWallpaperService();
+        }
     }
 
     @Override
@@ -105,15 +108,19 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             WallpaperApplication.getPicasso(this)
                     .load(photo.imageUrl)
                     .error(android.R.drawable.stat_notify_error)
-                    .into(currentImageCallback);
+                    .into(mCurrentImageCallback);
         } else {
             mCurrentPhoto.setTitle(R.string.no_current_photo);
         }
 
-        long nextPhotoTime = Settings.getNextAlarm(this);
-        if (nextPhotoTime != 0) {
-            CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
-            mNextPhoto.setTitle(getString(R.string.next_photo) + " " + nextTime);
+        if (Settings.isEnabled(this)) {
+            long nextPhotoTime = Settings.getLastUpdated(this) + (Settings.getUpdateInterval(this) * 1000);
+            if (nextPhotoTime + 59000 < System.currentTimeMillis()) {
+                mNextPhoto.setTitle(getString(R.string.next_photo) + " " + getString(R.string.next_unlock));
+            } else {
+                CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
+                mNextPhoto.setTitle(getString(R.string.next_photo) + " " + nextTime);
+            }
             mNextPhoto.setSummary("Click to set it now");
         } else {
             mNextPhoto.setTitle(R.string.disabled);
@@ -121,7 +128,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
     }
 
-    private Target currentImageCallback = new Target() {
+    private Target mCurrentImageCallback = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             mCurrentPhoto.setIcon(new BitmapDrawable(bitmap));
@@ -162,12 +169,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else if (key.equals(mCategories.getKey())) {
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
-            Utils.setAlarm(this, Integer.parseInt((String) newValue));
+            Settings.setUpdated(this);
             setIntervalSummary((String) newValue);
             onWallpaperChanged(null);
-        } else if (key.equals("enable")) {
-            Utils.cancelAlarm(this);
-            Settings.setNextAlarm(this, 0);
         } else if (key.equals("use_parallax")) {
             Settings.setDesiredWidth(this, 0);
         }
