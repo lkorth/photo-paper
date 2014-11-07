@@ -54,7 +54,7 @@ public class WallpaperService extends IntentService {
 
                 if (photo != null) {
                     Bitmap bitmap = WallpaperApplication.getPicasso(this)
-                            .load(Photos.getNextPhoto(this).imageUrl)
+                            .load(photo.imageUrl)
                             .centerCrop()
                             .resize(width, height)
                             .get();
