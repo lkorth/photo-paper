@@ -72,6 +72,14 @@
             android:key="version"
             android:title="@string/version" />
 
+        <Preference
+            android:title="@string/trademark"
+            android:summary="@string/trademark_summary" />
+
+        <Preference
+            android:title="@string/privacy"
+            android:summary="@string/privacy_summary" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

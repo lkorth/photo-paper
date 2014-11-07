@@ -28,6 +28,10 @@
     <string name="contact">Contact Developer</string>
     <string name="contact_summary">If you are having problems, click here to contact the developer</string>
     <string name="version">Version</string>
+    <string name="trademark">Trademark</string>
+    <string name="trademark_summary">This product uses the 500px API but is not endorsed or certified by 500px</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_summary">No data or information is collected from users of this app. Contacting the developer will include log output of this app, no personal or identifiable information is contained in the log.</string>
 
     <!-- Log Reporting -->
     <string name="send_email_via">Send email via</string>

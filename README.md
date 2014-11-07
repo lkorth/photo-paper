@@ -21,7 +21,8 @@ When running the app you need to set a consumer key in the `gradle.properties` f
 ## License
 
 Photo Paper is open source and available under the MIT license, see the [LICENSE](LICENSE) file for more info.
+
 Photo Paper uses the [500px API](http://developers.500px.com/) to access photos and operates under [500px's](http://500px.com/)
-[terms of use](https://github.com/500px/api-documentation/blob/master/basics/terms_of_use.md).
-Photos and images from 500px are owned by 500px members and not by me or 500px.
-All rights not expressly granted to you are reserved by 500px and/or its members.
+[terms of use](https://github.com/500px/api-documentation/blob/master/basics/terms_of_use.md),
+but is not endorsed or certified by 500px. Photos and images from 500px are owned by 500px
+members and not by me or 500px. All rights not expressly granted to you are reserved by 500px and/or its members.
