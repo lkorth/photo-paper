@@ -5,6 +5,7 @@ import android.app.WallpaperManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class WallpaperService extends IntentService {
+
+    public static final String SLEEP_KEY = "sleep";
 
     public WallpaperService() {
         super("WallpaperService");
@@ -43,6 +46,10 @@ public class WallpaperService extends IntentService {
             logger.debug("Setting wallpaper to " + width + "px wide by " + height + "px tall");
 
             try {
+                if (intent.getBooleanExtra(SLEEP_KEY, false)) {
+                    SystemClock.sleep(10000);
+                }
+
                 Photos photo = Photos.getNextPhoto(this);
 
                 if (photo != null) {
