@@ -19,8 +19,6 @@ import java.io.IOException;
 
 public class WallpaperService extends IntentService {
 
-    public static final int WALLPAPER_REQUEST_CODE = 1000;
-
     public WallpaperService() {
         super("WallpaperService");
     }

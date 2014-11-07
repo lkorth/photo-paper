@@ -87,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity implements
         super.onResume();
         onWallpaperChanged(null);
 
-        if (Settings.getLastUpdated(this) <= System.currentTimeMillis()) {
+        if (Utils.shouldUpdateWallpaper(this)) {
             runWallpaperService();
         }
     }

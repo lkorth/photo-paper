@@ -1,2 +1,2 @@
-include ':500px'
+include ':PhotoPaper'
 include ':ActiveAndroid'

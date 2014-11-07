@@ -136,7 +136,7 @@ public class LogReporting {
         private File getFile() {
             File emailableLogsDir  = new File(mContext.getFilesDir(), "emailable_logs");
             emailableLogsDir.mkdir();
-            return new File(emailableLogsDir, "500px-wallpaper.log.gz");
+            return new File(emailableLogsDir, "photo-paper.log.gz");
         }
 
         private void buildEmailIntent(File file) {
@@ -144,8 +144,8 @@ public class LogReporting {
 
             mEmailIntent = new Intent(Intent.ACTION_SEND);
 		    mEmailIntent.setType("text/plain");
-            mEmailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ "500px-wallpaper@lukekorth.com" });
-            mEmailIntent.putExtra(Intent.EXTRA_SUBJECT, "500px Wallpaper Debug Log");
+            mEmailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ "photo-paper@lukekorth.com" });
+            mEmailIntent.putExtra(Intent.EXTRA_SUBJECT, "Photo Paper Debug Log");
 		    mEmailIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
 
             // grant permissions for all apps that can handle given intent
