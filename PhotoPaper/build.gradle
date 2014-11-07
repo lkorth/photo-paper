@@ -53,7 +53,7 @@ dependencies {
 // and https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
 gradle.taskGraph.whenReady { taskGraph ->
     // Only execute when we are trying to assemble a release build
-    if (taskGraph.hasTask(':500px:assembleRelease') || taskGraph.hasTask(':500px:installRelease')) {
+    if (taskGraph.hasTask(':PhotoPaper:assembleRelease') || taskGraph.hasTask(':PhotoPaper:installRelease')) {
         def password = System.console().readPassword("\nPlease enter key passphrase: ")
         if (password.size() <= 0) {
             throw new InvalidUserDataException("You must enter a password to proceed.")
