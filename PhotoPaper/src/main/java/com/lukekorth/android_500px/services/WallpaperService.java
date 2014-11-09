@@ -47,7 +47,7 @@ public class WallpaperService extends IntentService {
 
             try {
                 if (intent.getBooleanExtra(SLEEP_KEY, false)) {
-                    SystemClock.sleep(10000);
+                    SystemClock.sleep(2000);
                 }
 
                 Photos photo = Photos.getNextPhoto(this);
