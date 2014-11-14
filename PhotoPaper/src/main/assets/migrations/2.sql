@@ -1,0 +1,1 @@
+ALTER TABLE Photos ADD COLUMN failed_count INTEGER DEFAULT 0;

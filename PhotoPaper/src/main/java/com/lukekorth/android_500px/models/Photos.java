@@ -61,6 +61,9 @@ public class Photos extends Model {
     @Column(name = "seen_at")
     public long seenAt;
 
+    @Column(name = "failed_count")
+    public int failedCount;
+
     @Column(name = "added_at")
     public long addedAt;
 
@@ -113,12 +116,7 @@ public class Photos extends Model {
     }
 
     public static Photos getNextPhoto(Context context) {
-        Photos photo = getQuery(context).executeSingle();
-        photo.seen = true;
-        photo.seenAt = System.currentTimeMillis();
-        photo.save();
-
-        return photo;
+        return getQuery(context).executeSingle();
     }
 
     public static Photos getCurrentPhoto() {
@@ -152,7 +150,7 @@ public class Photos extends Model {
         }
 
         return query.where("seen = ?", false)
-                .orderBy("created_at ASC");
+                .orderBy("failed_count ASC, created_at ASC");
     }
 
     private static From getSeenQuery() {
