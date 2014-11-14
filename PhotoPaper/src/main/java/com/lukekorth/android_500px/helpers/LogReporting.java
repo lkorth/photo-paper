@@ -62,11 +62,11 @@ public class LogReporting {
             message.append("Device product: " + Build.PRODUCT + "\n");
 			message.append("App version: " + BuildConfig.VERSION_NAME + "\n");
             message.append("Debug: " + BuildConfig.DEBUG + "\n");
-            message.append("Wallpaper height: " + Utils.getWallpaperHeight(mContext));
-            message.append("Wallpaper width: " + Utils.getWallpaperWidth(mContext));
-            message.append("Screen height: " + Utils.getScreenHeight(mContext));
-            message.append("Screen width: " + Utils.getScreenWidth(mContext));
-            message.append("Supports parallax: " + Utils.supportsParallax(mContext));
+            message.append("Wallpaper height: " + Utils.getWallpaperHeight(mContext) + "\n");
+            message.append("Wallpaper width: " + Utils.getWallpaperWidth(mContext) + "\n");
+            message.append("Screen height: " + Utils.getScreenHeight(mContext) + "\n");
+            message.append("Screen width: " + Utils.getScreenWidth(mContext) + "\n");
+            message.append("Supports parallax: " + Utils.supportsParallax(mContext) + "\n");
 
 			Map<String,?> keys = prefs.getAll();
 			for(Map.Entry<String,?> entry : keys.entrySet()) {
