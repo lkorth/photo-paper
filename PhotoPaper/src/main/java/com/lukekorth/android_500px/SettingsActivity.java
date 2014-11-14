@@ -169,7 +169,7 @@ public class SettingsActivity extends PreferenceActivity implements
         } else if (key.equals(mCategories.getKey())) {
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
-            Settings.setUpdated(this);
+            Settings.setUpdateInterval(this, (String) newValue);
             setIntervalSummary((String) newValue);
             onWallpaperChanged(null);
         } else if (key.equals("use_parallax")) {

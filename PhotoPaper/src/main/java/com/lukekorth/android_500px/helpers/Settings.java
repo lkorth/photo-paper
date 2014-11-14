@@ -45,6 +45,10 @@ public class Settings {
         return Integer.parseInt(getPrefs(context).getString("update_interval", "3600"));
     }
 
+    public static void setUpdateInterval(Context context, String interval) {
+        getPrefs(context).edit().putString("update_interval", interval);
+    }
+
     public static boolean useParallax(Context context) {
         return getPrefs(context).getBoolean("use_parallax", false);
     }
