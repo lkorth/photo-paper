@@ -46,7 +46,7 @@ public class Settings {
     }
 
     public static void setUpdateInterval(Context context, String interval) {
-        getPrefs(context).edit().putString("update_interval", interval);
+        getPrefs(context).edit().putString("update_interval", interval).apply();
     }
 
     public static boolean useParallax(Context context) {
