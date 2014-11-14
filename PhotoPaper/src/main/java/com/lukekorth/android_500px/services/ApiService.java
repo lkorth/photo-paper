@@ -39,6 +39,7 @@ public class ApiService extends IntentService {
     private boolean mIsCurrentNetworkOk;
     private OkHttpClient mOkHttpClient;
     private int mPage = 1;
+    private int mTotalPages = 1;
 
     public ApiService() {
         super("ApiService");
@@ -54,11 +55,13 @@ public class ApiService extends IntentService {
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
             wakeLock.acquire();
 
+            long startTime = System.currentTimeMillis();
+
             registerWifiReceiver();
             mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
-
             mOkHttpClient = new OkHttpClient();
-            while (Utils.needMorePhotos(this) && mIsCurrentNetworkOk) {
+            while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mIsCurrentNetworkOk &&
+                    (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
 
@@ -80,24 +83,25 @@ public class ApiService extends IntentService {
                 .url(url + "&consumer_key=" + CONSUMER_KEY)
                 .build();
 
-        mPage++;
-
         try {
             Response response = mOkHttpClient.newCall(request).execute();
             mLogger.debug("Response code: " + response.code());
-            JSONArray json = new JSONObject(response.body().string()).getJSONArray("photos");
+            JSONObject body = new JSONObject(response.body().string());
+            mPage = body.getInt("currentPage") + 1;
+            mTotalPages = body.getInt("total_pages");
 
+            JSONArray photos = body.getJSONArray("photos");
             String feature = Settings.getFeature(this);
             int desiredHeight = Settings.getDesiredHeight(this);
             int desiredWidth = Settings.getDesiredWidth(this);
             Photos photo;
             Picasso picasso = WallpaperApplication.getPicasso(this);
-            for (int i = 0; i < json.length(); i++) {
+            for (int i = 0; i < photos.length(); i++) {
                 if (!mIsCurrentNetworkOk) {
                     break;
                 }
 
-                photo = Photos.create(json.getJSONObject(i), feature, desiredHeight, desiredWidth);
+                photo = Photos.create(photos.getJSONObject(i), feature, desiredHeight, desiredWidth);
                 if (photo != null) {
                     mLogger.debug("Photo added, caching");
                     picasso.load(photo.imageUrl).fetch();
