@@ -38,6 +38,7 @@ public class ApiService extends IntentService {
     private BroadcastReceiver mWifiReceiver;
     private boolean mIsCurrentNetworkOk;
     private OkHttpClient mOkHttpClient;
+    private int mErrorCount = 0;
     private int mPage = 1;
     private int mTotalPages = 1;
 
@@ -60,8 +61,8 @@ public class ApiService extends IntentService {
             registerWifiReceiver();
             mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
             mOkHttpClient = new OkHttpClient();
-            while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mIsCurrentNetworkOk &&
-                    (System.currentTimeMillis() - startTime) < 300000) {
+            while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mErrorCount < 5 &&
+                    mIsCurrentNetworkOk && (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
 
@@ -85,7 +86,14 @@ public class ApiService extends IntentService {
 
         try {
             Response response = mOkHttpClient.newCall(request).execute();
-            mLogger.debug("Response code: " + response.code());
+
+            int responseCode = response.code();
+            mLogger.debug("Response code: " + responseCode);
+            if (responseCode != 200) {
+                mErrorCount++;
+                return;
+            }
+
             JSONObject body = new JSONObject(response.body().string());
             mPage = body.getInt("currentPage") + 1;
             mTotalPages = body.getInt("total_pages");
