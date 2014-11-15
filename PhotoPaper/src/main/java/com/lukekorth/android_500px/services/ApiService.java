@@ -95,7 +95,7 @@ public class ApiService extends IntentService {
             }
 
             JSONObject body = new JSONObject(response.body().string());
-            mPage = body.getInt("currentPage") + 1;
+            mPage = body.getInt("current_page") + 1;
             mTotalPages = body.getInt("total_pages");
 
             JSONArray photos = body.getJSONArray("photos");
