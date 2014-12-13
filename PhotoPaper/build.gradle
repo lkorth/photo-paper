@@ -34,6 +34,7 @@ android.buildTypes.each { type ->
 
 dependencies {
     compile project(':ActiveAndroid')
+    compile project(':500px-android-sdk')
 
     compile 'com.android.support:support-v4:21.0.0'
 
