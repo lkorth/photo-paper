@@ -3,4 +3,4 @@
 	url = https://github.com/pardom/ActiveAndroid.git
 [submodule "500px-android-sdk"]
 	path = 500px-android-sdk
-	url = https://github.com/500px/500px-android-sdk.git
+	url = https://github.com/lkorth/500px-android-sdk.git
