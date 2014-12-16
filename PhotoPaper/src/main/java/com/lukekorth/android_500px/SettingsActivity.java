@@ -131,8 +131,8 @@ public class SettingsActivity extends PreferenceActivity implements
     public void onUserUpdated(UserUpdatedEvent event) {
         User user = User.getUser();
         if (user != null) {
-            mLogin.setSummary(getString(R.string.logged_in_as) + " " + user.userName + ". " +
-                    getString(R.string.click_to_logout));
+            mLogin.setTitle(user.userName);
+            mLogin.setSummary(getString(R.string.click_to_logout));
 
             WallpaperApplication.getPicasso(this)
                     .load(user.photo)
@@ -162,7 +162,8 @@ public class SettingsActivity extends PreferenceActivity implements
         if (photo != null) {
             CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
             mCurrentPhoto.setTitle(photo.name);
-            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\nSet " + timeSet);
+            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\n" + getString(R.string.set) +
+                    " " + timeSet);
             WallpaperApplication.getPicasso(this)
                     .load(photo.imageUrl)
                     .error(android.R.drawable.stat_notify_error)
@@ -172,14 +173,23 @@ public class SettingsActivity extends PreferenceActivity implements
         }
 
         if (Settings.isEnabled(this)) {
-            long nextPhotoTime = Settings.getLastUpdated(this) + (Settings.getUpdateInterval(this) * 1000);
-            if (nextPhotoTime + 59000 < System.currentTimeMillis()) {
-                mNextPhoto.setTitle(getString(R.string.next_photo) + " " + getString(R.string.next_unlock));
+            int photosRemaining = Photos.unseenPhotoCount(this);
+            if (photosRemaining > 0) {
+                mNextPhoto.setEnabled(true);
+
+                long nextPhotoTime = Settings.getLastUpdated(this) + (Settings.getUpdateInterval(this) * 1000);
+                if (nextPhotoTime + 59000 < System.currentTimeMillis()) {
+                    mNextPhoto.setTitle(getString(R.string.next_photo) + " " + getString(R.string.next_unlock));
+                } else {
+                    CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
+                    mNextPhoto.setTitle(getString(R.string.next_photo) + " " + nextTime);
+                }
+                mNextPhoto.setSummary(photosRemaining + " " + getString(R.string.remaining_photos));
             } else {
-                CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
-                mNextPhoto.setTitle(getString(R.string.next_photo) + " " + nextTime);
+                mNextPhoto.setEnabled(false);
+                mNextPhoto.setTitle(R.string.no_photos_remaining);
+                mNextPhoto.setSummary(R.string.select_different_feature_or_categories);
             }
-            mNextPhoto.setSummary("Click to set it now");
         } else {
             mNextPhoto.setTitle(R.string.disabled);
             mNextPhoto.setSummary(R.string.enable_below);
