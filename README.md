@@ -14,9 +14,16 @@ This mean one less service running and eating resources.
 
 ## API Key
 
-When running the app you need to set a consumer key in the `gradle.properties` file by adding the line
-`systemProp.consumer_key="KEY"` to access the 500px API. API keys can generated with an account from
-[500px's developer page](http://developers.500px.com/).
+When running the app you need to set a consumer key and consumer secret in the `gradle.properties`
+file by adding the following lines:
+
+```ini
+systemProp.consumer_key="KEY"
+systemProp.consumer_secret="SECRET"
+```
+
+The consumer key and consumer secret are required to access the 500px API.
+API keys can generated with an account from [500px's developer page](http://developers.500px.com/).
 
 ## License
 
