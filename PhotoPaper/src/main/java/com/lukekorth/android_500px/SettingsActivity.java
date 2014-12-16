@@ -84,7 +84,7 @@ public class SettingsActivity extends PreferenceActivity implements
         }
 
         WallpaperApplication.getBus().register(this);
-        onUserUpdated(null);
+        onUserUpdated(new UserUpdatedEvent(User.getUser()));
         runApiService();
 
         AppRate.with(this)
@@ -129,7 +129,7 @@ public class SettingsActivity extends PreferenceActivity implements
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        User user = User.getUser();
+        User user = event.getUser();
         if (user != null) {
             mLogin.setTitle(user.userName);
             mLogin.setSummary(getString(R.string.click_to_logout));
@@ -228,7 +228,7 @@ public class SettingsActivity extends PreferenceActivity implements
         } else if (preference.getKey().equals("login")) {
             if (User.isUserLoggedIn()) {
                 User.logout();
-                WallpaperApplication.getBus().post(new UserUpdatedEvent());
+                WallpaperApplication.getBus().post(new UserUpdatedEvent(null));
             } else {
                 Intent intent = new Intent(this, FiveHundredPxOAuthActivity.class)
                         .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)

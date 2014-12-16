@@ -33,7 +33,7 @@ public class UserInfoIntentService extends IntentService {
             user.photo = jsonUser.getString("userpic_url");
             user.save();
 
-            WallpaperApplication.getBus().post(new UserUpdatedEvent());
+            WallpaperApplication.getBus().post(new UserUpdatedEvent(user));
         } catch (JSONException e) {}
     }
 }
