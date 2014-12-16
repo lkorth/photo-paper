@@ -11,6 +11,10 @@
     <string name="enable_below">You must enable Photo Paper before wallpapers will be set</string>
     <string name="loading">Loading...</string>
     <string name="settings_500px">500px Settings</string>
+    <string name="login_with_500px">Login with 500px</string>
+    <string name="login_with_500px_summary">Click to login</string>
+    <string name="logged_in_as">Logged in as</string>
+    <string name="click_to_logout">Click to logout.</string>
     <string name="feature">Feature</string>
     <string name="categories">Categories</string>
     <string name="nsfw_title">Allow NSFW Photos</string>
@@ -32,6 +36,9 @@
     <string name="trademark_summary">This product uses the 500px API but is not endorsed or certified by 500px</string>
     <string name="privacy">Privacy</string>
     <string name="privacy_summary">No data or information is collected from users of this app. Contacting the developer will include log output of this app, no personal or identifiable information is contained in the log.</string>
+
+    <string name="login_error">Login Error</string>
+    <string name="login_error_message">There was an error logging in to 500px.</string>
 
     <!-- Log Reporting -->
     <string name="send_email_via">Send email via</string>

@@ -15,6 +15,11 @@
 
     <PreferenceCategory android:title="@string/settings_500px">
 
+        <Preference
+            android:key="login"
+            android:title="@string/login_with_500px"
+            android:summary="@string/login_with_500px_summary" />
+
         <ListPreference
             android:key="feature"
             android:title="@string/feature"

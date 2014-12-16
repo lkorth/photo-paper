@@ -30,6 +30,7 @@ android {
 
 android.buildTypes.each { type ->
     type.buildConfigField 'String', 'CONSUMER_KEY', System.properties['consumer_key'] ?: '""'
+    type.buildConfigField 'String', 'CONSUMER_SECRET', System.properties['consumer_secret'] ?: '""'
 }
 
 dependencies {

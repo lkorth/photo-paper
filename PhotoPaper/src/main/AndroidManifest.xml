@@ -15,9 +15,9 @@
         android:name=".WallpaperApplication">
 
         <meta-data android:name="AA_DB_NAME" android:value="500px.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="2" />
+        <meta-data android:name="AA_DB_VERSION" android:value="3" />
         <meta-data android:name="AA_MODELS"
-            android:value="com.lukekorth.android_500px.models.Photos" />
+            android:value="com.lukekorth.android_500px.models.Photos, com.lukekorth.android_500px.models.User" />
 
         <activity
             android:name=".SettingsActivity"
@@ -29,6 +29,7 @@
         </activity>
         <activity android:name=".HistoryActivity" android:label="@string/history" />
 
+        <service android:name=".services.UserInfoIntentService" />
         <service android:name=".services.ApiService" />
         <service android:name=".services.WallpaperService" />
 

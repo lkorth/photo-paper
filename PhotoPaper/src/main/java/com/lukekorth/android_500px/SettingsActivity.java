@@ -1,5 +1,7 @@
 package com.lukekorth.android_500px;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,10 +15,14 @@ import android.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
+import com.fivehundredpx.api.auth.AccessToken;
+import com.fivehundredpx.api.auth.FiveHundredPxOAuthActivity;
 import com.lukekorth.android_500px.helpers.LogReporting;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.User;
+import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.lukekorth.android_500px.services.ApiService;
 import com.lukekorth.android_500px.services.WallpaperService;
@@ -32,6 +38,9 @@ import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 public class SettingsActivity extends PreferenceActivity implements
         Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
+    private static final int FIVE_HUNDRED_PX_LOGIN = 20;
+
+    private Preference mLogin;
     private ListPreference mFeature;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
@@ -45,12 +54,14 @@ public class SettingsActivity extends PreferenceActivity implements
 
         mCurrentPhoto = findPreference("current_photo");
         mNextPhoto = findPreference("next_photo");
+        mLogin = findPreference("login");
         mFeature = (ListPreference) findPreference("feature");
         mCategories = (MultiSelectListPreference) findPreference("categories");
         mInterval = (ListPreference) findPreference("update_interval");
 
         mNextPhoto.setOnPreferenceClickListener(this);
         mCurrentPhoto.setOnPreferenceClickListener(this);
+        mLogin.setOnPreferenceClickListener(this);
         findPreference("contact").setOnPreferenceClickListener(this);
 
         mFeature.setOnPreferenceChangeListener(this);
@@ -73,6 +84,7 @@ public class SettingsActivity extends PreferenceActivity implements
         }
 
         WallpaperApplication.getBus().register(this);
+        onUserUpdated(null);
         runApiService();
 
         AppRate.with(this)
@@ -97,6 +109,52 @@ public class SettingsActivity extends PreferenceActivity implements
         WallpaperApplication.getBus().unregister(this);
         super.onDestroy();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FIVE_HUNDRED_PX_LOGIN) {
+            if (resultCode == Activity.RESULT_OK) {
+                User.newUser(this,
+                        (AccessToken) data.getParcelableExtra(FiveHundredPxOAuthActivity.ACCESS_TOKEN));
+            } else if (resultCode != Activity.RESULT_CANCELED) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.login_error)
+                        .setMessage(R.string.login_error_message)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+        }
+    }
+
+    @Subscribe
+    public void onUserUpdated(UserUpdatedEvent event) {
+        User user = User.getUser();
+        if (user != null) {
+            mLogin.setSummary(getString(R.string.logged_in_as) + " " + user.userName + ". " +
+                    getString(R.string.click_to_logout));
+
+            WallpaperApplication.getPicasso(this)
+                    .load(user.photo)
+                    .error(android.R.drawable.stat_notify_error)
+                    .into(mUserImageCallback);
+        }
+    }
+
+    private Target mUserImageCallback = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            mLogin.setIcon(new BitmapDrawable(bitmap));
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+    };
 
     @Subscribe
     public void onWallpaperChanged(WallpaperChangedEvent event) {
@@ -153,6 +211,15 @@ public class SettingsActivity extends PreferenceActivity implements
             mNextPhoto.setSummary("");
             runWallpaperService();
             return true;
+        } else if (preference.getKey().equals("login")) {
+            if (User.isUserLoggedIn()) {
+                User.logout();
+            } else {
+                Intent intent = new Intent(this, FiveHundredPxOAuthActivity.class)
+                        .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
+                        .putExtra(FiveHundredPxOAuthActivity.CONSUMER_SECRET, BuildConfig.CONSUMER_SECRET);
+                startActivityForResult(intent, FIVE_HUNDRED_PX_LOGIN);
+            }
         } else if (preference.getKey().equals("contact")) {
             new LogReporting(this).collectAndSendLogs();
             return true;
