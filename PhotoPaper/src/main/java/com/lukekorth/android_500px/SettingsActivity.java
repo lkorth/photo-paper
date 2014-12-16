@@ -138,6 +138,10 @@ public class SettingsActivity extends PreferenceActivity implements
                     .load(user.photo)
                     .error(android.R.drawable.stat_notify_error)
                     .into(mUserImageCallback);
+        } else {
+            mLogin.setTitle(R.string.login_with_500px);
+            mLogin.setSummary(R.string.login_with_500px_summary);
+            mLogin.setIcon(null);
         }
     }
 
@@ -224,6 +228,7 @@ public class SettingsActivity extends PreferenceActivity implements
         } else if (preference.getKey().equals("login")) {
             if (User.isUserLoggedIn()) {
                 User.logout();
+                WallpaperApplication.getBus().post(new UserUpdatedEvent());
             } else {
                 Intent intent = new Intent(this, FiveHundredPxOAuthActivity.class)
                         .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
