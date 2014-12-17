@@ -17,6 +17,25 @@
         <item>@string/fresh_this_week</item>
     </string-array>
 
+    <string-array name="logged_in_feature_index">
+        <item>user_favorites</item>
+        <item>popular</item>
+        <item>upcoming</item>
+        <item>editors</item>
+        <item>fresh_today</item>
+        <item>fresh_yesterday</item>
+        <item>fresh_week</item>
+    </string-array>
+    <string-array name="logged_in_features">
+        <item>@string/your_favorites</item>
+        <item>@string/popular</item>
+        <item>@string/upcoming</item>
+        <item>@string/editors_choice</item>
+        <item>@string/fresh_today</item>
+        <item>@string/fresh_yesterday</item>
+        <item>@string/fresh_this_week</item>
+    </string-array>
+
     <string-array name="interval_index">
         <item>60</item>
         <item>120</item>

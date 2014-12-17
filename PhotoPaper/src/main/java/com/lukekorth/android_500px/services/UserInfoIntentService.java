@@ -11,6 +11,7 @@ import com.lukekorth.android_500px.models.UserUpdatedEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 public class UserInfoIntentService extends IntentService {
 
@@ -34,6 +35,8 @@ public class UserInfoIntentService extends IntentService {
             user.save();
 
             WallpaperApplication.getBus().post(new UserUpdatedEvent(user));
-        } catch (JSONException e) {}
+        } catch (JSONException e) {
+            LoggerFactory.getLogger("UserInfoIntentService").error(e.getMessage());
+        }
     }
 }

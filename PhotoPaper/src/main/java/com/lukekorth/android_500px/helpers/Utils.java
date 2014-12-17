@@ -71,4 +71,17 @@ public class Utils {
         return ((double) getWallpaperWidth(context) / getScreenWidth(context)) >= 2;
     }
 
+    public static String getListSummary(Context context, int indexArrayId, int valueArrayId,
+                                        String index, String defaultValue) {
+        String[] indexArray = context.getResources().getStringArray(indexArrayId);
+        String[] valueArray = context.getResources().getStringArray(valueArrayId);
+        int i;
+        for (i = 0; i < indexArray.length; i++) {
+            if (indexArray[i].equals(index)) {
+                return valueArray[i];
+            }
+        }
+        return defaultValue;
+    }
+
 }

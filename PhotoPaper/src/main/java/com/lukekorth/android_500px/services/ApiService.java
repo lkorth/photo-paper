@@ -14,6 +14,7 @@ import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.User;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -28,6 +29,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 public class ApiService extends IntentService {
 
@@ -75,16 +81,12 @@ public class ApiService extends IntentService {
     }
 
     private void getPhotos() {
-        String url = API_BASE_URL + "photos?feature=" + Settings.getFeature(this) + "&only=" +
-                        getCategoriesForRequest() + "&page=" + mPage +
-                        "&image_size=5&rpp=100";
-        mLogger.debug("Getting photos. Url: " + url);
-        Request request = new Request.Builder()
-                .header("User-Agent", "com.lukekorth.android_500px")
-                .url(url + "&consumer_key=" + CONSUMER_KEY)
-                .build();
-
         try {
+            Request request = new Request.Builder()
+                    .header("User-Agent", "com.lukekorth.android_500px")
+                    .url(buildRequestUrl())
+                    .build();
+
             Response response = mOkHttpClient.newCall(request).execute();
 
             int responseCode = response.code();
@@ -118,10 +120,10 @@ public class ApiService extends IntentService {
                     mLogger.debug("Photos.create returned null");
                 }
             }
-        } catch (JSONException e) {
+        } catch (JSONException | IOException | OAuthExpectationFailedException |
+                OAuthCommunicationException | OAuthMessageSignerException e) {
             mLogger.error(e.getMessage());
-        } catch (IOException e) {
-            mLogger.error(e.getMessage());
+            mErrorCount++;
         }
     }
 
@@ -137,6 +139,31 @@ public class ApiService extends IntentService {
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(mWifiReceiver, filter);
+    }
+
+    private String buildRequestUrl() throws OAuthCommunicationException,
+            OAuthExpectationFailedException, OAuthMessageSignerException {
+        String feature = Settings.getFeature(this);
+        String url = API_BASE_URL + "photos?feature=" + feature + "&only=" +
+                        getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
+
+        if (feature.equals(getResources().getStringArray(R.array.logged_in_feature_index)[0])) {
+            User user = User.getUser();
+            url += "&username=" + user.userName;
+
+            mLogger.debug("Getting photos. Url: " + url);
+
+            CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(
+                    BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);
+            consumer.setTokenWithSecret(user.accessToken, user.accessTokenSecret);
+            url = consumer.sign(url);
+        } else {
+            mLogger.debug("Getting photos. Url: " + url);
+
+            url += "&consumer_key=" + CONSUMER_KEY;
+        }
+
+        return url;
     }
 
     private String getCategoriesForRequest() {

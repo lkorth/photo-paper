@@ -12,7 +12,6 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 import com.fivehundredpx.api.auth.AccessToken;
@@ -41,7 +40,6 @@ public class SettingsActivity extends PreferenceActivity implements
     private static final int FIVE_HUNDRED_PX_LOGIN = 20;
 
     private Preference mLogin;
-    private ListPreference mFeature;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
     private Preference mCurrentPhoto;
@@ -55,7 +53,6 @@ public class SettingsActivity extends PreferenceActivity implements
         mCurrentPhoto = findPreference("current_photo");
         mNextPhoto = findPreference("next_photo");
         mLogin = findPreference("login");
-        mFeature = (ListPreference) findPreference("feature");
         mCategories = (MultiSelectListPreference) findPreference("categories");
         mInterval = (ListPreference) findPreference("update_interval");
 
@@ -64,16 +61,14 @@ public class SettingsActivity extends PreferenceActivity implements
         mLogin.setOnPreferenceClickListener(this);
         findPreference("contact").setOnPreferenceClickListener(this);
 
-        mFeature.setOnPreferenceChangeListener(this);
         mCategories.setOnPreferenceChangeListener(this);
         mInterval.setOnPreferenceChangeListener(this);
         findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
         findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
-        setFeatureSummary(mFeature.getValue());
         setCategoriesSummary(mCategories.getValues());
-        setIntervalSummary(mInterval.getValue());
+        mInterval.setSummary(mInterval.getEntry());
         findPreference("version").setSummary(BuildConfig.VERSION_NAME);
 
         if (Utils.supportsParallax(this)) {
@@ -246,13 +241,13 @@ public class SettingsActivity extends PreferenceActivity implements
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-        if (key.equals(mFeature.getKey())) {
-            setFeatureSummary((String) newValue);
-        } else if (key.equals(mCategories.getKey())) {
+        if (key.equals(mCategories.getKey())) {
+            Settings.setCategories(this, (Set<String>) newValue);
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
-            Settings.setUpdateInterval(this, (String) newValue);
-            setIntervalSummary((String) newValue);
+            Settings.setUpdateInterval(this, newValue.toString());
+            mInterval.setSummary(Utils.getListSummary(this, R.array.interval_index,
+                    R.array.intervals, newValue.toString(), getString(R.string.one_hour)));
             onWallpaperChanged(null);
         } else if (key.equals("use_parallax")) {
             Settings.setDesiredWidth(this, 0);
@@ -271,14 +266,6 @@ public class SettingsActivity extends PreferenceActivity implements
         startService(new Intent(this, WallpaperService.class));
     }
 
-    private void setFeatureSummary(String index) {
-        String summary = getSummary(R.array.feature_index, R.array.features, index);
-        if (TextUtils.isEmpty(summary)) {
-            summary = getString(R.string.popular);
-        }
-        mFeature.setSummary(summary);
-    }
-
     private void setCategoriesSummary(Set<String> indexes) {
         if (indexes.size() == 0) {
             mCategories.setSummary(getString(R.string.landscapes));
@@ -290,26 +277,6 @@ public class SettingsActivity extends PreferenceActivity implements
             }
             mCategories.setSummary(summary.substring(0, summary.length() - 2));
         }
-    }
-
-    private void setIntervalSummary(String index) {
-        String summary = getSummary(R.array.interval_index, R.array.intervals, index);
-        if (TextUtils.isEmpty(summary)) {
-            summary = getString(R.string.one_hour);
-        }
-        mInterval.setSummary(summary);
-    }
-
-    private String getSummary(int indexArrayId, int valueArrayId, String index) {
-        String[] indexArray = getResources().getStringArray(indexArrayId);
-        String[] valueArray = getResources().getStringArray(valueArrayId);
-        int i;
-        for (i = 0; i < indexArray.length; i++) {
-            if (indexArray[i].equals(index)) {
-                return valueArray[i];
-            }
-        }
-        return "";
     }
 
 }

@@ -18,6 +18,10 @@ public class Settings {
         return getPrefs(context).getString("feature", "popular");
     }
 
+    public static void setFeature(Context context, String feature) {
+        getPrefs(context).edit().putString("feature", feature).apply();
+    }
+
     public static int[] getCategories(Context context) {
         Set<String> defaultCategory = new HashSet<String>();
         defaultCategory.add("8");
@@ -31,6 +35,10 @@ public class Settings {
         }
 
         return categories;
+    }
+
+    public static void setCategories(Context context, Set<String> categories) {
+        getPrefs(context).edit().putStringSet("categories", categories).apply();
     }
 
     public static boolean allowNSFW(Context context) {

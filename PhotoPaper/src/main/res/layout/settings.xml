@@ -20,11 +20,9 @@
             android:title="@string/login_with_500px"
             android:summary="@string/login_with_500px_summary" />
 
-        <ListPreference
+        <com.lukekorth.android_500px.views.FeatureListPreference
             android:key="feature"
-            android:title="@string/feature"
-            android:entries="@array/features"
-            android:entryValues="@array/feature_index" />
+            android:title="@string/feature" />
 
         <MultiSelectListPreference
             android:key="categories"
@@ -57,7 +55,8 @@
             android:key="update_interval"
             android:title="@string/update_interval"
             android:entries="@array/intervals"
-            android:entryValues="@array/interval_index" />
+            android:entryValues="@array/interval_index"
+            android:defaultValue="3600" />
 
         <CheckBoxPreference
             android:key="use_parallax"
