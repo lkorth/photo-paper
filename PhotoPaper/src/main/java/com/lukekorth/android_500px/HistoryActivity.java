@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -81,7 +80,7 @@ public class HistoryActivity extends ListActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             final Photos photo = mPhotos.get(position);
 
             ViewHolderItem viewHolderItem;
@@ -105,8 +104,8 @@ public class HistoryActivity extends ListActivity {
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(Photos.BASE_URL_500PX + photo.urlPath));
+                    Intent intent = new Intent(mContext, ViewPhotoActivity.class)
+                            .putExtra(ViewPhotoActivity.PHOTO_POSITION_KEY, position);
                     mContext.startActivity(intent);
                 }
             });

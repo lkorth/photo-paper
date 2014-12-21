@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".HistoryActivity" android:label="@string/history" />
+        <activity android:name=".ViewPhotoActivity" />
 
         <service android:name=".services.UserInfoIntentService" />
         <service android:name=".services.ApiService" />

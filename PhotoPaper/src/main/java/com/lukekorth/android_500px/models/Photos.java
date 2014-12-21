@@ -106,13 +106,17 @@ public class Photos extends Model {
             } else {
                 logger.debug("Photo was not an acceptable size");
             }
-        } catch (JSONException e) {
-            logger.error(e.getMessage());
-        } catch (ParseException e) {
+        } catch (JSONException | ParseException e) {
             logger.error(e.getMessage());
         }
 
         return null;
+    }
+
+    public static Photos getPhoto(int id) {
+        return new Select().from(Photos.class)
+                .where("photo_id = ?", id)
+                .executeSingle();
     }
 
     public static Photos getNextPhoto(Context context) {
