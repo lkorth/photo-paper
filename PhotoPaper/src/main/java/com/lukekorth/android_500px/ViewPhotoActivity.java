@@ -79,6 +79,7 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
 
     @Override
     public void onPageSelected(int position) {
+        mCurrentPhoto = position;
         setPhotoName(position);
     }
 
