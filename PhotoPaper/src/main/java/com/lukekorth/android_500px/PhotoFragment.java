@@ -6,9 +6,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.ViewTreeObserver;
 
 import com.lukekorth.android_500px.models.Photos;
+
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
 public class PhotoFragment extends Fragment {
 
@@ -25,9 +30,30 @@ public class PhotoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPhoto = Photos.getPhoto(getArguments().getInt(PHOTO_ID_KEY));
-        WallpaperApplication.getPicasso(getActivity())
-                .load(mPhoto.imageUrl)
-                .into((ImageView) getView().findViewById(R.id.photo));
+
+        ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (SDK_INT >= JELLY_BEAN) {
+                        getView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+
+                    if (mPhoto == null) {
+                        mPhoto = Photos.getPhoto(getArguments().getInt(PHOTO_ID_KEY));
+
+                        ImageViewTouch photoView = (ImageViewTouch) getView().findViewById(R.id.photo);
+
+                        WallpaperApplication.getPicasso(getActivity())
+                                .load(mPhoto.imageUrl)
+                                .resize(photoView.getWidth(), photoView.getHeight())
+                                .centerInside()
+                                .into(photoView);
+                    }
+                }
+            });
+        }
     }
+
 }
