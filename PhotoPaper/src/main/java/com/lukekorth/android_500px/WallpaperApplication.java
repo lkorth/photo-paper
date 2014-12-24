@@ -7,20 +7,14 @@ import android.preference.PreferenceManager;
 import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.helpers.Cache;
 import com.lukekorth.android_500px.helpers.ThreadBus;
+import com.lukekorth.mailable_log.MailableLog;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.Date;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.android.LogcatAppender;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
 
 public class WallpaperApplication extends com.activeandroid.app.Application  implements Thread.UncaughtExceptionHandler {
 
@@ -36,13 +30,9 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         super.onCreate();
 
         migrate();
-        initLogger();
+        MailableLog.init(this, BuildConfig.DEBUG);
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
-    }
-
-    public String getLogFilePath() {
-        return getFileStreamPath("debug.log").getAbsolutePath();
     }
 
     private void migrate() {
@@ -62,37 +52,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
             editor.putInt(VERSION, BuildConfig.VERSION_CODE);
             editor.apply();
 
-            new File(getLogFilePath()).delete();
-        }
-    }
-
-    private void initLogger() {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        loggerContext.reset();
-
-        PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-        encoder.setContext(loggerContext);
-        encoder.setPattern("%date{MMM dd | HH:mm:ss.SSS} %highlight(%-5level) %-25([%logger{36}]) %msg%n");
-        encoder.start();
-
-        FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
-        fileAppender.setContext(loggerContext);
-        fileAppender.setFile(getLogFilePath());
-        fileAppender.setAppend(true);
-        fileAppender.setEncoder(encoder);
-        fileAppender.start();
-
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
-                LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.addAppender(fileAppender);
-
-        if (BuildConfig.DEBUG) {
-            LogcatAppender logcatAppender = new LogcatAppender();
-            logcatAppender.setContext(loggerContext);
-            logcatAppender.setEncoder(encoder);
-            logcatAppender.start();
-
-            root.addAppender(logcatAppender);
+            MailableLog.clearLog(this);
         }
     }
 
