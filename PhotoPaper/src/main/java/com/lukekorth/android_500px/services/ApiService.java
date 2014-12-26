@@ -15,9 +15,11 @@ import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.User;
+import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -44,6 +46,7 @@ public class ApiService extends IntentService {
     private BroadcastReceiver mWifiReceiver;
     private boolean mIsCurrentNetworkOk;
     private OkHttpClient mOkHttpClient;
+    private Bus mBus;
     private int mErrorCount = 0;
     private int mPage = 1;
     private int mTotalPages = 1;
@@ -63,6 +66,8 @@ public class ApiService extends IntentService {
             wakeLock.acquire();
 
             long startTime = System.currentTimeMillis();
+
+            mBus = WallpaperApplication.getBus();
 
             registerWifiReceiver();
             mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
@@ -115,9 +120,8 @@ public class ApiService extends IntentService {
                 if (photo != null) {
                     mLogger.debug("Photo added, caching");
                     picasso.load(photo.imageUrl).fetch();
+                    mBus.post(new WallpaperChangedEvent());
                     SystemClock.sleep(200);
-                } else {
-                    mLogger.debug("Photos.create returned null");
                 }
             }
         } catch (JSONException | IOException | OAuthExpectationFailedException |
