@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class WallpaperService extends IntentService {
 
-    public static final String SLEEP_KEY = "sleep";
+    public static final String USER_PRESENT_RECEIVER_KEY = "com.lukekorth.android_500px.services.WallpaperService.SLEEP";
 
     public WallpaperService() {
         super("WallpaperService");
@@ -35,8 +35,15 @@ public class WallpaperService extends IntentService {
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
             wakeLock.acquire();
 
-            if (intent.getBooleanExtra(SLEEP_KEY, false)) {
+            if (intent.getBooleanExtra(USER_PRESENT_RECEIVER_KEY, false)) {
+                logger.debug("User present, waiting 2 seconds and then setting wallpaper");
+
                 SystemClock.sleep(2000);
+
+                if (!Utils.shouldUpdateWallpaper(this)) {
+                    logger.debug("Wallpaper does not need to be updated");
+                    return;
+                }
             }
 
             WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
