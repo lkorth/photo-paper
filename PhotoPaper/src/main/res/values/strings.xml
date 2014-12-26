@@ -30,6 +30,8 @@
     <string name="update_interval">Update Interval</string>
     <string name="parallax">Scroll Wallpaper</string>
     <string name="parallax_summary">Scroll wallpaper when swiping through home screens</string>
+    <string name="clear_cache_title">Clear Cached Photos</string>
+    <string name="clear_cache_summary">Click to clear all downloaded photos</string>
     <string name="rate_app">Rate Photo Paper</string>
     <string name="help">Help</string>
     <string name="contact">Contact Developer</string>

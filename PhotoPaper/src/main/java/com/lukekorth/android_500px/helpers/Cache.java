@@ -24,8 +24,7 @@ public class Cache {
             Class.forName("com.squareup.okhttp.OkHttpClient");
             File cacheDir = createDefaultCacheDir(context, CACHE_PATH);
             long cacheSize = calculateDiskCacheSize(cacheDir);
-            OkHttpDownloader downloader = new OkHttpDownloader(cacheDir, cacheSize);
-            return downloader;
+            return new OkHttpDownloader(cacheDir, cacheSize);
         } catch (ClassNotFoundException e) {
             return new UrlConnectionDownloader(context);
         }

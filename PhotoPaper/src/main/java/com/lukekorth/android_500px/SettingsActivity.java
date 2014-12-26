@@ -24,6 +24,7 @@ import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.lukekorth.android_500px.services.ApiService;
+import com.lukekorth.android_500px.services.ClearCacheIntentService;
 import com.lukekorth.android_500px.services.WallpaperService;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
@@ -57,8 +58,8 @@ public class SettingsActivity extends PreferenceActivity implements
         mInterval = (ListPreference) findPreference("update_interval");
 
         mNextPhoto.setOnPreferenceClickListener(this);
-        mCurrentPhoto.setOnPreferenceClickListener(this);
         mLogin.setOnPreferenceClickListener(this);
+        findPreference("clear_cache").setOnPreferenceClickListener(this);
         findPreference("contact").setOnPreferenceClickListener(this);
 
         mCategories.setOnPreferenceChangeListener(this);
@@ -212,8 +213,8 @@ public class SettingsActivity extends PreferenceActivity implements
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        if (preference.getKey().equals(mCurrentPhoto.getKey())) {
-            startActivity(new Intent(this, HistoryActivity.class));
+        if (preference.getKey().equals("clear_cache")) {
+            startService(new Intent(this, ClearCacheIntentService.class));
             return true;
         } else if (preference.getKey().equals(mNextPhoto.getKey())) {
             mNextPhoto.setTitle(R.string.loading);
