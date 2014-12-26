@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.WallpaperChangedEvent;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -34,6 +36,11 @@ public class HistoryActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateHistory(null);
+    }
+
+    @Subscribe
+    public void updateHistory(WallpaperChangedEvent event) {
         setListAdapter(new PhotoAdapter(this, Photos.getSeenPhotos()));
     }
 
