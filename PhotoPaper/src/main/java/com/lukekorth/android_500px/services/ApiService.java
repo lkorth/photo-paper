@@ -39,8 +39,7 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 
 public class ApiService extends IntentService {
 
-    private static final String API_BASE_URL = "https://api.500px.com/v1/";
-    private static final String CONSUMER_KEY = BuildConfig.CONSUMER_KEY;
+    public static final String API_BASE_URL = "https://api.500px.com/v1/";
 
     private Logger mLogger;
     private BroadcastReceiver mWifiReceiver;
@@ -116,7 +115,13 @@ public class ApiService extends IntentService {
                     break;
                 }
 
-                photo = Photos.create(photos.getJSONObject(i), feature, desiredHeight, desiredWidth);
+                String search = "";
+                if (feature.equals("search")) {
+                    search = Settings.getSearchQuery(this);
+                }
+
+                photo = Photos.create(photos.getJSONObject(i), feature, search, desiredHeight,
+                        desiredWidth);
                 if (photo != null) {
                     mLogger.debug("Photo added, caching");
                     picasso.load(photo.imageUrl).fetch();
@@ -148,10 +153,16 @@ public class ApiService extends IntentService {
     private String buildRequestUrl() throws OAuthCommunicationException,
             OAuthExpectationFailedException, OAuthMessageSignerException {
         String feature = Settings.getFeature(this);
-        String url = API_BASE_URL + "photos?feature=" + feature + "&only=" +
+        String url;
+        if (feature.equals("search")) {
+            url = API_BASE_URL + "photos/search?term=" + Settings.getSearchQuery(this) +
+                    "&page=" + mPage + "&image_size=5&rpp=100";
+        } else {
+            url = API_BASE_URL + "photos?feature=" + feature + "&only=" +
                         getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
+        }
 
-        if (feature.equals(getResources().getStringArray(R.array.logged_in_feature_index)[0])) {
+        if (feature.equals("user_favorites")) {
             User user = User.getUser();
             url += "&username=" + user.userName;
 
@@ -164,7 +175,7 @@ public class ApiService extends IntentService {
         } else {
             mLogger.debug("Getting photos. Url: " + url);
 
-            url += "&consumer_key=" + CONSUMER_KEY;
+            url += "&consumer_key=" + BuildConfig.CONSUMER_KEY;
         }
 
         return url;

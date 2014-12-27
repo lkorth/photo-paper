@@ -48,6 +48,8 @@ dependencies {
 
     compile 'com.lukekorth:mailable_log:0.1.1'
 
+    compile 'com.lukekorth:ez-loaders:1.4.0'
+
     compile 'fr.nicolaspomepuy:discreetapprate:2.0@aar'
 }
 

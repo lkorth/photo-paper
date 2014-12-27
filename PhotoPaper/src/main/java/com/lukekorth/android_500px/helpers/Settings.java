@@ -22,6 +22,14 @@ public class Settings {
         getPrefs(context).edit().putString("feature", feature).apply();
     }
 
+    public static String getSearchQuery(Context context) {
+        return getPrefs(context).getString("search_query", "");
+    }
+
+    public static void setSearchQuery(Context context, String query) {
+        getPrefs(context).edit().putString("search_query", query).apply();
+    }
+
     public static int[] getCategories(Context context) {
         Set<String> defaultCategory = new HashSet<String>();
         defaultCategory.add("8");

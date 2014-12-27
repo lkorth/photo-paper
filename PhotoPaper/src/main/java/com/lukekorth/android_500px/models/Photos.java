@@ -43,6 +43,9 @@ public class Photos extends Model {
     @Column(name = "feature")
     public String feature;
 
+    @Column(name = "search")
+    public String search;
+
     @Column(name = "category")
     public int category;
 
@@ -71,7 +74,8 @@ public class Photos extends Model {
         super();
     }
 
-    public static Photos create(JSONObject jsonPhoto, String feature, int desiredHeight, int desiredWidth) {
+    public static Photos create(JSONObject jsonPhoto, String feature, String search,
+                                int desiredHeight, int desiredWidth) {
         Logger logger = LoggerFactory.getLogger("Photos");
         try {
             int actualHeight = jsonPhoto.getInt("height");
@@ -89,6 +93,7 @@ public class Photos extends Model {
                     photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
                     photo.feature = feature;
+                    photo.search = search;
                     photo.category = jsonPhoto.getInt("category");
                     photo.nsfw = jsonPhoto.getBoolean("nsfw");
                     photo.imageUrl = jsonPhoto.getString("image_url");
@@ -136,8 +141,14 @@ public class Photos extends Model {
     }
 
     private static From getQuery(Context context) {
+        String feature = Settings.getFeature(context);
+
         From query = new Select().from(Photos.class)
-                .where("feature = ?", Settings.getFeature(context));
+                .where("feature = ?", feature);
+
+        if (feature.equals("search")) {
+            query.where("search = ?", Settings.getSearchQuery(context));
+        }
 
         int[] categories = Settings.getCategories(context);
         Object[] categoryArgs = new Object[categories.length];

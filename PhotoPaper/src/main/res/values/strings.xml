@@ -53,8 +53,12 @@
     <string name="by">By</string>
     <string name="open_in_500px">Open in 500px</string>
 
+    <!-- Search -->
+    <string name="save">Save</string>
+
     <!-- Features -->
     <string name="your_favorites">Your Favorites</string>
+    <string name="search">Search</string>
     <string name="popular">Popular</string>
     <string name="upcoming">Upcoming</string>
     <string name="editors_choice">Editor\'s Choice</string>

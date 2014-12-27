@@ -19,6 +19,7 @@ import com.fivehundredpx.api.auth.FiveHundredPxOAuthActivity;
 import com.lukekorth.android_500px.helpers.LogReporting;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
+import com.lukekorth.android_500px.models.ActivityResumedEvent;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
@@ -94,6 +95,7 @@ public class SettingsActivity extends PreferenceActivity implements
     protected void onResume() {
         super.onResume();
         onWallpaperChanged(null);
+        WallpaperApplication.getBus().post(new ActivityResumedEvent());
 
         if (Utils.shouldUpdateWallpaper(this)) {
             runWallpaperService();

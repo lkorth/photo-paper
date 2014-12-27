@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="feature_index">
+        <item>search</item>
         <item>popular</item>
         <item>upcoming</item>
         <item>editors</item>
@@ -9,6 +10,7 @@
         <item>fresh_week</item>
     </string-array>
     <string-array name="features">
+        <item>@string/search</item>
         <item>@string/popular</item>
         <item>@string/upcoming</item>
         <item>@string/editors_choice</item>
@@ -19,6 +21,7 @@
 
     <string-array name="logged_in_feature_index">
         <item>user_favorites</item>
+        <item>search</item>
         <item>popular</item>
         <item>upcoming</item>
         <item>editors</item>
@@ -28,6 +31,7 @@
     </string-array>
     <string-array name="logged_in_features">
         <item>@string/your_favorites</item>
+        <item>@string/search</item>
         <item>@string/popular</item>
         <item>@string/upcoming</item>
         <item>@string/editors_choice</item>

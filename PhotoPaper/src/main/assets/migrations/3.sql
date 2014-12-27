@@ -1,0 +1,1 @@
+ALTER TABLE Photos ADD COLUMN search TEXT;

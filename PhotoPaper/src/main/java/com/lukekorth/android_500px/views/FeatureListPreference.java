@@ -10,9 +10,11 @@ import android.preference.Preference;
 import android.util.AttributeSet;
 
 import com.lukekorth.android_500px.R;
+import com.lukekorth.android_500px.SearchActivity;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
+import com.lukekorth.android_500px.models.ActivityResumedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.services.ApiService;
@@ -46,7 +48,6 @@ public class FeatureListPreference extends ListPreference implements Preference.
         WallpaperApplication.getBus().register(this);
         setOnPreferenceChangeListener(this);
         initEntries();
-        setFeatureSummary(Settings.getFeature(getContext()));
     }
 
     @Override
@@ -56,10 +57,15 @@ public class FeatureListPreference extends ListPreference implements Preference.
     }
 
     @Subscribe
+    public void onActivityResumed(ActivityResumedEvent event) {
+        setFeatureSummary(Settings.getFeature(getContext()));
+    }
+
+    @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
         if (event.getUser() == null &&
-                getValue().equals(getContext().getResources().getStringArray(R.array.logged_in_feature_index)[0])) {
-            setValue(getContext().getResources().getStringArray(R.array.feature_index)[0]);
+                getValue().equals("your_favorites")) {
+            setValue("your_favorites");
             setFeatureSummary(getValue());
         }
     }
@@ -68,6 +74,14 @@ public class FeatureListPreference extends ListPreference implements Preference.
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
         initEntries();
         super.onPrepareDialogBuilder(builder);
+    }
+
+    @Override
+    protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
+        if (positiveResult && Settings.getFeature(getContext()).equals("search")) {
+            getContext().startActivity(new Intent(getContext(), SearchActivity.class));
+        }
     }
 
     private void initEntries() {
@@ -81,7 +95,10 @@ public class FeatureListPreference extends ListPreference implements Preference.
     }
 
     private void setFeatureSummary(String index) {
-        if (User.isUserLoggedIn()) {
+        if (Settings.getFeature(getContext()).equals("search")) {
+            setSummary(getContext().getString(R.string.search) + ": " +
+                    Settings.getSearchQuery(getContext()));
+        } else if (User.isUserLoggedIn()) {
             setSummary(Utils.getListSummary(getContext(), R.array.logged_in_feature_index,
                     R.array.logged_in_features, index, getContext().getString(R.string.popular)));
         } else {
@@ -94,7 +111,11 @@ public class FeatureListPreference extends ListPreference implements Preference.
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Settings.setFeature(getContext(), newValue.toString());
         setFeatureSummary(newValue.toString());
-        getContext().startService(new Intent(getContext(), ApiService.class));
+
+        if (!newValue.toString().equals("search")) {
+            getContext().startService(new Intent(getContext(), ApiService.class));
+        }
+
         return true;
     }
 
