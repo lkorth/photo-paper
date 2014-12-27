@@ -111,7 +111,9 @@ public class Photos extends Model {
             } else {
                 logger.debug("Photo was not an acceptable size");
             }
-        } catch (JSONException | ParseException e) {
+        } catch (JSONException e) {
+            logger.error(e.getMessage());
+        } catch (ParseException e) {
             logger.error(e.getMessage());
         }
 

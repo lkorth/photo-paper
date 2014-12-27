@@ -129,8 +129,19 @@ public class ApiService extends IntentService {
                     SystemClock.sleep(200);
                 }
             }
-        } catch (JSONException | IOException | OAuthExpectationFailedException |
-                OAuthCommunicationException | OAuthMessageSignerException e) {
+        } catch (JSONException e) {
+            mLogger.error(e.getMessage());
+            mErrorCount++;
+        } catch (IOException e) {
+            mLogger.error(e.getMessage());
+            mErrorCount++;
+        } catch (OAuthExpectationFailedException e) {
+            mLogger.error(e.getMessage());
+            mErrorCount++;
+        } catch (OAuthCommunicationException e) {
+            mLogger.error(e.getMessage());
+            mErrorCount++;
+        } catch (OAuthMessageSignerException e) {
             mLogger.error(e.getMessage());
             mErrorCount++;
         }

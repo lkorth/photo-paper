@@ -120,7 +120,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     @Override
     public Loader<List<String>> onCreateLoader(int id, Bundle args) {
-        return new EzLoader<>(this, SEARCH_BROADCAST, this);
+        return new EzLoader<List<String>>(this, SEARCH_BROADCAST, this);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     @Override
     public List<String> loadInBackground(int id) {
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            return new ArrayList<>();
+            return new ArrayList<String>();
         }
 
         Request request = new Request.Builder()
@@ -145,17 +145,19 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             Response response = new OkHttpClient().newCall(request).execute();
             if (response.code() == 200) {
                 JSONArray photos = new JSONObject(response.body().string()).getJSONArray("photos");
-                ArrayList<String> data = new ArrayList<>();
+                ArrayList<String> data = new ArrayList<String>();
                 for (int i = 0; i < photos.length(); i++) {
                     data.add(photos.getJSONObject(i).getString("image_url"));
                 }
 
                 return data;
             } else {
-                return new ArrayList<>();
+                return new ArrayList<String>();
             }
-        } catch (IOException | JSONException e) {
-            return new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<String>();
+        } catch (JSONException e) {
+            return new ArrayList<String>();
         }
     }
 
@@ -205,7 +207,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
         public PhotoAdapter(Context context) {
             mContext = context;
-            mPhotos = new ArrayList<>();
+            mPhotos = new ArrayList<String>();
         }
 
         public void setPhotos(List<String> photos) {
