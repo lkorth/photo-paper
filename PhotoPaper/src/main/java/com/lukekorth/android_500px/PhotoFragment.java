@@ -40,13 +40,16 @@ public class PhotoFragment extends Fragment {
 
         mPhotoSet = false;
 
-        final ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
+        ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
         if (viewTreeObserver.isAlive()) {
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     if (SDK_INT >= JELLY_BEAN) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(this);
+                        ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
+                        if (viewTreeObserver.isAlive()) {
+                            viewTreeObserver.removeOnGlobalLayoutListener(this);
+                        }
                     }
 
                     if (!mPhotoSet) {
