@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/grid_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:numColumns="4"
-    android:scrollbarStyle="insideOverlay"
-    android:scrollbars="none"
-    android:listSelector="@null" />
+    android:layout_height="match_parent">
+
+    <GridView
+        android:id="@+id/grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="4"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="none"
+        android:listSelector="@null" />
+
+    <TextView
+        android:id="@+id/no_search_results"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:text="@string/no_results_found"
+        android:textSize="30sp" />
+
+</FrameLayout>

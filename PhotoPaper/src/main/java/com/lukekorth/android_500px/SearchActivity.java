@@ -66,6 +66,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(mPhotoAdapter);
+        gridView.setEmptyView(findViewById(R.id.no_search_results));
         gridView.setOnScrollListener(this);
 
         ActionBar actionBar = getActionBar();
