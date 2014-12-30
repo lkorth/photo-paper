@@ -15,6 +15,7 @@ import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.ActivityResumedEvent;
+import com.lukekorth.android_500px.models.EnableCategoriesEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.services.ApiService;
@@ -80,7 +81,10 @@ public class FeatureListPreference extends ListPreference implements Preference.
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (positiveResult && Settings.getFeature(getContext()).equals("search")) {
+            WallpaperApplication.getBus().post(new EnableCategoriesEvent(false));
             getContext().startActivity(new Intent(getContext(), SearchActivity.class));
+        } else {
+            WallpaperApplication.getBus().post(new EnableCategoriesEvent(true));
         }
     }
 
