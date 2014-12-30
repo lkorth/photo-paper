@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.PowerManager;
 import android.os.SystemClock;
 
@@ -166,7 +167,7 @@ public class ApiService extends IntentService {
         String feature = Settings.getFeature(this);
         String url;
         if (feature.equals("search")) {
-            url = API_BASE_URL + "photos/search?term=" + Settings.getSearchQuery(this) +
+            url = API_BASE_URL + "photos/search?term=" + Uri.encode(Settings.getSearchQuery(this)) +
                     "&page=" + mPage + "&image_size=5&rpp=100";
         } else {
             url = API_BASE_URL + "photos?feature=" + feature + "&only=" +

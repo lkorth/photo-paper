@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -137,8 +138,8 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
         Request request = new Request.Builder()
                 .header("User-Agent", "com.lukekorth.android_500px")
-                .url(ApiService.API_BASE_URL + "photos/search?term=" + mCurrentQuery + "&rpp=100" +
-                        "&image_size=2&consumer_key=" + BuildConfig.CONSUMER_KEY)
+                .url(ApiService.API_BASE_URL + "photos/search?term=" + Uri.encode(mCurrentQuery) +
+                        "&rpp=100" + "&image_size=2&consumer_key=" + BuildConfig.CONSUMER_KEY)
                 .build();
 
         try {
