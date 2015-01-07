@@ -27,6 +27,8 @@ public class HistoryActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WallpaperApplication.getBus().register(this);
+
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -37,6 +39,12 @@ public class HistoryActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
         updateHistory(null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        WallpaperApplication.getBus().unregister(this);
     }
 
     @Subscribe
