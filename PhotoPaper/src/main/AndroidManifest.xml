@@ -29,7 +29,7 @@
         </activity>
         <activity android:name=".SearchActivity" android:label="@string/search" />
         <activity android:name=".HistoryActivity" android:label="@string/history" />
-        <activity android:name=".ViewPhotoActivity" />
+        <activity android:name=".ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
 
         <service android:name=".services.UserInfoIntentService" />
         <service android:name=".services.ApiService" />
