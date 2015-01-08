@@ -22,6 +22,8 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
 
     public static final String PHOTO_POSITION_KEY = "com.lukekorth.android_500px.ViewPhotoActivity.PHOTO_POSITION_KEY";
 
+    private ActionBar mActionBar;
+
     private List<Photos> mPhotos;
     private int mCurrentPhoto;
 
@@ -46,6 +48,7 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
         viewPager.setAdapter(new PhotoPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(mCurrentPhoto);
 
+        mActionBar = getActionBar();
         setPhotoName(mCurrentPhoto);
 
         ActionBar actionBar = getActionBar();
@@ -75,8 +78,10 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
     }
 
     private void setPhotoName(int position) {
-        setTitle(mPhotos.get(position).name + " " + getString(R.string.by) + " " +
-                mPhotos.get(position).userName);
+        if (mActionBar != null) {
+            mActionBar.setTitle("  " + mPhotos.get(position).name);
+            mActionBar.setSubtitle("   " + mPhotos.get(position).userName);
+        }
     }
 
     private void launch500PxForPhoto(int position) {
