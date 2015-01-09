@@ -2,6 +2,7 @@ package com.lukekorth.android_500px;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -223,8 +224,23 @@ public class SettingsActivity extends PreferenceActivity implements
     @Override
     public boolean onPreferenceClick(Preference preference) {
         if (preference.getKey().equals("clear_cache")) {
-            startService(new Intent(this, ClearCacheIntentService.class));
-            return true;
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.are_you_sure)
+                    .setMessage(R.string.are_you_sure_message)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startService(new Intent(SettingsActivity.this, ClearCacheIntentService.class));
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
         } else if (preference.getKey().equals(mNextPhoto.getKey())) {
             mNextPhoto.setTitle(R.string.loading);
             mNextPhoto.setSummary("");
