@@ -77,17 +77,6 @@ public class FeatureListPreference extends ListPreference implements Preference.
         super.onPrepareDialogBuilder(builder);
     }
 
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-        if (positiveResult && Settings.getFeature(getContext()).equals("search")) {
-            WallpaperApplication.getBus().post(new EnableCategoriesEvent(false));
-            getContext().startActivity(new Intent(getContext(), SearchActivity.class));
-        } else {
-            WallpaperApplication.getBus().post(new EnableCategoriesEvent(true));
-        }
-    }
-
     private void initEntries() {
         if (User.isUserLoggedIn()) {
             setEntries(R.array.logged_in_features);
@@ -113,14 +102,16 @@ public class FeatureListPreference extends ListPreference implements Preference.
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Settings.setFeature(getContext(), newValue.toString());
-        setFeatureSummary(newValue.toString());
-
         if (!newValue.toString().equals("search")) {
+            Settings.setFeature(getContext(), newValue.toString());
+            WallpaperApplication.getBus().post(new EnableCategoriesEvent(true));
+            setFeatureSummary(newValue.toString());
             getContext().startService(new Intent(getContext(), ApiService.class));
+            return true;
+        } else {
+            WallpaperApplication.getBus().post(new EnableCategoriesEvent(false));
+            getContext().startActivity(new Intent(getContext(), SearchActivity.class));
+            return false;
         }
-
-        return true;
     }
-
 }

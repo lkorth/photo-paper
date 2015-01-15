@@ -195,6 +195,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
                 finish();
                 return true;
             case R.id.save_search:
+                Settings.setFeature(this, "search");
                 Settings.setSearchQuery(this, mCurrentQuery);
                 startService(new Intent(this, ApiService.class));
                 finish();
