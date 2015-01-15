@@ -1,16 +1,16 @@
 package com.lukekorth.android_500px.models;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class SearchCompleteEvent {
 
-    private List<String> mPhotos;
+    private ArrayList<String> mPhotos;
 
-    public SearchCompleteEvent(List<String> photos) {
+    public SearchCompleteEvent(ArrayList<String> photos) {
         mPhotos = photos;
     }
 
-    public List<String> getPhotos() {
+    public ArrayList<String> getPhotos() {
         return mPhotos;
     }
 }

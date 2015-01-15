@@ -35,7 +35,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -43,6 +42,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         AbsListView.OnScrollListener, View.OnClickListener {
 
     private static final String QUERY_KEY = "com.lukekorth.android_500px.SearchActivity.QUERY_KEY";
+    private static final String PHOTOS_KEY = "com.lukekorth.android_500px.SearchActivity.PHOTOS_KEY";
 
     private OkHttpClient mOkHttpClient;
 
@@ -64,7 +64,12 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         }
 
         mOkHttpClient = new OkHttpClient();
-        mPhotoAdapter = new PhotoAdapter(this);
+
+        if (savedInstanceState != null) {
+            mPhotoAdapter = new PhotoAdapter(this, savedInstanceState.getStringArrayList(PHOTOS_KEY));
+        } else {
+            mPhotoAdapter = new PhotoAdapter(this, new ArrayList<String>());
+        }
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(mPhotoAdapter);
@@ -89,6 +94,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(QUERY_KEY, mCurrentQuery);
+        outState.putStringArrayList(PHOTOS_KEY, mPhotoAdapter.getPhotos());
     }
 
     @Override
@@ -216,15 +222,19 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     private class PhotoAdapter extends BaseAdapter {
 
         private Context mContext;
-        private List<String> mPhotos;
+        private ArrayList<String> mPhotos;
 
-        public PhotoAdapter(Context context) {
+        public PhotoAdapter(Context context, ArrayList<String> photos) {
             mContext = context;
-            mPhotos = new ArrayList<String>();
+            mPhotos = photos;
         }
 
-        public void setPhotos(List<String> photos) {
+        public void setPhotos(ArrayList<String> photos) {
             mPhotos = photos;
+        }
+
+        public ArrayList<String> getPhotos() {
+            return mPhotos;
         }
 
         @Override
