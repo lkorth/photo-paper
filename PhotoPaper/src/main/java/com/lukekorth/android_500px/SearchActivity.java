@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
@@ -20,13 +20,14 @@ import android.widget.GridView;
 import android.widget.SearchView;
 
 import com.lukekorth.android_500px.helpers.Settings;
+import com.lukekorth.android_500px.models.SearchCompleteEvent;
 import com.lukekorth.android_500px.services.ApiService;
 import com.lukekorth.android_500px.views.SquareImageView;
-import com.lukekorth.ez_loaders.EzLoader;
-import com.lukekorth.ez_loaders.EzLoaderInterface;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,10 +40,11 @@ import java.util.List;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class SearchActivity extends Activity implements SearchView.OnQueryTextListener,
-        AbsListView.OnScrollListener, EzLoaderInterface<List<String>>, View.OnClickListener {
+        AbsListView.OnScrollListener, View.OnClickListener {
 
-    private static final String SEARCH_BROADCAST = "com.lukekorth.android_500px.SearchActivity.SEARCH";
     private static final String QUERY_KEY = "com.lukekorth.android_500px.SearchActivity.QUERY_KEY";
+
+    private OkHttpClient mOkHttpClient;
 
     private SearchView mSearchView;
     private PhotoAdapter mPhotoAdapter;
@@ -51,6 +53,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.search_grid_view);
 
         if (savedInstanceState != null) {
@@ -60,8 +63,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             }
         }
 
-        getLoaderManager().initLoader(0, null, this);
-
+        mOkHttpClient = new OkHttpClient();
         mPhotoAdapter = new PhotoAdapter(this);
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
@@ -73,6 +75,14 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        WallpaperApplication.getBus().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        WallpaperApplication.getBus().unregister(this);
     }
 
     @Override
@@ -108,33 +118,15 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         mSearchView.setIconified(true);
         mSearchView.setIconified(true);
 
-        sendBroadcast(new Intent(SEARCH_BROADCAST));
+        performSearch();
+        setProgressBarIndeterminateVisibility(true);
 
         return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v == mSearchView && !TextUtils.isEmpty(mCurrentQuery)) {
-            mSearchView.setQuery(mCurrentQuery, false);
-        }
-    }
-
-    @Override
-    public Loader<List<String>> onCreateLoader(int id, Bundle args) {
-        return new EzLoader<List<String>>(this, SEARCH_BROADCAST, this);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<String>> loader, List<String> data) {
-        mPhotoAdapter.setPhotos(data);
-        mPhotoAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public List<String> loadInBackground(int id) {
+    private void performSearch() {
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            return new ArrayList<String>();
+            mPhotoAdapter.setPhotos(new ArrayList<String>());
         }
 
         Request request = new Request.Builder()
@@ -143,23 +135,47 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
                         "&rpp=100" + "&image_size=2&consumer_key=" + BuildConfig.CONSUMER_KEY)
                 .build();
 
-        try {
-            Response response = new OkHttpClient().newCall(request).execute();
-            if (response.code() == 200) {
-                JSONArray photos = new JSONObject(response.body().string()).getJSONArray("photos");
-                ArrayList<String> data = new ArrayList<String>();
-                for (int i = 0; i < photos.length(); i++) {
-                    data.add(photos.getJSONObject(i).getString("image_url"));
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                try {
+                    if (response.code() == 200) {
+                        JSONArray photos = new JSONObject(response.body().string()).getJSONArray("photos");
+                        ArrayList<String> data = new ArrayList<String>();
+                        for (int i = 0; i < photos.length(); i++) {
+                            data.add(photos.getJSONObject(i).getString("image_url"));
+                        }
+
+                        WallpaperApplication.getBus().post(new SearchCompleteEvent(data));
+                    } else {
+                        WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
+                    }
+                } catch (IOException e) {
+                    WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
+                } catch (JSONException e) {
+                    WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
                 }
 
-                return data;
-            } else {
-                return new ArrayList<String>();
             }
-        } catch (IOException e) {
-            return new ArrayList<String>();
-        } catch (JSONException e) {
-            return new ArrayList<String>();
+        });
+    }
+
+    @Subscribe
+    public void onSearchComplete(SearchCompleteEvent event) {
+        mPhotoAdapter.setPhotos(event.getPhotos());
+        mPhotoAdapter.notifyDataSetChanged();
+        setProgressBarIndeterminateVisibility(false);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == mSearchView && !TextUtils.isEmpty(mCurrentQuery)) {
+            mSearchView.setQuery(mCurrentQuery, false);
         }
     }
 
@@ -195,12 +211,6 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
-
-    @Override
-    public void onReleaseResources(List<String> strings) {}
-
-    @Override
-    public void onLoaderReset(Loader<List<String>> loader) {}
 
     private class PhotoAdapter extends BaseAdapter {
 
