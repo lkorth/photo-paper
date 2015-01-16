@@ -6,21 +6,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
+import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
-
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
 public class PhotoFragment extends Fragment {
 
     public static final String PHOTO_ID_KEY = "com.lukekorth.android_500px.PhotoFragment.PHOTO_ID_KEY";
 
     private Photos mPhoto;
-    private boolean mPhotoSet;
+    private ImageViewTouch mImageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,39 +28,21 @@ public class PhotoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.full_screen_photo, container, false);
-    }
+        View view = inflater.inflate(R.layout.full_screen_photo, container, false);
+        mImageView = (ImageViewTouch) view.findViewById(R.id.photo);
+
+        return view;
+   }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        mPhotoSet = false;
-
-        ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
-        if (viewTreeObserver.isAlive()) {
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (SDK_INT >= JELLY_BEAN) {
-                        ViewTreeObserver viewTreeObserver = getView().getViewTreeObserver();
-                        if (viewTreeObserver.isAlive()) {
-                            viewTreeObserver.removeOnGlobalLayoutListener(this);
-                        }
-                    }
-
-                    if (!mPhotoSet) {
-                        ImageViewTouch photoView = (ImageViewTouch) getView().findViewById(R.id.photo);
-                        WallpaperApplication.getPicasso(getActivity())
-                                .load(mPhoto.imageUrl)
-                                .resize(photoView.getWidth(), photoView.getHeight())
-                                .centerInside()
-                                .into(photoView);
-                        mPhotoSet = true;
-                    }
-                }
-            });
-        }
+        WallpaperApplication.getPicasso(getActivity())
+                .load(mPhoto.imageUrl)
+                .resize(Utils.getScreenWidth(getActivity()), Utils.getScreenHeight(getActivity()))
+                .centerInside()
+                .into(mImageView);
     }
 
 }
