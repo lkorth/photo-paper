@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -28,8 +29,28 @@ public class Utils {
     }
 
     public static boolean needMorePhotos(Context context) {
-        return (Photos.unseenPhotoCount(context) == 0 ||
-                (86400 / Photos.unseenPhotoCount(context)) > Settings.getUpdateInterval(context));
+        int remainingPhotos = Photos.unseenPhotoCount(context);
+        if (remainingPhotos <= 10) {
+            setFetchingPhotos(context, true);
+            return true;
+        } else if (remainingPhotos >= 144) {
+            setFetchingPhotos(context, false);
+            return false;
+        } else {
+            return isFetchingPhotos(context);
+        }
+    }
+
+    public static boolean isFetchingPhotos(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("fetching_photos", false);
+    }
+
+    public static void setFetchingPhotos(Context context, boolean fetching) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean("fetching_photos", fetching)
+                .apply();
     }
 
     public static boolean isConnectedToWifi(Context context) {
@@ -83,5 +104,4 @@ public class Utils {
         }
         return defaultValue;
     }
-
 }
