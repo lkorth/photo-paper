@@ -138,6 +138,10 @@ public class Photos extends Model {
         return getSeenQuery().execute();
     }
 
+    public static List<Photos> getUnseenPhotos(Context context) {
+        return getQuery(context).execute();
+    }
+
     public static int unseenPhotoCount(Context context) {
         return getQuery(context).count();
     }

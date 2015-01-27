@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.PowerManager;
-import android.os.SystemClock;
 
 import com.lukekorth.android_500px.BuildConfig;
 import com.lukekorth.android_500px.R;
@@ -21,7 +20,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.otto.Bus;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,6 +75,8 @@ public class ApiService extends IntentService {
                 getPhotos();
             }
 
+            startService(new Intent(this, PhotoCacheIntentService.class));
+
             unregisterReceiver(mWifiReceiver);
             wakeLock.release();
             mLogger.debug("Done fetching photos");
@@ -109,8 +109,6 @@ public class ApiService extends IntentService {
             String feature = Settings.getFeature(this);
             int desiredHeight = Settings.getDesiredHeight(this);
             int desiredWidth = Settings.getDesiredWidth(this);
-            Photos photo;
-            Picasso picasso = WallpaperApplication.getPicasso(this);
             for (int i = 0; i < photos.length(); i++) {
                 if (!mIsCurrentNetworkOk) {
                     break;
@@ -121,13 +119,9 @@ public class ApiService extends IntentService {
                     search = Settings.getSearchQuery(this);
                 }
 
-                photo = Photos.create(photos.getJSONObject(i), feature, search, desiredHeight,
-                        desiredWidth);
-                if (photo != null) {
-                    mLogger.debug("Photo added, caching");
-                    picasso.load(photo.imageUrl).fetch();
+                if (Photos.create(
+                        photos.getJSONObject(i), feature, search, desiredHeight, desiredWidth) != null) {
                     mBus.post(new WallpaperChangedEvent());
-                    SystemClock.sleep(200);
                 }
             }
         } catch (JSONException e) {

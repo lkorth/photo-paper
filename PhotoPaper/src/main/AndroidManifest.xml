@@ -33,6 +33,7 @@
 
         <service android:name=".services.UserInfoIntentService" />
         <service android:name=".services.ApiService" />
+        <service android:name=".services.PhotoCacheIntentService" />
         <service android:name=".services.WallpaperService" />
         <service android:name=".services.ClearCacheIntentService" />
 
