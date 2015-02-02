@@ -14,9 +14,9 @@ android {
 
     signingConfigs {
         release {
-            storeFile System.getenv().containsKey('ANDROID_KEYSTORE') ? file(System.getenv('ANDROID_KEYSTORE')) : file(".")
+            storeFile file(System.properties['keystore'])
             storePassword ""
-            keyAlias System.getenv().containsKey('ANDROID_KEYSTORE_ALIAS') ? System.getenv('ANDROID_KEYSTORE_ALIAS').replace("\"", "") : ""
+            keyAlias System.properties['alias']
             keyPassword ""
         }
     }
