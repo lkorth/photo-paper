@@ -148,23 +148,21 @@ public class Photos extends Model {
 
     private static From getQuery(Context context) {
         String feature = Settings.getFeature(context);
-
         From query = new Select().from(Photos.class)
                 .where("feature = ?", feature);
-
         if (feature.equals("search")) {
             query.where("search = ?", Settings.getSearchQuery(context));
-        } else {
-            int[] categories = Settings.getCategories(context);
-            Object[] categoryArgs = new Object[categories.length];
-            String placeHolders = "";
-            for (int i = 0; i < categories.length; i++) {
-                placeHolders += "?, ";
-                categoryArgs[i] = categories[i];
-            }
-            placeHolders = placeHolders.substring(0, placeHolders.length() - 2);
-            query.where("category IN (" + placeHolders + ")", categoryArgs);
         }
+
+        int[] categories = Settings.getCategories(context);
+        Object[] categoryArgs = new Object[categories.length];
+        String placeHolders = "";
+        for (int i = 0; i < categories.length; i++) {
+            placeHolders += "?, ";
+            categoryArgs[i] = categories[i];
+        }
+        placeHolders = placeHolders.substring(0, placeHolders.length() - 2);
+        query.where("category IN (" + placeHolders + ")", categoryArgs);
 
         if (!Settings.allowNSFW(context)) {
             query.where("nsfw = ?", false);
@@ -205,5 +203,4 @@ public class Photos extends Model {
 
         return scale && aspectRatio;
     }
-
 }

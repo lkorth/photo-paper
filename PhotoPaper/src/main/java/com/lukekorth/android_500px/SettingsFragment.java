@@ -22,7 +22,6 @@ import com.lukekorth.android_500px.helpers.LogReporting;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.ActivityResumedEvent;
-import com.lukekorth.android_500px.models.EnableCategoriesEvent;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
@@ -86,7 +85,6 @@ public class SettingsFragment extends PreferenceFragment
 
         WallpaperApplication.getBus().register(this);
         onUserUpdated(new UserUpdatedEvent(User.getUser()));
-        onEnableCategories(new EnableCategoriesEvent(!Settings.getFeature(mContext).equals("search")));
         runApiService();
     }
 
@@ -136,11 +134,6 @@ public class SettingsFragment extends PreferenceFragment
         public void onPrepareLoad(Drawable placeHolderDrawable) {
         }
     };
-
-    @Subscribe
-    public void onEnableCategories(EnableCategoriesEvent event) {
-        mCategories.setEnabled(event.enable);
-    }
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {

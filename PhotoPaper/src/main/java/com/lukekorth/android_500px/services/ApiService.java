@@ -162,7 +162,7 @@ public class ApiService extends IntentService {
         String url;
         if (feature.equals("search")) {
             url = API_BASE_URL + "photos/search?term=" + Uri.encode(Settings.getSearchQuery(this)) +
-                    "&page=" + mPage + "&image_size=5&rpp=100";
+                    "&only=" + getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
         } else {
             url = API_BASE_URL + "photos?feature=" + feature + "&only=" +
                         getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
