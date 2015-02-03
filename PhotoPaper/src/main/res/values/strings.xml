@@ -50,8 +50,8 @@
     <!-- Log Reporting -->
     <string name="send_email_via">Send email via</string>
 
-    <!-- History -->
-    <string name="history">History</string>
+    <!-- Recent Photos -->
+    <string name="recent_photos">Recent Photos</string>
     <string name="open_in_500px">Open in 500px</string>
 
     <!-- Search -->

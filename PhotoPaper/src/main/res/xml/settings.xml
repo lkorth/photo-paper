@@ -8,7 +8,7 @@
        <Preference
            android:key="current_photo">
                <intent android:targetPackage="com.lukekorth.android_500px"
-                   android:targetClass="com.lukekorth.android_500px.HistoryActivity" />
+                   android:targetClass="com.lukekorth.android_500px.RecentPhotosActivity" />
        </Preference>
 
        <Preference

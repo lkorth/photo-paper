@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class HistoryActivity extends ListActivity {
+public class RecentPhotosActivity extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,7 @@ public class HistoryActivity extends ListActivity {
 
     @Subscribe
     public void updateHistory(WallpaperChangedEvent event) {
-        setListAdapter(new PhotoAdapter(this, Photos.getSeenPhotos()));
+        setListAdapter(new PhotoAdapter(this, Photos.getRecentlySeenPhotos()));
     }
 
     @Override

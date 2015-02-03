@@ -131,11 +131,11 @@ public class Photos extends Model {
     }
 
     public static Photos getCurrentPhoto() {
-        return getSeenQuery().executeSingle();
+        return getRecentlySeenQuery().executeSingle();
     }
 
-    public static List<Photos> getSeenPhotos() {
-        return getSeenQuery().execute();
+    public static List<Photos> getRecentlySeenPhotos() {
+        return getRecentlySeenQuery().execute();
     }
 
     public static List<Photos> getUnseenPhotos(Context context) {
@@ -172,9 +172,10 @@ public class Photos extends Model {
                 .orderBy("failed_count ASC, created_at ASC");
     }
 
-    private static From getSeenQuery() {
+    private static From getRecentlySeenQuery() {
         return new Select().from(Photos.class)
                 .where("seen = ?", true)
+                .where("seen_at > ?", System.currentTimeMillis() - 604800000) // 7 days in milliseconds
                 .orderBy("seen_at DESC");
     }
 

@@ -38,7 +38,7 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
 
         setContentView(R.layout.view_photo);
 
-        mPhotos = Photos.getSeenPhotos();
+        mPhotos = Photos.getRecentlySeenPhotos();
 
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
 

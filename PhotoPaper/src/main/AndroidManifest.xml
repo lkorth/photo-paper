@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SearchActivity" android:label="@string/search" />
-        <activity android:name=".HistoryActivity" android:label="@string/history" />
+        <activity android:name=".RecentPhotosActivity" android:label="@string/recent_photos" />
         <activity android:name=".ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
 
         <service android:name=".services.UserInfoIntentService" />
