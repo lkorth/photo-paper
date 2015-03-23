@@ -1,22 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22"
 
     defaultConfig {
         applicationId "com.lukekorth.android_500px"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 6
         versionName "0.3.0"
     }
 
     signingConfigs {
         release {
-            storeFile file(System.properties['keystore'])
+            storeFile file(System.properties['KEYSTORE'])
             storePassword ""
-            keyAlias System.properties['alias']
+            keyAlias System.properties['KEYSTORE_EMAIL']
             keyPassword ""
         }
     }
@@ -29,15 +29,15 @@ android {
 }
 
 android.buildTypes.each { type ->
-    type.buildConfigField 'String', 'CONSUMER_KEY', System.properties['consumer_key'] ?: '""'
-    type.buildConfigField 'String', 'CONSUMER_SECRET', System.properties['consumer_secret'] ?: '""'
+    type.buildConfigField 'String', 'CONSUMER_KEY', System.properties['CONSUMER_KEY'] ?: '""'
+    type.buildConfigField 'String', 'CONSUMER_SECRET', System.properties['CONSUMER_SECRET'] ?: '""'
 }
 
 dependencies {
     compile project(':ActiveAndroid')
     compile project(':500px-android-sdk')
 
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.0.0'
 
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
