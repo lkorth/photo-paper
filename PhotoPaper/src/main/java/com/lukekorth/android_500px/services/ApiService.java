@@ -81,6 +81,7 @@ public class ApiService extends IntentService {
             wakeLock.release();
             mLogger.debug("Done fetching photos");
         } else {
+            mBus.post(new WallpaperChangedEvent());
             mLogger.debug("Not getting photos at this time");
         }
     }
