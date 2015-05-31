@@ -33,11 +33,6 @@
             android:entries="@array/categories"
             android:entryValues="@array/category_index" />
 
-        <CheckBoxPreference
-            android:key="allow_nsfw"
-            android:title="@string/nsfw_title"
-            android:summary="@string/nsfw_summary" />
-
     </PreferenceCategory>
 
     <PreferenceCategory android:key="settings" android:title="@string/settings">

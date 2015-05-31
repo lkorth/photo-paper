@@ -70,7 +70,6 @@ public class SettingsFragment extends PreferenceFragment
         mInterval.setOnPreferenceChangeListener(this);
         findPreference("enable").setOnPreferenceChangeListener(this);
         findPreference("use_only_wifi").setOnPreferenceChangeListener(this);
-        findPreference("allow_nsfw").setOnPreferenceChangeListener(this);
 
         setCategoriesSummary(mCategories.getValues());
         mInterval.setSummary(mInterval.getEntry());

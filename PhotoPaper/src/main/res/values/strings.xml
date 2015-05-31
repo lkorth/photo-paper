@@ -20,8 +20,6 @@
     <string name="click_to_logout">Click to logout</string>
     <string name="feature">Feature</string>
     <string name="categories">Categories</string>
-    <string name="nsfw_title">Allow NSFW Photos</string>
-    <string name="nsfw_summary">Show photos that are not suitable for work</string>
     <string name="settings">Settings</string>
     <string name="enable">Enabled</string>
     <string name="enable_summary">Enable Photo Paper to change your wallpaper at the specified interval</string>

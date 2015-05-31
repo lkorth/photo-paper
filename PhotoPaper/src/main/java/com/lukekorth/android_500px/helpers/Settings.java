@@ -49,10 +49,6 @@ public class Settings {
         getPrefs(context).edit().putStringSet("categories", categories).apply();
     }
 
-    public static boolean allowNSFW(Context context) {
-        return getPrefs(context).getBoolean("allow_nsfw", false);
-    }
-
     public static boolean isEnabled(Context context) {
         return getPrefs(context).getBoolean("enable", false);
     }

@@ -49,9 +49,6 @@ public class Photos extends Model {
     @Column(name = "category")
     public int category;
 
-    @Column(name = "nsfw")
-    public boolean nsfw;
-
     @Column(name = "image_url")
     public String imageUrl;
 
@@ -95,7 +92,6 @@ public class Photos extends Model {
                     photo.feature = feature;
                     photo.search = search;
                     photo.category = jsonPhoto.getInt("category");
-                    photo.nsfw = jsonPhoto.getBoolean("nsfw");
                     photo.imageUrl = jsonPhoto.getString("image_url");
                     photo.urlPath = jsonPhoto.getString("url");
                     photo.seen = false;
@@ -149,7 +145,8 @@ public class Photos extends Model {
     private static From getQuery(Context context) {
         String feature = Settings.getFeature(context);
         From query = new Select().from(Photos.class)
-                .where("feature = ?", feature);
+                .where("feature = ?", feature)
+                .where("nsfw = ?", false);
         if (feature.equals("search")) {
             query.where("search = ?", Settings.getSearchQuery(context));
         }
@@ -163,10 +160,6 @@ public class Photos extends Model {
         }
         placeHolders = placeHolders.substring(0, placeHolders.length() - 2);
         query.where("category IN (" + placeHolders + ")", categoryArgs);
-
-        if (!Settings.allowNSFW(context)) {
-            query.where("nsfw = ?", false);
-        }
 
         return query.where("seen = ?", false)
                 .orderBy("failed_count ASC, created_at ASC");
