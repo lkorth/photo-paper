@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -162,6 +163,7 @@ public class SettingsFragment extends PreferenceFragment
                     " " + timeSet);
             WallpaperApplication.getPicasso(mContext)
                     .load(photo.imageUrl)
+                    .placeholder(new ColorDrawable(photo.palette))
                     .error(android.R.drawable.stat_notify_error)
                     .into(mCurrentImageCallback);
         } else {

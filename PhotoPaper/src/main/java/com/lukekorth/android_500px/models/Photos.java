@@ -55,6 +55,9 @@ public class Photos extends Model {
     @Column(name = "url_path")
     public String urlPath;
 
+    @Column(name = "palette")
+    public int palette;
+
     @Column(name = "seen")
     public boolean seen;
 

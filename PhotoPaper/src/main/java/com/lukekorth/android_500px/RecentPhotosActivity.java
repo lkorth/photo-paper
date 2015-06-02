@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -115,7 +116,11 @@ public class RecentPhotosActivity extends ListActivity {
             viewHolderItem.mName.setText(photo.name);
             viewHolderItem.mPhotographer.setText("© " + photo.userName + " / 500px");
             viewHolderItem.mSeenAt.setText("Seen " + timeSeen);
-            mPicasso.load(photo.imageUrl).resize(mSize, mSize).centerCrop().into(viewHolderItem.mPhoto);
+            mPicasso.load(photo.imageUrl)
+                    .resize(mSize, mSize)
+                    .centerCrop()
+                    .placeholder(new ColorDrawable(photo.palette))
+                    .into(viewHolderItem.mPhoto);
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

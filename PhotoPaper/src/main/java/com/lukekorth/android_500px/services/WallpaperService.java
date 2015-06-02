@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.support.v7.graphics.Palette;
 
+import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
@@ -67,6 +69,7 @@ public class WallpaperService extends IntentService {
 
                     wallpaperManager.setBitmap(bitmap);
 
+                    photo.palette = Palette.generate(bitmap).getMutedColor(R.color.brown);
                     photo.seen = true;
                     photo.seenAt = System.currentTimeMillis();
                     photo.save();
