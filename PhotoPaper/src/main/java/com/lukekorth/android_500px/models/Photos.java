@@ -80,27 +80,31 @@ public class Photos extends Model {
             if (isAcceptableSize(desiredHeight, desiredWidth, actualHeight, actualWidth)) {
                 int id = jsonPhoto.getInt("id");
                 if (!new Select().from(Photos.class).where("photo_id = ?", id).exists()) {
-                    Photos photo = new Photos();
-                    photo.photo_id = id;
-                    photo.name = jsonPhoto.getString("name");
-                    photo.description = jsonPhoto.getString("description");
-                    photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
+                    if (!jsonPhoto.getBoolean("nsfw")) {
+                        Photos photo = new Photos();
+                        photo.photo_id = id;
+                        photo.name = jsonPhoto.getString("name");
+                        photo.description = jsonPhoto.getString("description");
+                        photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
 
-                    String createdAt = jsonPhoto.getString("created_at");
-                    photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+                        String createdAt = jsonPhoto.getString("created_at");
+                        photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
-                    photo.feature = feature;
-                    photo.search = search;
-                    photo.category = jsonPhoto.getInt("category");
-                    photo.imageUrl = jsonPhoto.getString("image_url");
-                    photo.urlPath = jsonPhoto.getString("url");
-                    photo.seen = false;
-                    photo.seenAt = 0;
-                    photo.addedAt = System.currentTimeMillis();
+                        photo.feature = feature;
+                        photo.search = search;
+                        photo.category = jsonPhoto.getInt("category");
+                        photo.imageUrl = jsonPhoto.getString("image_url");
+                        photo.urlPath = jsonPhoto.getString("url");
+                        photo.seen = false;
+                        photo.seenAt = 0;
+                        photo.addedAt = System.currentTimeMillis();
 
-                    photo.save();
+                        photo.save();
 
-                    return photo;
+                        return photo;
+                    } else {
+                        logger.debug("Photo was nsfw");
+                    }
                 } else {
                     logger.debug("Photo already exists");
                 }
@@ -145,8 +149,7 @@ public class Photos extends Model {
     private static From getQuery(Context context) {
         String feature = Settings.getFeature(context);
         From query = new Select().from(Photos.class)
-                .where("feature = ?", feature)
-                .where("nsfw = ?", false);
+                .where("feature = ?", feature);
         if (feature.equals("search")) {
             query.where("search = ?", Settings.getSearchQuery(context));
         }
