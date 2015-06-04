@@ -32,16 +32,18 @@
             android:id="@+id/photographer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_below="@+id/name"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="16dp"
             android:layout_toRightOf="@+id/thumbnail" />
 
         <TextView
             android:id="@+id/seen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_below="@+id/photographer"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="16dp"
             android:layout_toRightOf="@+id/thumbnail" />
 
     </RelativeLayout>
