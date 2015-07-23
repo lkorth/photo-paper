@@ -101,8 +101,8 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
 
     private void launch500PxForPhoto(int position) {
         Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse(Photos.BASE_URL_500PX + mPhotos.get(position).urlPath))
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Uri.parse(Photos.BASE_URL_500PX + mPhotos.get(position).urlPath));
+
         startActivity(intent);
     }
 
