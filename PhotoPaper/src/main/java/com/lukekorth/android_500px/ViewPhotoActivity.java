@@ -73,6 +73,9 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.share_photo:
+                sharePhoto(mCurrentPhoto);
+                return true;
             case R.id.open_in_500px:
                 launch500PxForPhoto(mCurrentPhoto);
                 return true;
@@ -86,6 +89,14 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
             mActionBar.setTitle("  " + mPhotos.get(position).name);
             mActionBar.setSubtitle("   " + mPhotos.get(position).userName);
         }
+    }
+
+    private void sharePhoto(int position) {
+        Intent intent = new Intent(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, Photos.BASE_URL_500PX + mPhotos.get(position).urlPath);
+
+        startActivity(Intent.createChooser(intent, getString(R.string.share)));
     }
 
     private void launch500PxForPhoto(int position) {
