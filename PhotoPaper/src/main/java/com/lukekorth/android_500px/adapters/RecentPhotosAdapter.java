@@ -1,4 +1,4 @@
-package com.lukekorth.android_500px;
+package com.lukekorth.android_500px.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lukekorth.android_500px.R;
+import com.lukekorth.android_500px.ViewPhotoActivity;
+import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.squareup.picasso.Picasso;

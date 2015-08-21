@@ -1,32 +1,30 @@
 package com.lukekorth.android_500px;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.lukekorth.android_500px.adapters.PhotoPagerAdapter;
 import com.lukekorth.android_500px.models.Photos;
 
 import java.util.List;
 
-public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
+public class ViewPhotoActivity extends Activity implements ViewPager.OnPageChangeListener {
 
     public static final String PHOTO_POSITION_KEY = "com.lukekorth.android_500px.ViewPhotoActivity.PHOTO_POSITION_KEY";
 
     private ActionBar mActionBar;
-
     private List<Photos> mPhotos;
     private int mCurrentPhoto;
+    private PhotoPagerAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,21 +42,21 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
         setContentView(R.layout.view_photo);
 
         mPhotos = Photos.getRecentlySeenPhotos();
-
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
+
+        mAdapter = new PhotoPagerAdapter(this);
+        mAdapter.setPhotos(mPhotos);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setOnPageChangeListener(this);
-        viewPager.setAdapter(new PhotoPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(mAdapter);
         viewPager.setCurrentItem(mCurrentPhoto);
 
         mActionBar = getActionBar();
-        setPhotoName(mCurrentPhoto);
-
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setPhotoName(mCurrentPhoto);
     }
 
     @Override
@@ -117,26 +115,4 @@ public class ViewPhotoActivity extends FragmentActivity implements ViewPager.OnP
 
     @Override
     public void onPageScrollStateChanged(int state) {}
-
-    private class PhotoPagerAdapter extends FragmentPagerAdapter {
-
-        public PhotoPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            PhotoFragment fragment = new PhotoFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt(PhotoFragment.PHOTO_ID_KEY, mPhotos.get(position).photo_id);
-            fragment.setArguments(bundle);
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return mPhotos.size();
-        }
-    }
-
 }

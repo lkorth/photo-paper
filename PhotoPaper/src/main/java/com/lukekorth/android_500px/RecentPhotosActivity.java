@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
+import com.lukekorth.android_500px.adapters.RecentPhotosAdapter;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.otto.Subscribe;
 
