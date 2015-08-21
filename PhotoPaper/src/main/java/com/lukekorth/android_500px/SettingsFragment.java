@@ -2,7 +2,6 @@ package com.lukekorth.android_500px;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -41,8 +40,6 @@ public class SettingsFragment extends PreferenceFragment
 
     private static final int FIVE_HUNDRED_PX_LOGIN = 20;
 
-    private Context mContext;
-
     private Preference mLogin;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
@@ -53,8 +50,6 @@ public class SettingsFragment extends PreferenceFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-
-        mContext = getActivity().getApplicationContext();
 
         mCurrentPhoto = findPreference("current_photo");
         mNextPhoto = findPreference("next_photo");
@@ -76,7 +71,7 @@ public class SettingsFragment extends PreferenceFragment
         mInterval.setSummary(mInterval.getEntry());
         findPreference("version").setSummary(BuildConfig.VERSION_NAME);
 
-        if (Utils.supportsParallax(mContext)) {
+        if (Utils.supportsParallax(getActivity())) {
             findPreference("use_parallax").setOnPreferenceChangeListener(this);
         } else {
             ((PreferenceCategory) findPreference("settings"))
@@ -94,7 +89,7 @@ public class SettingsFragment extends PreferenceFragment
         onWallpaperChanged(null);
         WallpaperApplication.getBus().post(new ActivityResumedEvent());
 
-        if (Utils.shouldUpdateWallpaper(mContext)) {
+        if (Utils.shouldUpdateWallpaper(getActivity())) {
             runWallpaperService();
         }
     }
@@ -142,7 +137,7 @@ public class SettingsFragment extends PreferenceFragment
             mLogin.setTitle(user.userName);
             mLogin.setSummary(getString(R.string.click_to_logout));
 
-            WallpaperApplication.getPicasso(mContext)
+            WallpaperApplication.getPicasso(getActivity())
                     .load(user.photo)
                     .error(android.R.drawable.stat_notify_error)
                     .into(mUserImageCallback);
@@ -161,21 +156,23 @@ public class SettingsFragment extends PreferenceFragment
             mCurrentPhoto.setTitle(photo.name);
             mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\n" + getString(R.string.set) +
                     " " + timeSet);
-            WallpaperApplication.getPicasso(mContext)
+            WallpaperApplication.getPicasso(getActivity())
                     .load(photo.imageUrl)
                     .placeholder(new ColorDrawable(photo.palette))
                     .error(android.R.drawable.stat_notify_error)
                     .into(mCurrentImageCallback);
         } else {
             mCurrentPhoto.setTitle(R.string.no_current_photo);
+            mCurrentPhoto.setSummary("");
+            mCurrentPhoto.setIcon(null);
         }
 
-        if (Settings.isEnabled(mContext)) {
-            int photosRemaining = Photos.unseenPhotoCount(mContext);
+        if (Settings.isEnabled(getActivity())) {
+            int photosRemaining = Photos.unseenPhotoCount(getActivity());
             if (photosRemaining > 0) {
                 mNextPhoto.setEnabled(true);
 
-                long nextPhotoTime = Settings.getLastUpdated(mContext) + (Settings.getUpdateInterval(mContext) * 1000);
+                long nextPhotoTime = Settings.getLastUpdated(getActivity()) + (Settings.getUpdateInterval(getActivity()) * 1000);
                 if (nextPhotoTime + 59000 < System.currentTimeMillis()) {
                     mNextPhoto.setTitle(getString(R.string.next_photo) + " " + getString(R.string.next_unlock));
                 } else {
@@ -197,13 +194,13 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceClick(Preference preference) {
         if (preference.getKey().equals("clear_cache")) {
-            new AlertDialog.Builder(mContext)
+            new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.are_you_sure)
                     .setMessage(R.string.are_you_sure_message)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mContext.startService(new Intent(mContext, ClearCacheIntentService.class));
+                            getActivity().startService(new Intent(getActivity(), ClearCacheIntentService.class));
                             dialog.dismiss();
                         }
                     })
@@ -224,13 +221,13 @@ public class SettingsFragment extends PreferenceFragment
                 User.logout();
                 WallpaperApplication.getBus().post(new UserUpdatedEvent(null));
             } else {
-                Intent intent = new Intent(mContext, FiveHundredPxOAuthActivity.class)
+                Intent intent = new Intent(getActivity(), FiveHundredPxOAuthActivity.class)
                         .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
                         .putExtra(FiveHundredPxOAuthActivity.CONSUMER_SECRET, BuildConfig.CONSUMER_SECRET);
                 startActivityForResult(intent, FIVE_HUNDRED_PX_LOGIN);
             }
         } else if (preference.getKey().equals("contact")) {
-            new LogReporting(mContext).collectAndSendLogs();
+            new LogReporting(getActivity()).collectAndSendLogs();
             return true;
         }
 
@@ -241,15 +238,15 @@ public class SettingsFragment extends PreferenceFragment
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         if (key.equals(mCategories.getKey())) {
-            Settings.setCategories(mContext, (Set<String>) newValue);
+            Settings.setCategories(getActivity(), (Set<String>) newValue);
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
-            Settings.setUpdateInterval(mContext, newValue.toString());
-            mInterval.setSummary(Utils.getListSummary(mContext, R.array.interval_index,
+            Settings.setUpdateInterval(getActivity(), newValue.toString());
+            mInterval.setSummary(Utils.getListSummary(getActivity(), R.array.interval_index,
                     R.array.intervals, newValue.toString(), getString(R.string.one_hour)));
             onWallpaperChanged(null);
         } else if (key.equals("use_parallax")) {
-            Settings.setDesiredWidth(mContext, 0);
+            Settings.setDesiredWidth(getActivity(), 0);
         }
 
         runApiService();
@@ -262,10 +259,10 @@ public class SettingsFragment extends PreferenceFragment
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FIVE_HUNDRED_PX_LOGIN) {
             if (resultCode == Activity.RESULT_OK) {
-                User.newUser(mContext,
+                User.newUser(getActivity(),
                         (AccessToken) data.getParcelableExtra(FiveHundredPxOAuthActivity.ACCESS_TOKEN));
             } else if (resultCode != Activity.RESULT_CANCELED) {
-                new AlertDialog.Builder(mContext)
+                new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.login_error)
                         .setMessage(R.string.login_error_message)
                         .setPositiveButton(android.R.string.ok, null)
@@ -288,10 +285,10 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     private void runApiService() {
-        mContext.startService(new Intent(mContext, ApiService.class));
+        getActivity().startService(new Intent(getActivity(), ApiService.class));
     }
 
     private void runWallpaperService() {
-        mContext.startService(new Intent(mContext, WallpaperService.class));
+        getActivity().startService(new Intent(getActivity(), WallpaperService.class));
     }
 }
