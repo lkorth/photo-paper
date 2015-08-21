@@ -90,6 +90,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         if (sPicasso == null) {
             sPicasso = new Picasso.Builder(context.getApplicationContext())
                     .downloader(Cache.createCacheDownloader(context.getApplicationContext()))
+                    .indicatorsEnabled(BuildConfig.DEBUG)
                     .build();
         }
         return sPicasso;
