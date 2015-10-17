@@ -79,8 +79,7 @@ public class Photos extends Model {
         super();
     }
 
-    public static Photos create(Photo photo, String feature, String search, int desiredHeight,
-                                int desiredWidth) {
+    public static Photos create(Photo photo, String feature, String search) {
         Logger logger = LoggerFactory.getLogger("Photos");
 
         if (photo.nsfw) {
@@ -94,31 +93,27 @@ public class Photos extends Model {
         }
 
         try {
-            if (isAcceptableSize(desiredHeight, desiredWidth, photo.height, photo.width)) {
-                Photos photoModel = new Photos();
-                photoModel.photo_id = Integer.parseInt(photo.id);
-                photoModel.name = photo.name;
-                photoModel.description = photo.description;
-                photoModel.userName = photo.user.fullName;
+            Photos photoModel = new Photos();
+            photoModel.photo_id = Integer.parseInt(photo.id);
+            photoModel.name = photo.name;
+            photoModel.description = photo.description;
+            photoModel.userName = photo.user.fullName;
 
-                String createdAt = photo.createdAt;
-                photoModel.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+            String createdAt = photo.createdAt;
+            photoModel.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
-                photoModel.feature = feature;
-                photoModel.search = search;
-                photoModel.category = photo.category;
-                photoModel.imageUrl = photo.imageUrl;
-                photoModel.urlPath = photo.url;
-                photoModel.seen = false;
-                photoModel.seenAt = 0;
-                photoModel.addedAt = System.currentTimeMillis();
+            photoModel.feature = feature;
+            photoModel.search = search;
+            photoModel.category = photo.category;
+            photoModel.imageUrl = photo.imageUrl;
+            photoModel.urlPath = photo.url;
+            photoModel.seen = false;
+            photoModel.seenAt = 0;
+            photoModel.addedAt = System.currentTimeMillis();
 
-                photoModel.save();
+            photoModel.save();
 
-                return photoModel;
-            } else {
-                logger.debug("Photo was not an acceptable size");
-            }
+            return photoModel;
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
@@ -179,31 +174,5 @@ public class Photos extends Model {
                 .where("seen = ?", true)
                 .where("seen_at > ?", System.currentTimeMillis() - 604800000) // 7 days in milliseconds
                 .orderBy("seen_at DESC");
-    }
-
-    private static boolean isAcceptableSize(int desiredHeight, int desiredWidth, int actualHeight, int actualWidth) {
-        boolean scale;
-        if (actualHeight >= desiredHeight && actualWidth >= desiredWidth) {
-            scale = true;
-        } else {
-            double scaleHeight = 0;
-            if (actualHeight < desiredHeight) {
-                scaleHeight = (double) desiredHeight / actualHeight;
-            }
-
-            double scaleWidth = 0;
-            if (actualWidth < desiredWidth) {
-                scaleWidth = (double) desiredWidth / actualWidth;
-            }
-
-            scale = Math.max(scaleHeight, scaleWidth) <= 1.5;
-        }
-
-        double desiredAspectRatio = (double) desiredHeight / desiredWidth;
-        double actualAspectRatio = (double) actualHeight / actualWidth;
-        double percentDifference = (Math.abs(desiredAspectRatio - actualAspectRatio) / desiredAspectRatio) * 100;
-        boolean aspectRatio = percentDifference < 30;
-
-        return scale && aspectRatio;
     }
 }

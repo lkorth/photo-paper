@@ -90,10 +90,8 @@ public class ApiService extends IntentService {
             mPage = response.body().currentPage + 1;
             mTotalPages = response.body().totalPages;
 
-            int desiredHeight = Settings.getDesiredHeight(this);
-            int desiredWidth = Settings.getDesiredWidth(this);
             for (int i = 0; i < response.body().photos.length; i++) {
-                if (Photos.create(response.body().photos[i], response.body().feature, search, desiredHeight, desiredWidth) != null) {
+                if (Photos.create(response.body().photos[i], response.body().feature, search) != null) {
                     mBus.post(new WallpaperChangedEvent());
                 }
             }

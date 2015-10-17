@@ -71,9 +71,7 @@ public class SettingsFragment extends PreferenceFragment
         mInterval.setSummary(mInterval.getEntry());
         findPreference("version").setSummary(BuildConfig.VERSION_NAME);
 
-        if (Utils.supportsParallax(getActivity())) {
-            findPreference("use_parallax").setOnPreferenceChangeListener(this);
-        } else {
+        if (!Utils.supportsParallax(getActivity())) {
             ((PreferenceCategory) findPreference("settings"))
                     .removePreference(findPreference("use_parallax"));
         }
@@ -245,8 +243,6 @@ public class SettingsFragment extends PreferenceFragment
             mInterval.setSummary(Utils.getListSummary(getActivity(), R.array.interval_index,
                     R.array.intervals, newValue.toString(), getString(R.string.one_hour)));
             onWallpaperChanged(null);
-        } else if (key.equals("use_parallax")) {
-            Settings.setDesiredWidth(getActivity(), 0);
         }
 
         runApiService();
