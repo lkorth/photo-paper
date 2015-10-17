@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -20,21 +19,17 @@ import android.widget.GridView;
 import android.widget.SearchView;
 
 import com.lukekorth.android_500px.helpers.Settings;
-import com.lukekorth.android_500px.models.SearchCompleteEvent;
+import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.SearchResult;
 import com.lukekorth.android_500px.services.ApiService;
 import com.lukekorth.android_500px.views.SquareImageView;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.otto.Subscribe;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -42,9 +37,6 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         AbsListView.OnScrollListener, View.OnClickListener {
 
     private static final String QUERY_KEY = "com.lukekorth.android_500px.SearchActivity.QUERY_KEY";
-    private static final String PHOTOS_KEY = "com.lukekorth.android_500px.SearchActivity.PHOTOS_KEY";
-
-    private OkHttpClient mOkHttpClient;
 
     private SearchView mSearchView;
     private PhotoAdapter mPhotoAdapter;
@@ -60,16 +52,11 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             mCurrentQuery = savedInstanceState.getString(QUERY_KEY);
             if (!TextUtils.isEmpty(mCurrentQuery)) {
                 setTitle(mCurrentQuery);
+                performSearch();
             }
         }
 
-        mOkHttpClient = new OkHttpClient();
-
-        if (savedInstanceState != null) {
-            mPhotoAdapter = new PhotoAdapter(this, savedInstanceState.getStringArrayList(PHOTOS_KEY));
-        } else {
-            mPhotoAdapter = new PhotoAdapter(this, new ArrayList<String>());
-        }
+        mPhotoAdapter = new PhotoAdapter(this, new ArrayList<Photos>());
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(mPhotoAdapter);
@@ -94,7 +81,6 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(QUERY_KEY, mCurrentQuery);
-        outState.putStringArrayList(PHOTOS_KEY, mPhotoAdapter.getPhotos());
     }
 
     @Override
@@ -132,48 +118,24 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     private void performSearch() {
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            mPhotoAdapter.setPhotos(new ArrayList<String>());
+            mPhotoAdapter.setPhotos(new ArrayList<Photos>());
         }
 
-        Request request = new Request.Builder()
-                .header("User-Agent", "com.lukekorth.android_500px")
-                .url(ApiService.API_BASE_URL + "photos/search?term=" + Uri.encode(mCurrentQuery) +
-                        "&rpp=100" + "&image_size=2&consumer_key=" + BuildConfig.CONSUMER_KEY)
-                .build();
-
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
+        WallpaperApplication.getFiveHundredPxClient().search(mCurrentQuery, new Callback<SearchResult>() {
             @Override
-            public void onFailure(Request request, IOException e) {
-                WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
+            public void success(SearchResult searchResult, Response response) {
+                onSearchComplete(searchResult.getPhotos());
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
-                try {
-                    if (response.code() == 200) {
-                        JSONArray photos = new JSONObject(response.body().string()).getJSONArray("photos");
-                        ArrayList<String> data = new ArrayList<String>();
-                        for (int i = 0; i < photos.length(); i++) {
-                            data.add(photos.getJSONObject(i).getString("image_url"));
-                        }
-
-                        WallpaperApplication.getBus().post(new SearchCompleteEvent(data));
-                    } else {
-                        WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
-                    }
-                } catch (IOException e) {
-                    WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
-                } catch (JSONException e) {
-                    WallpaperApplication.getBus().post(new SearchCompleteEvent(new ArrayList<String>()));
-                }
-
+            public void failure(RetrofitError error) {
+                onSearchComplete(new ArrayList<Photos>());
             }
         });
     }
 
-    @Subscribe
-    public void onSearchComplete(SearchCompleteEvent event) {
-        mPhotoAdapter.setPhotos(event.getPhotos());
+    public void onSearchComplete(List<Photos> photos) {
+        mPhotoAdapter.setPhotos(photos);
         mPhotoAdapter.notifyDataSetChanged();
         setProgressBarIndeterminateVisibility(false);
     }
@@ -222,18 +184,18 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     private class PhotoAdapter extends BaseAdapter {
 
         private Context mContext;
-        private ArrayList<String> mPhotos;
+        private List<Photos> mPhotos;
 
-        public PhotoAdapter(Context context, ArrayList<String> photos) {
+        public PhotoAdapter(Context context, ArrayList<Photos> photos) {
             mContext = context;
             mPhotos = photos;
         }
 
-        public void setPhotos(ArrayList<String> photos) {
+        public void setPhotos(List<Photos> photos) {
             mPhotos = photos;
         }
 
-        public ArrayList<String> getPhotos() {
+        public List<Photos> getPhotos() {
             return mPhotos;
         }
 
@@ -243,7 +205,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         }
 
         @Override
-        public String getItem(int position) {
+        public Photos getItem(int position) {
             return mPhotos.get(position);
         }
 
@@ -261,7 +223,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             }
 
             WallpaperApplication.getPicasso(mContext)
-                    .load(getItem(position))
+                    .load(getItem(position).imageUrl)
                     .fit()
                     .tag(mContext)
                     .into(view);

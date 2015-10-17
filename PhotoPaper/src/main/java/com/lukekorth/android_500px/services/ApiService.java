@@ -1,24 +1,17 @@
 package com.lukekorth.android_500px.services;
 
 import android.app.IntentService;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.PowerManager;
 
-import com.lukekorth.android_500px.BuildConfig;
 import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
+import com.lukekorth.android_500px.interfaces.FiveHundredPxClient;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import com.squareup.otto.Bus;
 
 import org.json.JSONArray;
@@ -27,23 +20,15 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 public class ApiService extends IntentService {
 
-    public static final String API_BASE_URL = "https://api.500px.com/v1/";
-
     private Logger mLogger;
-    private BroadcastReceiver mWifiReceiver;
-    private boolean mIsCurrentNetworkOk;
-    private OkHttpClient mOkHttpClient;
     private Bus mBus;
     private int mErrorCount = 0;
     private int mPage = 1;
@@ -67,17 +52,13 @@ public class ApiService extends IntentService {
 
             mBus = WallpaperApplication.getBus();
 
-            registerWifiReceiver();
-            mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(this);
-            mOkHttpClient = new OkHttpClient();
             while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mErrorCount < 5 &&
-                    mIsCurrentNetworkOk && (System.currentTimeMillis() - startTime) < 300000) {
+                    Utils.isCurrentNetworkOk(this) && (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
 
             startService(new Intent(this, PhotoCacheIntentService.class));
 
-            unregisterReceiver(mWifiReceiver);
             wakeLock.release();
             mLogger.debug("Done fetching photos");
         } else {
@@ -88,104 +69,46 @@ public class ApiService extends IntentService {
 
     private void getPhotos() {
         try {
-            Request request = new Request.Builder()
-                    .header("User-Agent", "com.lukekorth.android_500px")
-                    .url(buildRequestUrl())
-                    .build();
+            String feature = Settings.getFeature(this);
+            String search = feature.equals("search") ? Settings.getSearchQuery(this) : "";
 
-            Response response = mOkHttpClient.newCall(request).execute();
+            FiveHundredPxClient client = WallpaperApplication.getFiveHundredPxClient();
+            Response response;
+            switch (feature) {
+                case "search":
+                    response = client.getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
+                    break;
+                case "user_favorites":
+                    response = client.getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
+                    break;
+                default:
+                    response = client.getPhotos(feature, getCategoriesForRequest(), mPage);
+                    break;
+            }
 
-            int responseCode = response.code();
+            int responseCode = response.getStatus();
             mLogger.debug("Response code: " + responseCode);
             if (responseCode != 200) {
                 mErrorCount++;
                 return;
             }
 
-            JSONObject body = new JSONObject(response.body().string());
+            JSONObject body = new JSONObject(new String(((TypedByteArray) response.getBody()).getBytes()));
             mPage = body.getInt("current_page") + 1;
             mTotalPages = body.getInt("total_pages");
 
             JSONArray photos = body.getJSONArray("photos");
-            String feature = Settings.getFeature(this);
             int desiredHeight = Settings.getDesiredHeight(this);
             int desiredWidth = Settings.getDesiredWidth(this);
             for (int i = 0; i < photos.length(); i++) {
-                if (!mIsCurrentNetworkOk) {
-                    break;
-                }
-
-                String search = "";
-                if (feature.equals("search")) {
-                    search = Settings.getSearchQuery(this);
-                }
-
-                if (Photos.create(
-                        photos.getJSONObject(i), feature, search, desiredHeight, desiredWidth) != null) {
+                if (Photos.create(photos.getJSONObject(i), feature, search, desiredHeight, desiredWidth) != null) {
                     mBus.post(new WallpaperChangedEvent());
                 }
             }
         } catch (JSONException e) {
             mLogger.error(e.getMessage());
             mErrorCount++;
-        } catch (IOException e) {
-            mLogger.error(e.getMessage());
-            mErrorCount++;
-        } catch (OAuthExpectationFailedException e) {
-            mLogger.error(e.getMessage());
-            mErrorCount++;
-        } catch (OAuthCommunicationException e) {
-            mLogger.error(e.getMessage());
-            mErrorCount++;
-        } catch (OAuthMessageSignerException e) {
-            mLogger.error(e.getMessage());
-            mErrorCount++;
         }
-    }
-
-    private void registerWifiReceiver() {
-        mWifiReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mIsCurrentNetworkOk = Utils.isCurrentNetworkOk(context);
-                mLogger.debug("Received connectivity change. Network ok: " + mIsCurrentNetworkOk);
-            }
-        };
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        registerReceiver(mWifiReceiver, filter);
-    }
-
-    private String buildRequestUrl() throws OAuthCommunicationException,
-            OAuthExpectationFailedException, OAuthMessageSignerException {
-        String feature = Settings.getFeature(this);
-        String url;
-        if (feature.equals("search")) {
-            url = API_BASE_URL + "photos/search?term=" + Uri.encode(Settings.getSearchQuery(this)) +
-                    "&only=" + getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
-        } else {
-            url = API_BASE_URL + "photos?feature=" + feature + "&only=" +
-                        getCategoriesForRequest() + "&page=" + mPage + "&image_size=5&rpp=100";
-        }
-
-        if (feature.equals("user_favorites")) {
-            User user = User.getUser();
-            url += "&username=" + user.userName;
-
-            mLogger.debug("Getting photos. Url: " + url);
-
-            CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(
-                    BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);
-            consumer.setTokenWithSecret(user.accessToken, user.accessTokenSecret);
-            url = consumer.sign(url);
-        } else {
-            mLogger.debug("Getting photos. Url: " + url);
-
-            url += "&consumer_key=" + BuildConfig.CONSUMER_KEY;
-        }
-
-        return url;
     }
 
     private String getCategoriesForRequest() {
@@ -202,5 +125,4 @@ public class ApiService extends IntentService {
             return null;
         }
     }
-
 }

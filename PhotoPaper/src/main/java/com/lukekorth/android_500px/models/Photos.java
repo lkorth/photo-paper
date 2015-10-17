@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
+import com.google.gson.annotations.SerializedName;
 import com.lukekorth.android_500px.helpers.Settings;
 
 import org.json.JSONException;
@@ -25,12 +26,15 @@ public class Photos extends Model {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
+    @SerializedName("id")
     @Column(name = "photo_id")
     public int photo_id;
 
+    @SerializedName("name")
     @Column(name = "name")
     public String name;
 
+    @SerializedName("description")
     @Column(name = "description")
     public String description;
 
@@ -46,12 +50,15 @@ public class Photos extends Model {
     @Column(name = "search")
     public String search;
 
+    @SerializedName("category")
     @Column(name = "category")
     public int category;
 
+    @SerializedName("image_url")
     @Column(name = "image_url")
     public String imageUrl;
 
+    @SerializedName("url")
     @Column(name = "url_path")
     public String urlPath;
 
