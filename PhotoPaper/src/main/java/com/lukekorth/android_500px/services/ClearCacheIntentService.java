@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.WallpaperApplication;
+import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.picasso.PicassoTools;
 
@@ -22,9 +23,9 @@ public class ClearCacheIntentService extends IntentService {
 
         ActiveAndroid.getDatabase().delete("Photos", null, null);
         PicassoTools.clearCache(WallpaperApplication.getPicasso(this));
+        Settings.clearUpdated(this);
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());
         startService(new Intent(this, ApiService.class));
     }
-
 }

@@ -75,4 +75,8 @@ public class Settings {
     public static void setUpdated(Context context) {
         getPrefs(context).edit().putLong("last_updated", System.currentTimeMillis()).apply();
     }
+
+    public static void clearUpdated(Context context) {
+        getPrefs(context).edit().putLong("last_updated", 0).apply();
+    }
 }
