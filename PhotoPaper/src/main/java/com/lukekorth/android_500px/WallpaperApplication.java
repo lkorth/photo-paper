@@ -13,8 +13,10 @@ import com.lukekorth.android_500px.helpers.SigningOkClient;
 import com.lukekorth.android_500px.helpers.ThreadBus;
 import com.lukekorth.android_500px.interfaces.FiveHundredPxClient;
 import com.lukekorth.android_500px.models.User;
+import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.mailable_log.MailableLog;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import org.slf4j.Logger;
@@ -42,6 +44,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         MailableLog.init(this, BuildConfig.DEBUG);
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
+        getBus().register(this);
     }
 
     private void migrate() {
@@ -86,6 +89,11 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         }
 
         mDefaultExceptionHandler.uncaughtException(thread, ex);
+    }
+
+    @Subscribe
+    public void onUserUpdated(UserUpdatedEvent event) {
+        sFiveHundredPxClient = null;
     }
 
     public static FiveHundredPxClient getFiveHundredPxClient() {
