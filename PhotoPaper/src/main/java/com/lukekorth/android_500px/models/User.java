@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.fivehundredpx.api.auth.AccessToken;
+import com.google.gson.annotations.SerializedName;
 import com.lukekorth.android_500px.services.UserInfoIntentService;
 
 @Table(name = "User")
@@ -16,15 +17,22 @@ public class User extends Model {
     @Column(name = "user_id")
     public int id;
 
+    @SerializedName("username")
     @Column(name = "username")
     public String userName;
 
+    @SerializedName("firstname")
     @Column(name = "firstname")
     public String firstName;
 
+    @SerializedName("lastname")
     @Column(name = "lastname")
     public String lastName;
 
+    @SerializedName("fullname")
+    public String fullName;
+
+    @SerializedName("userpic_url")
     @Column(name = "photo")
     public String photo;
 

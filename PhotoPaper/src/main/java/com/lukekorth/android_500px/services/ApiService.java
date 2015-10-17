@@ -9,21 +9,20 @@ import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.interfaces.FiveHundredPxClient;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.PhotosResponse;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.otto.Bus;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
+import retrofit.Call;
+import retrofit.Response;
 
 public class ApiService extends IntentService {
 
@@ -67,39 +66,38 @@ public class ApiService extends IntentService {
             String search = feature.equals("search") ? Settings.getSearchQuery(this) : "";
 
             FiveHundredPxClient client = WallpaperApplication.getFiveHundredPxClient();
-            Response response;
+            Call<PhotosResponse> call;
             switch (feature) {
                 case "search":
-                    response = client.getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
+                    call = client.getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
                     break;
                 case "user_favorites":
-                    response = client.getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
+                    call = client.getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
                     break;
                 default:
-                    response = client.getPhotos(feature, getCategoriesForRequest(), mPage);
+                    call = client.getPhotos(feature, getCategoriesForRequest(), mPage);
                     break;
             }
 
-            int responseCode = response.getStatus();
+            Response<PhotosResponse> response = call.execute();
+            int responseCode = response.code();
             mLogger.debug("Response code: " + responseCode);
             if (responseCode != 200) {
                 mErrorCount++;
                 return;
             }
 
-            JSONObject body = new JSONObject(new String(((TypedByteArray) response.getBody()).getBytes()));
-            mPage = body.getInt("current_page") + 1;
-            mTotalPages = body.getInt("total_pages");
+            mPage = response.body().currentPage + 1;
+            mTotalPages = response.body().totalPages;
 
-            JSONArray photos = body.getJSONArray("photos");
             int desiredHeight = Settings.getDesiredHeight(this);
             int desiredWidth = Settings.getDesiredWidth(this);
-            for (int i = 0; i < photos.length(); i++) {
-                if (Photos.create(photos.getJSONObject(i), feature, search, desiredHeight, desiredWidth) != null) {
+            for (int i = 0; i < response.body().photos.length; i++) {
+                if (Photos.create(response.body().photos[i], response.body().feature, search, desiredHeight, desiredWidth) != null) {
                     mBus.post(new WallpaperChangedEvent());
                 }
             }
-        } catch (JSONException e) {
+        } catch (IOException e) {
             mLogger.error(e.getMessage());
             mErrorCount++;
         }

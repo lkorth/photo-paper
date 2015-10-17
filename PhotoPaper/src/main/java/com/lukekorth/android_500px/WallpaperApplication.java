@@ -7,14 +7,14 @@ import android.preference.PreferenceManager;
 import com.activeandroid.ActiveAndroid;
 import com.fivehundredpx.api.auth.AccessToken;
 import com.lukekorth.android_500px.helpers.Cache;
-import com.lukekorth.android_500px.helpers.FiveHundredPxClientRequestInterceptor;
-import com.lukekorth.android_500px.helpers.RetrofitOAuthConsumer;
-import com.lukekorth.android_500px.helpers.SigningOkClient;
+import com.lukekorth.android_500px.helpers.ConsumerApiKeyInterceptor;
 import com.lukekorth.android_500px.helpers.ThreadBus;
+import com.lukekorth.android_500px.helpers.UserAgentInterceptor;
 import com.lukekorth.android_500px.interfaces.FiveHundredPxClient;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.mailable_log.MailableLog;
+import com.squareup.okhttp.OkHttpClient;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import retrofit.RestAdapter;
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
+import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
+import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
 public class WallpaperApplication extends com.activeandroid.app.Application  implements Thread.UncaughtExceptionHandler {
 
@@ -98,20 +101,23 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     public static FiveHundredPxClient getFiveHundredPxClient() {
         if (sFiveHundredPxClient == null) {
-            RestAdapter.Builder restAdapterBuilder = new RestAdapter.Builder()
-                    .setEndpoint("https://api.500px.com/v1");
-
+            OkHttpClient client = new OkHttpClient();
             if (User.isUserLoggedIn()) {
-                RetrofitOAuthConsumer oAuthConsumer = new RetrofitOAuthConsumer(BuildConfig.CONSUMER_KEY,
-                        BuildConfig.CONSUMER_SECRET);
                 AccessToken accessToken = User.getLoggedInUserAccessToken();
-                oAuthConsumer.setTokenWithSecret(accessToken.getToken(), accessToken.getTokenSecret());
-                restAdapterBuilder.setClient(new SigningOkClient(oAuthConsumer));
+                OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY,
+                        BuildConfig.CONSUMER_SECRET);
+                consumer.setTokenWithSecret(accessToken.getToken(), accessToken.getTokenSecret());
+                client.interceptors().add(new SigningInterceptor(consumer));
             } else {
-                restAdapterBuilder.setRequestInterceptor(new FiveHundredPxClientRequestInterceptor());
+                client.interceptors().add(new ConsumerApiKeyInterceptor());
             }
 
-            sFiveHundredPxClient = restAdapterBuilder
+            client.interceptors().add(new UserAgentInterceptor());
+
+            sFiveHundredPxClient = new Retrofit.Builder()
+                    .baseUrl("https://api.500px.com/v1/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(FiveHundredPxClient.class);
         }

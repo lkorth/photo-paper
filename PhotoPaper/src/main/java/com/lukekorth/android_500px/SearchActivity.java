@@ -19,7 +19,7 @@ import android.widget.GridView;
 import android.widget.SearchView;
 
 import com.lukekorth.android_500px.helpers.Settings;
-import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.Photo;
 import com.lukekorth.android_500px.models.SearchResult;
 import com.lukekorth.android_500px.services.ApiService;
 import com.lukekorth.android_500px.views.SquareImageView;
@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -56,7 +56,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             }
         }
 
-        mPhotoAdapter = new PhotoAdapter(this, new ArrayList<Photos>());
+        mPhotoAdapter = new PhotoAdapter(this, new ArrayList<Photo>());
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(mPhotoAdapter);
@@ -118,23 +118,24 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     private void performSearch() {
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            mPhotoAdapter.setPhotos(new ArrayList<Photos>());
+            mPhotoAdapter.setPhotos(new ArrayList<Photo>());
         }
 
-        WallpaperApplication.getFiveHundredPxClient().search(mCurrentQuery, new Callback<SearchResult>() {
-            @Override
-            public void success(SearchResult searchResult, Response response) {
-                onSearchComplete(searchResult.getPhotos());
-            }
+        WallpaperApplication.getFiveHundredPxClient().search(mCurrentQuery)
+                .enqueue(new Callback<SearchResult>() {
+                    @Override
+                    public void onResponse(Response<SearchResult> response, Retrofit retrofit) {
+                        onSearchComplete(response.body().photos);
+                    }
 
-            @Override
-            public void failure(RetrofitError error) {
-                onSearchComplete(new ArrayList<Photos>());
-            }
-        });
+                    @Override
+                    public void onFailure(Throwable error) {
+                        onSearchComplete(new ArrayList<Photo>());
+                    }
+                });
     }
 
-    public void onSearchComplete(List<Photos> photos) {
+    public void onSearchComplete(List<Photo> photos) {
         mPhotoAdapter.setPhotos(photos);
         mPhotoAdapter.notifyDataSetChanged();
         setProgressBarIndeterminateVisibility(false);
@@ -184,18 +185,18 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     private class PhotoAdapter extends BaseAdapter {
 
         private Context mContext;
-        private List<Photos> mPhotos;
+        private List<Photo> mPhotos;
 
-        public PhotoAdapter(Context context, ArrayList<Photos> photos) {
+        public PhotoAdapter(Context context, ArrayList<Photo> photos) {
             mContext = context;
             mPhotos = photos;
         }
 
-        public void setPhotos(List<Photos> photos) {
+        public void setPhotos(List<Photo> photos) {
             mPhotos = photos;
         }
 
-        public List<Photos> getPhotos() {
+        public List<Photo> getPhotos() {
             return mPhotos;
         }
 
@@ -205,7 +206,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         }
 
         @Override
-        public Photos getItem(int position) {
+        public Photo getItem(int position) {
             return mPhotos.get(position);
         }
 

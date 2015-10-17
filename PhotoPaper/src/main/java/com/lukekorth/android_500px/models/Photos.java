@@ -10,8 +10,6 @@ import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.android_500px.helpers.Settings;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,48 +79,46 @@ public class Photos extends Model {
         super();
     }
 
-    public static Photos create(JSONObject jsonPhoto, String feature, String search,
-                                int desiredHeight, int desiredWidth) {
+    public static Photos create(Photo photo, String feature, String search, int desiredHeight,
+                                int desiredWidth) {
         Logger logger = LoggerFactory.getLogger("Photos");
+
+        if (photo.nsfw) {
+            logger.debug("Photo was nsfw");
+            return null;
+        }
+
+        if (new Select().from(Photos.class).where("photo_id = ?", photo.id).exists()) {
+            logger.debug("Photo already exists");
+            return null;
+        }
+
         try {
-            int actualHeight = jsonPhoto.getInt("height");
-            int actualWidth = jsonPhoto.getInt("width");
-            if (isAcceptableSize(desiredHeight, desiredWidth, actualHeight, actualWidth)) {
-                int id = jsonPhoto.getInt("id");
-                if (!new Select().from(Photos.class).where("photo_id = ?", id).exists()) {
-                    if (!jsonPhoto.getBoolean("nsfw")) {
-                        Photos photo = new Photos();
-                        photo.photo_id = id;
-                        photo.name = jsonPhoto.getString("name");
-                        photo.description = jsonPhoto.getString("description");
-                        photo.userName = jsonPhoto.getJSONObject("user").getString("fullname");
+            if (isAcceptableSize(desiredHeight, desiredWidth, photo.height, photo.width)) {
+                Photos photoModel = new Photos();
+                photoModel.photo_id = Integer.parseInt(photo.id);
+                photoModel.name = photo.name;
+                photoModel.description = photo.description;
+                photoModel.userName = photo.user.fullName;
 
-                        String createdAt = jsonPhoto.getString("created_at");
-                        photo.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+                String createdAt = photo.createdAt;
+                photoModel.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
 
-                        photo.feature = feature;
-                        photo.search = search;
-                        photo.category = jsonPhoto.getInt("category");
-                        photo.imageUrl = jsonPhoto.getString("image_url");
-                        photo.urlPath = jsonPhoto.getString("url");
-                        photo.seen = false;
-                        photo.seenAt = 0;
-                        photo.addedAt = System.currentTimeMillis();
+                photoModel.feature = feature;
+                photoModel.search = search;
+                photoModel.category = photo.category;
+                photoModel.imageUrl = photo.imageUrl;
+                photoModel.urlPath = photo.url;
+                photoModel.seen = false;
+                photoModel.seenAt = 0;
+                photoModel.addedAt = System.currentTimeMillis();
 
-                        photo.save();
+                photoModel.save();
 
-                        return photo;
-                    } else {
-                        logger.debug("Photo was nsfw");
-                    }
-                } else {
-                    logger.debug("Photo already exists");
-                }
+                return photoModel;
             } else {
                 logger.debug("Photo was not an acceptable size");
             }
-        } catch (JSONException e) {
-            logger.error(e.getMessage());
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
