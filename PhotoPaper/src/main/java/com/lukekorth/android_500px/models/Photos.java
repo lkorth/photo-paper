@@ -28,11 +28,9 @@ public class Photos extends Model {
     @Column(name = "photo_id")
     public int photo_id;
 
-    @SerializedName("name")
     @Column(name = "name")
     public String name;
 
-    @SerializedName("description")
     @Column(name = "description")
     public String description;
 
@@ -48,9 +46,16 @@ public class Photos extends Model {
     @Column(name = "search")
     public String search;
 
-    @SerializedName("category")
     @Column(name = "category")
     public int category;
+
+    @SerializedName("highest_rating")
+    @Column(name = "highest_rating")
+    public double highestRating;
+
+    @SerializedName("times_viewed")
+    @Column(name = "times_viewed")
+    public int views;
 
     @SerializedName("image_url")
     @Column(name = "image_url")
@@ -105,6 +110,8 @@ public class Photos extends Model {
             photoModel.feature = feature;
             photoModel.search = search;
             photoModel.category = photo.category;
+            photoModel.highestRating = photo.highestRating;
+            photoModel.views = photo.views;
             photoModel.imageUrl = photo.imageUrl;
             photoModel.urlPath = photo.url;
             photoModel.seen = false;
@@ -166,7 +173,7 @@ public class Photos extends Model {
         query.where("category IN (" + placeHolders + ")", categoryArgs);
 
         return query.where("seen = ?", false)
-                .orderBy("failed_count ASC, created_at ASC");
+                .orderBy("failed_count ASC, highest_rating DESC, times_viewed DESC, created_at ASC");
     }
 
     private static From getRecentlySeenQuery() {

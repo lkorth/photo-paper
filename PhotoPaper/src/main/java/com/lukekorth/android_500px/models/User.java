@@ -80,5 +80,4 @@ public class User extends Model {
 
         return new AccessToken(user.accessToken, user.accessTokenSecret);
     }
-
 }

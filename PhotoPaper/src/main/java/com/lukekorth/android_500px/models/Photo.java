@@ -13,6 +13,7 @@ public class Photo {
     @SerializedName("favorites_count") public int favorites;
     public boolean nsfw;
     @SerializedName("highest_rating") public double highestRating;
+    @SerializedName("times_viewed") public int views;
     @SerializedName("image_url") public String imageUrl;
     public String url;
     public User user;
