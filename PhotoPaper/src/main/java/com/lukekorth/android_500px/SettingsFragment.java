@@ -130,13 +130,12 @@ public class SettingsFragment extends PreferenceFragment
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        User user = event.getUser();
-        if (user != null) {
-            mLogin.setTitle(user.userName);
+        if (event.user != null) {
+            mLogin.setTitle(event.user.userName);
             mLogin.setSummary(getString(R.string.click_to_logout));
 
             WallpaperApplication.getPicasso(getActivity())
-                    .load(user.photo)
+                    .load(event.user.photo)
                     .error(android.R.drawable.stat_notify_error)
                     .into(mUserImageCallback);
         } else {

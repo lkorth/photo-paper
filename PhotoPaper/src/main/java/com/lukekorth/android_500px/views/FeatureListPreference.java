@@ -63,8 +63,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        if (event.getUser() == null &&
-                getValue().equals("your_favorites")) {
+        if (event.user == null && getValue().equals("your_favorites")) {
             setValue("your_favorites");
             setFeatureSummary(getValue());
         }
