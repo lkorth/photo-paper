@@ -19,8 +19,8 @@ public class Utils {
     }
 
     public static boolean shouldUpdateWallpaper(Context context) {
-        return Settings.isEnabled(context) && (Settings.getLastUpdated(context) +
-                 (Settings.getUpdateInterval(context) * 1000) < System.currentTimeMillis());
+        return Settings.isEnabled(context) && (((Settings.getLastUpdated(context) +
+                 (Settings.getUpdateInterval(context) * 1000)) < System.currentTimeMillis()));
     }
 
     public static boolean isCurrentNetworkOk(Context context) {
