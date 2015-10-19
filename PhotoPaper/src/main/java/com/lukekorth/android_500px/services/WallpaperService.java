@@ -23,6 +23,7 @@ import java.io.IOException;
 public class WallpaperService extends IntentService {
 
     public static final String USER_PRESENT_RECEIVER_KEY = "com.lukekorth.android_500px.services.WallpaperService.SLEEP";
+    public static final String SKIP_WALLPAPER_KEY = "com.lukekorth.android_500px.services.WallpaperService.SKIP";
 
     public WallpaperService() {
         super("WallpaperService");
@@ -32,7 +33,7 @@ public class WallpaperService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Logger logger = LoggerFactory.getLogger("WallpaperService");
 
-        if (!Utils.shouldUpdateWallpaper(this)) {
+        if (!Utils.shouldUpdateWallpaper(this) && !intent.getBooleanExtra(SKIP_WALLPAPER_KEY, false)) {
             logger.debug("App is not enabled or wallpaper does not need to be updated");
             return;
         }

@@ -88,7 +88,7 @@ public class SettingsFragment extends PreferenceFragment
         WallpaperApplication.getBus().post(new ActivityResumedEvent());
 
         if (Utils.shouldUpdateWallpaper(getActivity())) {
-            runWallpaperService();
+            runWallpaperService(false);
         }
     }
 
@@ -211,7 +211,7 @@ public class SettingsFragment extends PreferenceFragment
         } else if (preference.getKey().equals(mNextPhoto.getKey())) {
             mNextPhoto.setTitle(R.string.loading);
             mNextPhoto.setSummary("");
-            runWallpaperService();
+            runWallpaperService(true);
             return true;
         } else if (preference.getKey().equals("login")) {
             if (User.isUserLoggedIn()) {
@@ -283,7 +283,9 @@ public class SettingsFragment extends PreferenceFragment
         getActivity().startService(new Intent(getActivity(), ApiService.class));
     }
 
-    private void runWallpaperService() {
-        getActivity().startService(new Intent(getActivity(), WallpaperService.class));
+    private void runWallpaperService(boolean skip) {
+        Intent intent = new Intent(getActivity(), WallpaperService.class)
+                .putExtra(WallpaperService.SKIP_WALLPAPER_KEY, skip);
+        getActivity().startService(intent);
     }
 }
