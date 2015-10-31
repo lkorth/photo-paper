@@ -17,5 +17,7 @@ public class Photo {
     @SerializedName("image_url") public String imageUrl;
     public String url;
     public User user;
+    public boolean voted;
+    public boolean favorited;
 
 }

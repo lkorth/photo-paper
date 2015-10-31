@@ -159,6 +159,5 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         }
         return sPicasso;
     }
-
 }
 
