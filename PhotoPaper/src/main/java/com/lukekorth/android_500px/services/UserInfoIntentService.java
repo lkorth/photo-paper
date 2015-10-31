@@ -22,7 +22,7 @@ public class UserInfoIntentService extends IntentService {
         ((WallpaperApplication) getApplication()).onUserUpdated(null);
 
         try {
-            User userResponse = WallpaperApplication.getFiveHundredPxClient()
+            User userResponse = WallpaperApplication.getApiClient()
                     .users()
                     .execute()
                     .body()

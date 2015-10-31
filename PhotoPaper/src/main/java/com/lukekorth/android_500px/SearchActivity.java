@@ -121,7 +121,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             mPhotoAdapter.setPhotos(new ArrayList<Photo>());
         }
 
-        WallpaperApplication.getFiveHundredPxClient().search(mCurrentQuery)
+        WallpaperApplication.getApiClient().search(mCurrentQuery)
                 .enqueue(new Callback<SearchResult>() {
                     @Override
                     public void onResponse(Response<SearchResult> response, Retrofit retrofit) {

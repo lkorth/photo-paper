@@ -35,7 +35,8 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
 
-    private static FiveHundredPxClient sFiveHundredPxClient;
+    private static FiveHundredPxClient sApiClient;
+    private static FiveHundredPxClient sNonLoggedInApiClient;
     private static ThreadBus sBus;
     private static Picasso sPicasso;
 
@@ -96,11 +97,11 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        sFiveHundredPxClient = null;
+        sApiClient = null;
     }
 
-    public static FiveHundredPxClient getFiveHundredPxClient() {
-        if (sFiveHundredPxClient == null) {
+    public static FiveHundredPxClient getApiClient() {
+        if (sApiClient == null) {
             OkHttpClient client = new OkHttpClient();
             if (User.isUserLoggedIn()) {
                 AccessToken accessToken = User.getLoggedInUserAccessToken();
@@ -114,7 +115,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
             client.interceptors().add(new UserAgentInterceptor());
 
-            sFiveHundredPxClient = new Retrofit.Builder()
+            sApiClient = new Retrofit.Builder()
                     .baseUrl("https://api.500px.com/v1/")
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -122,7 +123,24 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
                     .create(FiveHundredPxClient.class);
         }
 
-        return sFiveHundredPxClient;
+        return sApiClient;
+    }
+
+    public static FiveHundredPxClient getNonLoggedInApiClient() {
+        if (sNonLoggedInApiClient == null) {
+            OkHttpClient client = new OkHttpClient();
+            client.interceptors().add(new ConsumerApiKeyInterceptor());
+            client.interceptors().add(new UserAgentInterceptor());
+
+            sNonLoggedInApiClient = new Retrofit.Builder()
+                    .baseUrl("https://api.500px.com/v1/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(FiveHundredPxClient.class);
+        }
+
+        return sNonLoggedInApiClient;
     }
 
     public static Bus getBus() {

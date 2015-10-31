@@ -65,17 +65,19 @@ public class ApiService extends IntentService {
             String feature = Settings.getFeature(this);
             String search = feature.equals("search") ? Settings.getSearchQuery(this) : "";
 
-            FiveHundredPxClient client = WallpaperApplication.getFiveHundredPxClient();
             Call<PhotosResponse> call;
             switch (feature) {
                 case "search":
-                    call = client.getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
+                    call = WallpaperApplication.getNonLoggedInApiClient()
+                            .getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
                     break;
                 case "user_favorites":
-                    call = client.getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
+                    call = WallpaperApplication.getApiClient()
+                            .getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
                     break;
                 default:
-                    call = client.getPhotos(feature, getCategoriesForRequest(), mPage);
+                    call = WallpaperApplication.getApiClient()
+                            .getPhotos(feature, getCategoriesForRequest(), mPage);
                     break;
             }
 
