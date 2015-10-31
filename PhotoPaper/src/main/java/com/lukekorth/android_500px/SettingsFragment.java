@@ -23,6 +23,7 @@ import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.ActivityResumedEvent;
 import com.lukekorth.android_500px.models.Photos;
+import com.lukekorth.android_500px.models.RemainingPhotosChangedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
@@ -164,6 +165,11 @@ public class SettingsFragment extends PreferenceFragment
             mCurrentPhoto.setIcon(null);
         }
 
+        onRemainingPhotosChanged(null);
+    }
+
+    @Subscribe
+    public void onRemainingPhotosChanged(RemainingPhotosChangedEvent event) {
         if (Settings.isEnabled(getActivity())) {
             int photosRemaining = Photos.unseenPhotoCount(getActivity());
             if (photosRemaining > 0) {

@@ -2,14 +2,15 @@ package com.lukekorth.android_500px.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.SystemClock;
 
 import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
-import com.lukekorth.android_500px.interfaces.FiveHundredPxClient;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.PhotosResponse;
+import com.lukekorth.android_500px.models.RemainingPhotosChangedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.otto.Bus;
@@ -94,13 +95,16 @@ public class ApiService extends IntentService {
 
             for (int i = 0; i < response.body().photos.length; i++) {
                 if (Photos.create(response.body().photos[i], response.body().feature, search) != null) {
-                    mBus.post(new WallpaperChangedEvent());
+                    mBus.post(new RemainingPhotosChangedEvent());
                 }
+                SystemClock.sleep(25);
             }
         } catch (IOException e) {
             mLogger.error(e.getMessage());
             mErrorCount++;
         }
+
+        SystemClock.sleep(5000);
     }
 
     private String getCategoriesForRequest() {
