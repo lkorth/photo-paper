@@ -108,10 +108,9 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
                         BuildConfig.CONSUMER_SECRET);
                 consumer.setTokenWithSecret(accessToken.getToken(), accessToken.getTokenSecret());
                 client.interceptors().add(new SigningInterceptor(consumer));
-            } else {
-                client.interceptors().add(new ConsumerApiKeyInterceptor());
             }
 
+            client.interceptors().add(new ConsumerApiKeyInterceptor());
             client.interceptors().add(new UserAgentInterceptor());
 
             sFiveHundredPxClient = new Retrofit.Builder()
