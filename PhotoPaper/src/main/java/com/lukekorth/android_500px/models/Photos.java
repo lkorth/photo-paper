@@ -156,10 +156,11 @@ public class Photos extends Model {
 
     private static From getQuery(Context context) {
         String feature = Settings.getFeature(context);
-        From query = new Select().from(Photos.class)
-                .where("feature = ?", feature);
+        From query = new Select().from(Photos.class);
         if (feature.equals("search")) {
             query.where("search = ?", Settings.getSearchQuery(context));
+        } else {
+            query.where("feature = ?", feature);
         }
 
         int[] categories = Settings.getCategories(context);
