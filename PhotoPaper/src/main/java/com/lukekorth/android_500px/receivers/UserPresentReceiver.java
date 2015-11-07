@@ -16,5 +16,4 @@ public class UserPresentReceiver extends BroadcastReceiver {
                 .putExtra(WallpaperService.USER_PRESENT_RECEIVER_KEY, true));
         }
     }
-
 }

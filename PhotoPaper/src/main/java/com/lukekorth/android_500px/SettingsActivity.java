@@ -3,6 +3,8 @@ package com.lukekorth.android_500px;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+import com.lukekorth.android_500px.sync.AccountCreator;
+
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 
@@ -15,6 +17,8 @@ public class SettingsActivity extends PreferenceActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
+        AccountCreator.createAccount(this);
 
         AppRate.with(this)
                 .text(R.string.rate_app)

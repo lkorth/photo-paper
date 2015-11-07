@@ -27,9 +27,9 @@ import com.lukekorth.android_500px.models.RemainingPhotosChangedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
-import com.lukekorth.android_500px.services.ApiService;
 import com.lukekorth.android_500px.services.ClearCacheIntentService;
 import com.lukekorth.android_500px.services.WallpaperService;
+import com.lukekorth.android_500px.sync.SyncAdapter;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -79,7 +79,6 @@ public class SettingsFragment extends PreferenceFragment
 
         WallpaperApplication.getBus().register(this);
         onUserUpdated(new UserUpdatedEvent(User.getUser()));
-        runApiService();
     }
 
     @Override
@@ -250,7 +249,7 @@ public class SettingsFragment extends PreferenceFragment
             onWallpaperChanged(null);
         }
 
-        runApiService();
+        SyncAdapter.requestSync();
 
         return true;
     }
@@ -283,10 +282,6 @@ public class SettingsFragment extends PreferenceFragment
             }
             mCategories.setSummary(summary.substring(0, summary.length() - 2));
         }
-    }
-
-    private void runApiService() {
-        getActivity().startService(new Intent(getActivity(), ApiService.class));
     }
 
     private void runWallpaperService(boolean skip) {

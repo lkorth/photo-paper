@@ -3,7 +3,6 @@ package com.lukekorth.android_500px;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -20,7 +19,7 @@ import com.lukekorth.android_500px.adapters.GridPhotoAdapter;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.models.Photo;
 import com.lukekorth.android_500px.models.SearchResult;
-import com.lukekorth.android_500px.services.ApiService;
+import com.lukekorth.android_500px.sync.SyncAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +161,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             case R.id.save_search:
                 Settings.setFeature(this, "search");
                 Settings.setSearchQuery(this, mCurrentQuery);
-                startService(new Intent(this, ApiService.class));
+                SyncAdapter.requestSync();
                 finish();
                 return true;
         }

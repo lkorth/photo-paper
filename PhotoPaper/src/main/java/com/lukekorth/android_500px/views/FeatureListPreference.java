@@ -17,7 +17,7 @@ import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.ActivityResumedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
-import com.lukekorth.android_500px.services.ApiService;
+import com.lukekorth.android_500px.sync.SyncAdapter;
 import com.squareup.otto.Subscribe;
 
 public class FeatureListPreference extends ListPreference implements Preference.OnPreferenceChangeListener {
@@ -103,7 +103,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
         if (!newValue.toString().equals("search")) {
             Settings.setFeature(getContext(), newValue.toString());
             setFeatureSummary(newValue.toString());
-            getContext().startService(new Intent(getContext(), ApiService.class));
+            SyncAdapter.requestSync();
             return true;
         } else {
             getContext().startActivity(new Intent(getContext(), SearchActivity.class));

@@ -7,6 +7,7 @@ import com.activeandroid.ActiveAndroid;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
+import com.lukekorth.android_500px.sync.SyncAdapter;
 import com.squareup.picasso.PicassoTools;
 
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,6 @@ public class ClearCacheIntentService extends IntentService {
         Settings.clearUpdated(this);
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());
-        startService(new Intent(this, ApiService.class));
+        SyncAdapter.requestSync();
     }
 }

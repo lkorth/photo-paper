@@ -14,6 +14,7 @@ import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photos;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
+import com.lukekorth.android_500px.sync.SyncAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,8 +89,8 @@ public class WallpaperService extends IntentService {
         }
 
         if (Utils.needMorePhotos(this)) {
-            logger.debug("Getting more photos via ApiService");
-            startService(new Intent(this, ApiService.class));
+            logger.debug("Getting more photos via Sync Adapter");
+            SyncAdapter.requestSync();
         }
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());

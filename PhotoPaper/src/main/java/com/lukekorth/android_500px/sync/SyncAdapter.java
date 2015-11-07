@@ -1,7 +1,12 @@
-package com.lukekorth.android_500px.services;
+package com.lukekorth.android_500px.sync;
 
-import android.app.IntentService;
-import android.content.Intent;
+import android.accounts.Account;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SyncResult;
+import android.os.Bundle;
 import android.os.SystemClock;
 
 import com.lukekorth.android_500px.R;
@@ -14,6 +19,7 @@ import com.lukekorth.android_500px.models.RemainingPhotosChangedEvent;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.WallpaperChangedEvent;
 import com.squareup.otto.Bus;
+import com.squareup.picasso.Picasso;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,40 +27,58 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import retrofit.Call;
 import retrofit.Response;
 
-public class ApiService extends IntentService {
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private Logger mLogger;
     private Bus mBus;
-    private int mErrorCount = 0;
-    private int mPage = 1;
-    private int mTotalPages = 1;
+    private int mErrorCount;
+    private int mPage;
+    private int mTotalPages;
 
-    public ApiService() {
-        super("ApiService");
+    public static void requestSync() {
+        ContentResolver.requestSync(AccountCreator.getAccount(),
+                "com.lukekorth.android_500px.sync.provider", new Bundle());
+    }
+
+    public SyncAdapter(Context context, boolean autoInitialize) {
+        super(context, autoInitialize);
+        init();
+    }
+
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+        init();
+    }
+
+    private void init() {
+        mLogger = LoggerFactory.getLogger("SyncAdapter");
+        mBus = WallpaperApplication.getBus();
+        mErrorCount = 0;
+        mPage = 1;
+        mTotalPages = 1;
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        mLogger = LoggerFactory.getLogger("ApiService");
-        mBus = WallpaperApplication.getBus();
-
-        if (Utils.shouldGetPhotos(this)) {
+    public void onPerformSync(Account account, Bundle extras, String authority,
+                              ContentProviderClient provider, SyncResult syncResult) {
+        if (Utils.shouldGetPhotos(getContext())) {
             mLogger.debug("Attempting to fetch new photos");
 
             long startTime = System.currentTimeMillis();
 
-            while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mErrorCount < 5 &&
-                    Utils.isCurrentNetworkOk(this) && (System.currentTimeMillis() - startTime) < 300000) {
+            while (Utils.needMorePhotos(getContext()) && mPage <= mTotalPages && mErrorCount < 5 &&
+                    Utils.isCurrentNetworkOk(getContext()) && (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
 
-            startService(new Intent(this, PhotoCacheIntentService.class));
-
             mLogger.debug("Done fetching photos");
+
+            cachePhotos();
         } else {
             mBus.post(new WallpaperChangedEvent());
             mLogger.debug("Not getting photos at this time");
@@ -63,14 +87,14 @@ public class ApiService extends IntentService {
 
     private void getPhotos() {
         try {
-            String feature = Settings.getFeature(this);
-            String search = feature.equals("search") ? Settings.getSearchQuery(this) : "";
+            String feature = Settings.getFeature(getContext());
+            String search = feature.equals("search") ? Settings.getSearchQuery(getContext()) : "";
 
             Call<PhotosResponse> call;
             switch (feature) {
                 case "search":
                     call = WallpaperApplication.getNonLoggedInApiClient()
-                            .getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
+                            .getPhotosFromSearch(Settings.getSearchQuery(getContext()), getCategoriesForRequest(), mPage);
                     break;
                 case "user_favorites":
                     call = WallpaperApplication.getApiClient()
@@ -107,9 +131,29 @@ public class ApiService extends IntentService {
         SystemClock.sleep(5000);
     }
 
+    private void cachePhotos() {
+        mLogger.debug("Caching photos");
+
+        Picasso picasso = WallpaperApplication.getPicasso(getContext());
+        List<Photos> photos = Photos.getUnseenPhotos(getContext());
+        for (Photos photo : photos) {
+            if (Utils.isCurrentNetworkOk(getContext())) {
+                picasso.load(photo.imageUrl)
+                        .tag("PhotoCacheIntentService")
+                        .fetch();
+                SystemClock.sleep(50);
+            } else {
+                picasso.cancelTag("PhotoCacheIntentService");
+                break;
+            }
+        }
+
+        mLogger.debug("Done caching photos");
+    }
+
     private String getCategoriesForRequest() {
-        String[] allCategories = getResources().getStringArray(R.array.categories);
-        int[] categories = Settings.getCategories(this);
+        String[] allCategories = getContext().getResources().getStringArray(R.array.categories);
+        int[] categories = Settings.getCategories(getContext());
         String filter = "";
         for (int category : categories) {
             filter += allCategories[category] + ",";
