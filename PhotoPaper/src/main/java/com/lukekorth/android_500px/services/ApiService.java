@@ -40,12 +40,12 @@ public class ApiService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         mLogger = LoggerFactory.getLogger("ApiService");
+        mBus = WallpaperApplication.getBus();
+
         if (Utils.shouldGetPhotos(this)) {
             mLogger.debug("Attempting to fetch new photos");
 
             long startTime = System.currentTimeMillis();
-
-            mBus = WallpaperApplication.getBus();
 
             while (Utils.needMorePhotos(this) && mPage <= mTotalPages && mErrorCount < 5 &&
                     Utils.isCurrentNetworkOk(this) && (System.currentTimeMillis() - startTime) < 300000) {
