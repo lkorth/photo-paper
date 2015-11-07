@@ -1,11 +1,11 @@
 package com.lukekorth.android_500px.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.lukekorth.android_500px.R;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.helpers.Utils;
 import com.lukekorth.android_500px.models.Photo;
@@ -24,11 +24,13 @@ public class GridPhotoAdapter extends BaseAdapter {
     private Context mContext;
     private List<Photo> mPhotos;
     private Picasso mPicasso;
+    private int mOneDpInPx;
 
     public GridPhotoAdapter(Context context, ArrayList<Photo> photos) {
         mContext = context;
         mPhotos = photos;
         mPicasso = WallpaperApplication.getPicasso(context);
+        mOneDpInPx = Utils.dpToPx(mContext, 0.5);
     }
 
     public void setPhotos(List<Photo> photos) {
@@ -60,10 +62,11 @@ public class GridPhotoAdapter extends BaseAdapter {
         if (view == null) {
             view = new SquareImageView(mContext);
             view.setScaleType(CENTER_CROP);
+            view.setPadding(mOneDpInPx, mOneDpInPx, mOneDpInPx, mOneDpInPx);
         }
 
         mPicasso.load(getItem(position).imageUrl)
-                .placeholder(new ColorDrawable(Utils.generateRandomColor()))
+                .placeholder(R.color.grey)
                 .fit()
                 .tag(TAG)
                 .into(view);
