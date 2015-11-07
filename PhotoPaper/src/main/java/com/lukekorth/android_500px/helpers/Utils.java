@@ -2,6 +2,7 @@ package com.lukekorth.android_500px.helpers;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -9,6 +10,8 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.lukekorth.android_500px.models.Photos;
+
+import java.util.Random;
 
 public class Utils {
 
@@ -82,5 +85,18 @@ public class Utils {
             }
         }
         return defaultValue;
+    }
+
+    public static int generateRandomColor() {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        red = (red + Color.red(-7637147)) / 2;
+        green = (green + Color.green(-7637147)) / 2;
+        blue = (blue + Color.blue(-7637147)) / 2;
+
+        return Color.rgb(red, green, blue);
     }
 }

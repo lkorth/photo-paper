@@ -10,19 +10,17 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.SearchView;
 
+import com.lukekorth.android_500px.adapters.GridPhotoAdapter;
 import com.lukekorth.android_500px.helpers.Settings;
 import com.lukekorth.android_500px.models.Photo;
 import com.lukekorth.android_500px.models.SearchResult;
 import com.lukekorth.android_500px.services.ApiService;
-import com.lukekorth.android_500px.views.SquareImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,22 +29,20 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-import static android.widget.ImageView.ScaleType.CENTER_CROP;
-
 public class SearchActivity extends Activity implements SearchView.OnQueryTextListener,
         AbsListView.OnScrollListener, View.OnClickListener {
 
     private static final String QUERY_KEY = "com.lukekorth.android_500px.SearchActivity.QUERY_KEY";
 
     private SearchView mSearchView;
-    private PhotoAdapter mPhotoAdapter;
+    private GridPhotoAdapter mAdapter;
     private String mCurrentQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.search_grid_view);
+        setContentView(R.layout.grid_view);
 
         if (savedInstanceState != null) {
             mCurrentQuery = savedInstanceState.getString(QUERY_KEY);
@@ -56,10 +52,10 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
             }
         }
 
-        mPhotoAdapter = new PhotoAdapter(this, new ArrayList<Photo>());
+        mAdapter = new GridPhotoAdapter(this, new ArrayList<Photo>());
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
-        gridView.setAdapter(mPhotoAdapter);
+        gridView.setAdapter(mAdapter);
         gridView.setEmptyView(findViewById(R.id.no_search_results));
         gridView.setOnScrollListener(this);
 
@@ -118,7 +114,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     private void performSearch() {
         if (TextUtils.isEmpty(mCurrentQuery)) {
-            mPhotoAdapter.setPhotos(new ArrayList<Photo>());
+            mAdapter.setPhotos(new ArrayList<Photo>());
         }
 
         WallpaperApplication.getApiClient().search(mCurrentQuery)
@@ -136,8 +132,8 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     }
 
     public void onSearchComplete(List<Photo> photos) {
-        mPhotoAdapter.setPhotos(photos);
-        mPhotoAdapter.notifyDataSetChanged();
+        mAdapter.setPhotos(photos);
+        mAdapter.notifyDataSetChanged();
         setProgressBarIndeterminateVisibility(false);
     }
 
@@ -151,9 +147,9 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-            WallpaperApplication.getPicasso(this).resumeTag(this);
+            WallpaperApplication.getPicasso(this).resumeTag(GridPhotoAdapter.TAG);
         } else {
-            WallpaperApplication.getPicasso(this).pauseTag(this);
+            WallpaperApplication.getPicasso(this).pauseTag(GridPhotoAdapter.TAG);
         }
     }
 
@@ -181,56 +177,4 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
-
-    private class PhotoAdapter extends BaseAdapter {
-
-        private Context mContext;
-        private List<Photo> mPhotos;
-
-        public PhotoAdapter(Context context, ArrayList<Photo> photos) {
-            mContext = context;
-            mPhotos = photos;
-        }
-
-        public void setPhotos(List<Photo> photos) {
-            mPhotos = photos;
-        }
-
-        public List<Photo> getPhotos() {
-            return mPhotos;
-        }
-
-        @Override
-        public int getCount() {
-            return mPhotos.size();
-        }
-
-        @Override
-        public Photo getItem(int position) {
-            return mPhotos.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            SquareImageView view = (SquareImageView) convertView;
-            if (view == null) {
-                view = new SquareImageView(mContext);
-                view.setScaleType(CENTER_CROP);
-            }
-
-            WallpaperApplication.getPicasso(mContext)
-                    .load(getItem(position).imageUrl)
-                    .fit()
-                    .tag(mContext)
-                    .into(view);
-
-            return view;
-        }
-
-    }
 }
