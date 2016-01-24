@@ -37,10 +37,6 @@ public class ViewPhotoActivity extends Activity implements ViewPager.OnPageChang
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
 
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.screenBrightness = 1.0f;
-        getWindow().setAttributes(params);
-
         setContentView(R.layout.view_photo);
 
         mPhotos = Photos.getRecentlySeenPhotos();
