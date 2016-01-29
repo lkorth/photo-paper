@@ -41,9 +41,9 @@ android.buildTypes.each { type ->
 dependencies {
     compile project(':500px-android-sdk')
 
-    compile 'com.android.support:palette-v7:23.1.0'
-    compile 'com.android.support:cardview-v7:23.1.0'
-    compile 'com.android.support:recyclerview-v7:23.1.0'
+    compile 'com.android.support:palette-v7:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
 
     compile 'se.akerfeldt:okhttp-signpost:1.0.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
