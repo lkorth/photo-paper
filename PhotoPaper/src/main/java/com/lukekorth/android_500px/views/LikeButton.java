@@ -46,6 +46,8 @@ public class LikeButton extends Button implements View.OnClickListener {
         setCompoundDrawablesWithIntrinsicBounds(R.drawable.button_action_like, 0, 0, 0);
         if (mPhoto.voted) {
             setBackgroundResource(R.drawable.button_action_bg_liked);
+        } else {
+            setBackgroundResource(R.drawable.button_action_bg);
         }
 
         setOnClickListener(this);

@@ -10,7 +10,6 @@ public class Photo {
     @SerializedName("created_at") public String createdAt;
     public int category;
     @SerializedName("votes_count") public int votes;
-    @SerializedName("favorites_count") public int favorites;
     public boolean nsfw;
     @SerializedName("highest_rating") public double highestRating;
     @SerializedName("times_viewed") public int views;

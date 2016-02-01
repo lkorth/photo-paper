@@ -42,10 +42,11 @@ public class FavoriteButton extends Button implements View.OnClickListener {
     public void setPhoto(Photo photo) {
         mPhoto = photo;
 
-        setText(Integer.toString(mPhoto.favorites));
         setCompoundDrawablesWithIntrinsicBounds(R.drawable.button_action_favorite, 0, 0, 0);
         if (mPhoto.favorited) {
             setBackgroundResource(R.drawable.button_action_bg_favorited);
+        } else {
+            setBackgroundResource(R.drawable.button_action_bg);
         }
 
         setOnClickListener(this);
@@ -105,7 +106,7 @@ public class FavoriteButton extends Button implements View.OnClickListener {
     public void setBackgroundResource(int resid) {
         super.setBackgroundResource(resid);
 
-        setPadding(dpToPx(getContext(), 2), dpToPx(getContext(), 4), dpToPx(getContext(), 8),
+        setPadding(dpToPx(getContext(), 4), dpToPx(getContext(), 4), dpToPx(getContext(), 4),
                 dpToPx(getContext(), 4));
     }
 }
