@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.lukekorth.android_500px.WallpaperApplication;
 import com.lukekorth.android_500px.models.User;
 import com.lukekorth.android_500px.models.UserUpdatedEvent;
+import com.lukekorth.android_500px.sync.AccountCreator;
 
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class UserInfoIntentService extends IntentService {
             user.lastName = userResponse.lastName;
             user.photo = userResponse.photo;
             user.save();
+
+            AccountCreator.createAccount(this);
 
             WallpaperApplication.getBus().post(new UserUpdatedEvent(user));
         } catch (IOException e) {
