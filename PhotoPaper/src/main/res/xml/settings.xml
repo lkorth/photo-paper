@@ -7,8 +7,8 @@
 
        <Preference
            android:key="current_photo">
-               <intent android:targetPackage="com.lukekorth.android_500px"
-                   android:targetClass="com.lukekorth.android_500px.RecentPhotosActivity" />
+               <intent android:targetPackage="com.lukekorth.photo_paper"
+                   android:targetClass="com.lukekorth.photo_paper.RecentPhotosActivity" />
        </Preference>
 
        <Preference
@@ -23,7 +23,7 @@
             android:title="@string/login_with_500px"
             android:summary="@string/login_with_500px_summary" />
 
-        <com.lukekorth.android_500px.views.FeatureListPreference
+        <com.lukekorth.photo_paper.views.FeatureListPreference
             android:key="feature"
             android:title="@string/feature" />
 

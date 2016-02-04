@@ -10,12 +10,12 @@
         android:layout_height="match_parent"
         android:background="@android:color/black" />
 
-    <com.lukekorth.android_500px.views.FavoriteButton
+    <com.lukekorth.photo_paper.views.FavoriteButton
         android:id="@+id/favorites"
         style="@style/button"
         android:layout_alignParentRight="true" />
 
-    <com.lukekorth.android_500px.views.LikeButton
+    <com.lukekorth.photo_paper.views.LikeButton
         android:id="@+id/votes"
         style="@style/button"
         android:layout_toLeftOf="@id/favorites" />
