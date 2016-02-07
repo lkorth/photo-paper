@@ -1,12 +1,12 @@
 package com.lukekorth.photo_paper;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +17,7 @@ import com.lukekorth.photo_paper.models.Photos;
 
 import java.util.List;
 
-public class ViewPhotoActivity extends Activity implements ViewPager.OnPageChangeListener {
+public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     public static final String PHOTO_POSITION_KEY = "com.lukekorth.photo_paper.ViewPhotoActivity.PHOTO_POSITION_KEY";
 
@@ -50,7 +50,7 @@ public class ViewPhotoActivity extends Activity implements ViewPager.OnPageChang
         viewPager.setAdapter(mAdapter);
         viewPager.setCurrentItem(mCurrentPhoto);
 
-        mActionBar = getActionBar();
+        mActionBar = getSupportActionBar();
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }

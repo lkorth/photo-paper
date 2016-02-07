@@ -1,8 +1,8 @@
 package com.lukekorth.photo_paper;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -11,7 +11,7 @@ import com.lukekorth.photo_paper.adapters.RecentPhotosAdapter;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
 import com.squareup.otto.Subscribe;
 
-public class RecentPhotosActivity extends Activity {
+public class RecentPhotosActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
 
@@ -27,7 +27,7 @@ public class RecentPhotosActivity extends Activity {
 
         WallpaperApplication.getBus().register(this);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

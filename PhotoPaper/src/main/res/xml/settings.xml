@@ -41,13 +41,15 @@
             android:key="enable"
             android:title="@string/enable"
             android:summary="@string/enable_summary"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            android:widgetLayout="@layout/preference_switch_layout" />
 
         <CheckBoxPreference
             android:key="use_only_wifi"
             android:title="@string/update_only_over_wifi"
             android:summary="@string/update_only_over_wifi_summary"
-            android:defaultValue="true" />
+            android:defaultValue="true"
+            android:widgetLayout="@layout/preference_switch_layout" />
 
         <ListPreference
             android:key="update_interval"
@@ -59,7 +61,8 @@
         <CheckBoxPreference
             android:key="use_parallax"
             android:title="@string/parallax"
-            android:summary="@string/parallax_summary" />
+            android:summary="@string/parallax_summary"
+            android:widgetLayout="@layout/preference_switch_layout" />
 
         <Preference
             android:key="clear_cache"

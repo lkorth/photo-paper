@@ -1,10 +1,10 @@
 package com.lukekorth.photo_paper;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +28,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SearchActivity extends Activity implements SearchView.OnQueryTextListener,
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
         AbsListView.OnScrollListener, View.OnClickListener {
 
     private static final String QUERY_KEY = "com.lukekorth.photo_paper.SearchActivity.QUERY_KEY";
@@ -39,8 +39,8 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.grid_view);
 
         if (savedInstanceState != null) {
@@ -58,7 +58,7 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         gridView.setEmptyView(findViewById(R.id.no_search_results));
         gridView.setOnScrollListener(this);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

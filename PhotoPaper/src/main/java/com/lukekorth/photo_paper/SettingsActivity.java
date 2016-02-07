@@ -1,11 +1,11 @@
 package com.lukekorth.photo_paper;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.lukekorth.photo_paper.sync.AccountCreator;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

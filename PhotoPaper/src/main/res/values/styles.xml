@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="FullScreenPhotoTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+    <style name="FullScreenPhotoTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
     </style>
 
