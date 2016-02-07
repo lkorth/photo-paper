@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 import com.activeandroid.ActiveAndroid;
 import com.fivehundredpx.api.auth.AccessToken;
+import com.google.gson.GsonBuilder;
+import com.lukekorth.mailable_log.MailableLog;
 import com.lukekorth.photo_paper.helpers.Cache;
 import com.lukekorth.photo_paper.helpers.ConsumerApiKeyInterceptor;
 import com.lukekorth.photo_paper.helpers.ThreadBus;
@@ -13,8 +15,6 @@ import com.lukekorth.photo_paper.helpers.UserAgentInterceptor;
 import com.lukekorth.photo_paper.interfaces.FiveHundredPxClient;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
-import com.lukekorth.mailable_log.MailableLog;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
@@ -24,8 +24,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
@@ -102,22 +103,25 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     public static FiveHundredPxClient getApiClient() {
         if (sApiClient == null) {
-            OkHttpClient client = new OkHttpClient();
+            OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
             if (User.isUserLoggedIn()) {
                 AccessToken accessToken = User.getLoggedInUserAccessToken();
                 OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY,
                         BuildConfig.CONSUMER_SECRET);
                 consumer.setTokenWithSecret(accessToken.getToken(), accessToken.getTokenSecret());
-                client.interceptors().add(new SigningInterceptor(consumer));
+                okHttpBuilder.addInterceptor(new SigningInterceptor(consumer));
             } else {
-                client.interceptors().add(new ConsumerApiKeyInterceptor());
+                okHttpBuilder.addInterceptor(new ConsumerApiKeyInterceptor());
             }
 
-            client.interceptors().add(new UserAgentInterceptor());
+            okHttpBuilder.addInterceptor(new UserAgentInterceptor());
 
             sApiClient = new Retrofit.Builder()
                     .baseUrl("https://api.500px.com/v1/")
-                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                            .excludeFieldsWithoutExposeAnnotation()
+                            .create()))
+                    .client(okHttpBuilder.build())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(FiveHundredPxClient.class);
@@ -128,13 +132,16 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     public static FiveHundredPxClient getNonLoggedInApiClient() {
         if (sNonLoggedInApiClient == null) {
-            OkHttpClient client = new OkHttpClient();
-            client.interceptors().add(new ConsumerApiKeyInterceptor());
-            client.interceptors().add(new UserAgentInterceptor());
+            OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
+                    .addInterceptor(new ConsumerApiKeyInterceptor())
+                    .addInterceptor(new UserAgentInterceptor());
 
             sNonLoggedInApiClient = new Retrofit.Builder()
                     .baseUrl("https://api.500px.com/v1/")
-                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                            .excludeFieldsWithoutExposeAnnotation()
+                            .create()))
+                    .client(okHttpBuilder.build())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(FiveHundredPxClient.class);

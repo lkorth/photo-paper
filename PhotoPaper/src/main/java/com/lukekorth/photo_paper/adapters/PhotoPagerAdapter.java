@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PhotoPagerAdapter extends PagerAdapter {
 
@@ -59,13 +59,13 @@ public class PhotoPagerAdapter extends PagerAdapter {
                     .photo(photo.photo_id)
                     .enqueue(new Callback<PhotoResponse>() {
                         @Override
-                        public void onResponse(final Response<PhotoResponse> response, Retrofit retrofit) {
+                        public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
                             ((FavoriteButton) view.findViewById(R.id.favorites)).setPhoto(response.body().photo);
                             ((LikeButton) view.findViewById(R.id.votes)).setPhoto(response.body().photo);
                         }
 
                         @Override
-                        public void onFailure(Throwable t) {}
+                        public void onFailure(Call<PhotoResponse> call, Throwable t) {}
                     });
         }
 

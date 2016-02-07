@@ -12,9 +12,9 @@ import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.models.Photo;
 import com.lukekorth.photo_paper.models.PhotoResponse;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.lukekorth.photo_paper.helpers.Utils.dpToPx;
 
@@ -62,18 +62,18 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                     .unfavorite(mPhoto.id)
                     .enqueue(new Callback<PhotoResponse>() {
                         @Override
-                        public void onResponse(Response<PhotoResponse> response, Retrofit retrofit) {
+                        public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
                             if (response.isSuccess()) {
                                 Photo photo = response.body().photo;
                                 photo.favorited = false;
                                 setPhoto(photo);
                             } else {
-                                onFailure(null);
+                                onFailure(null, null);
                             }
                         }
 
                         @Override
-                        public void onFailure(Throwable t) {
+                        public void onFailure(Call<PhotoResponse> call, Throwable t) {
                             setBackgroundResource(R.drawable.button_action_bg_favorited);
                         }
                     });
@@ -84,18 +84,18 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                     .favorite(mPhoto.id)
                     .enqueue(new Callback<PhotoResponse>() {
                         @Override
-                        public void onResponse(Response<PhotoResponse> response, Retrofit retrofit) {
+                        public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
                             if (response.isSuccess()) {
                                 Photo photo = response.body().photo;
                                 photo.favorited = true;
                                 setPhoto(photo);
                             } else {
-                                onFailure(null);
+                                onFailure(null, null);
                             }
                         }
 
                         @Override
-                        public void onFailure(Throwable t) {
+                        public void onFailure(Call<PhotoResponse> call, Throwable t) {
                             setBackgroundResource(R.drawable.button_action_bg);
                         }
                     });

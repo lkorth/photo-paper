@@ -1,11 +1,12 @@
 package com.lukekorth.photo_paper.helpers;
 
 import com.lukekorth.photo_paper.BuildConfig;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ConsumerApiKeyInterceptor implements Interceptor {
 
@@ -14,7 +15,7 @@ public class ConsumerApiKeyInterceptor implements Interceptor {
         Request request = chain.request()
                 .newBuilder()
                 .url(chain.request()
-                        .httpUrl()
+                        .url()
                         .newBuilder()
                         .addQueryParameter("consumer_key", BuildConfig.CONSUMER_KEY)
                         .build())

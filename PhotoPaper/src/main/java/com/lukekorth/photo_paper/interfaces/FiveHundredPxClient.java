@@ -5,12 +5,12 @@ import com.lukekorth.photo_paper.models.PhotosResponse;
 import com.lukekorth.photo_paper.models.SearchResult;
 import com.lukekorth.photo_paper.models.UsersResponse;
 
-import retrofit.Call;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Call;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface FiveHundredPxClient {
 

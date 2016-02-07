@@ -24,9 +24,9 @@ import com.lukekorth.photo_paper.sync.SyncAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchActivity extends Activity implements SearchView.OnQueryTextListener,
         AbsListView.OnScrollListener, View.OnClickListener {
@@ -119,12 +119,12 @@ public class SearchActivity extends Activity implements SearchView.OnQueryTextLi
         WallpaperApplication.getApiClient().search(mCurrentQuery)
                 .enqueue(new Callback<SearchResult>() {
                     @Override
-                    public void onResponse(Response<SearchResult> response, Retrofit retrofit) {
+                    public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
                         onSearchComplete(response.body().photos);
                     }
 
                     @Override
-                    public void onFailure(Throwable error) {
+                    public void onFailure(Call<SearchResult> call, Throwable t) {
                         onSearchComplete(new ArrayList<Photo>());
                     }
                 });
