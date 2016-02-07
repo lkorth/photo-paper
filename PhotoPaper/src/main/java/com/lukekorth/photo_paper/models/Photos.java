@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.photo_paper.helpers.Settings;
 
@@ -24,59 +25,76 @@ public class Photos extends Model {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
+    @Expose
     @SerializedName("id")
     @Column(name = "photo_id")
     public int photo_id;
 
+    @Expose
     @Column(name = "name")
     public String name;
 
+    @Expose
     @Column(name = "description")
     public String description;
 
+    @Expose
     @Column(name = "user_name")
     public String userName;
 
+    @Expose
     @Column(name = "created_at")
     public long createdAt;
 
+    @Expose
     @Column(name = "feature")
     public String feature;
 
+    @Expose
     @Column(name = "search")
     public String search;
 
+    @Expose
     @Column(name = "category")
     public int category;
 
+    @Expose
     @SerializedName("highest_rating")
     @Column(name = "highest_rating")
     public double highestRating;
 
+    @Expose
     @SerializedName("times_viewed")
     @Column(name = "times_viewed")
     public int views;
 
+    @Expose
     @SerializedName("image_url")
     @Column(name = "image_url")
     public String imageUrl;
 
+    @Expose
     @SerializedName("url")
     @Column(name = "url_path")
     public String urlPath;
 
+    @Expose
     @Column(name = "palette")
     public int palette;
 
+    @Expose
     @Column(name = "seen")
     public boolean seen;
 
+    @Expose
     @Column(name = "seen_at")
     public long seenAt;
 
+    @Expose
     @Column(name = "failed_count")
     public int failedCount;
 
+    @Expose
     @Column(name = "added_at")
     public long addedAt;
 

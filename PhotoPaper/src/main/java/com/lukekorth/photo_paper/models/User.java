@@ -8,37 +8,46 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.fivehundredpx.api.auth.AccessToken;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.photo_paper.services.UserInfoIntentService;
 
 @Table(name = "User")
 public class User extends Model {
 
+    @Expose
     @Column(name = "user_id")
     public int id;
 
+    @Expose
     @SerializedName("username")
     @Column(name = "username")
     public String userName;
 
+    @Expose
     @SerializedName("firstname")
     @Column(name = "firstname")
     public String firstName;
 
+    @Expose
     @SerializedName("lastname")
     @Column(name = "lastname")
     public String lastName;
 
+    @Expose
     @SerializedName("fullname")
     public String fullName;
 
+    @Expose
     @SerializedName("userpic_url")
     @Column(name = "photo")
     public String photo;
 
+    @Expose
     @Column(name = "access_token")
     public String accessToken;
 
+    @Expose
     @Column(name = "access_token_secret")
     public String accessTokenSecret;
 
