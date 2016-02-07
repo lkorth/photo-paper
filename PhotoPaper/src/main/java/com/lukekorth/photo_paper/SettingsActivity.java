@@ -5,9 +5,6 @@ import android.preference.PreferenceActivity;
 
 import com.lukekorth.photo_paper.sync.AccountCreator;
 
-import fr.nicolaspomepuy.discreetapprate.AppRate;
-import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
-
 public class SettingsActivity extends PreferenceActivity {
 
     @Override
@@ -19,11 +16,5 @@ public class SettingsActivity extends PreferenceActivity {
                 .commit();
 
         AccountCreator.createAccount(this);
-
-        AppRate.with(this)
-                .text(R.string.rate_app)
-                .initialLaunchCount(3)
-                .retryPolicy(RetryPolicy.EXPONENTIAL)
-                .checkAndShow();
     }
 }
