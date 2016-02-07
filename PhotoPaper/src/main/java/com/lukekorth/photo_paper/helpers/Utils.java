@@ -28,8 +28,7 @@ public class Utils {
     }
 
     public static boolean needMorePhotos(Context context) {
-        int remainingPhotos = Photos.unseenPhotoCount(context);
-        return remainingPhotos <= 10 && remainingPhotos < 144;
+        return Photos.unseenPhotoCount(context) <= 10;
     }
 
     public static boolean isConnectedToWifi(Context context) {

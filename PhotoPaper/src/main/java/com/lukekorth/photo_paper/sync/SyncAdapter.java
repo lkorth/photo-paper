@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 
 import com.lukekorth.photo_paper.R;
@@ -17,7 +18,6 @@ import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.PhotosResponse;
 import com.lukekorth.photo_paper.models.RemainingPhotosChangedEvent;
 import com.lukekorth.photo_paper.models.User;
-import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
@@ -41,8 +41,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private int mTotalPages;
 
     public static void requestSync() {
-        ContentResolver.requestSync(AccountCreator.getAccount(),
-                "com.lukekorth.photo_paper.sync.provider", new Bundle());
+        WallpaperApplication.getBus().post(new RemainingPhotosChangedEvent());
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ContentResolver.requestSync(AccountCreator.getAccount(), "com.lukekorth.android_500px.sync.provider",
+                        new Bundle());
+            }
+        }, 1000);
     }
 
     public SyncAdapter(Context context, boolean autoInitialize) {
@@ -71,8 +77,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             long startTime = System.currentTimeMillis();
 
-            while (Utils.needMorePhotos(getContext()) && mPage <= mTotalPages && mErrorCount < 5 &&
-                    Utils.isCurrentNetworkOk(getContext()) && (System.currentTimeMillis() - startTime) < 300000) {
+            while (Photos.unseenPhotoCount(getContext()) < 100 && mPage <= mTotalPages &&
+                    mErrorCount < 5 && Utils.isCurrentNetworkOk(getContext()) &&
+                    (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
 
@@ -80,7 +87,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             cachePhotos();
         } else {
-            mBus.post(new WallpaperChangedEvent());
+            mBus.post(new RemainingPhotosChangedEvent());
             mLogger.debug("Not getting photos at this time");
         }
     }
@@ -119,6 +126,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             for (int i = 0; i < response.body().photos.length; i++) {
                 if (Photos.create(response.body().photos[i], response.body().feature, search) != null) {
+                    mLogger.debug("Added photo");
                     mBus.post(new RemainingPhotosChangedEvent());
                 }
                 SystemClock.sleep(25);
