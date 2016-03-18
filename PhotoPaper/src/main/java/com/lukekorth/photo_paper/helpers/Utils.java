@@ -10,10 +10,12 @@ import android.view.WindowManager;
 
 import com.lukekorth.photo_paper.models.Photos;
 
+import io.realm.Realm;
+
 public class Utils {
 
-    public static boolean shouldGetPhotos(Context context) {
-        return Settings.isEnabled(context) && Utils.needMorePhotos(context) &&
+    public static boolean shouldGetPhotos(Context context, Realm realm) {
+        return Settings.isEnabled(context) && Utils.needMorePhotos(context, realm) &&
                 isCurrentNetworkOk(context);
     }
 
@@ -27,8 +29,8 @@ public class Utils {
                 (Settings.useOnlyWifi(context) && Utils.isConnectedToWifi(context));
     }
 
-    public static boolean needMorePhotos(Context context) {
-        return Photos.unseenPhotoCount(context) <= 10;
+    public static boolean needMorePhotos(Context context, Realm realm) {
+        return Photos.unseenPhotoCount(context, realm) <= 10;
     }
 
     public static boolean isConnectedToWifi(Context context) {

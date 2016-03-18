@@ -38,12 +38,14 @@ import java.util.Set;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
+import io.realm.Realm;
 
 public class SettingsFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
     private static final int FIVE_HUNDRED_PX_LOGIN = 20;
 
+    private Realm mRealm;
     private Preference mLogin;
     private MultiSelectListPreference mCategories;
     private ListPreference mInterval;
@@ -54,6 +56,8 @@ public class SettingsFragment extends PreferenceFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
+
+        mRealm = Realm.getDefaultInstance();
 
         mCurrentPhoto = findPreference("current_photo");
         mNextPhoto = findPreference("next_photo");
@@ -81,7 +85,7 @@ public class SettingsFragment extends PreferenceFragment
         }
 
         WallpaperApplication.getBus().register(this);
-        onUserUpdated(new UserUpdatedEvent(User.getUser()));
+        onUserUpdated(new UserUpdatedEvent());
     }
 
     @Override
@@ -109,6 +113,7 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public void onDestroy() {
         WallpaperApplication.getBus().unregister(this);
+        mRealm.close();
         super.onDestroy();
     }
 
@@ -144,12 +149,13 @@ public class SettingsFragment extends PreferenceFragment
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        if (event.user != null) {
-            mLogin.setTitle(event.user.userName);
+        User user = User.getUser(mRealm);
+        if (user != null) {
+            mLogin.setTitle(user.getUserName());
             mLogin.setSummary(getString(R.string.click_to_logout));
 
             WallpaperApplication.getPicasso(getActivity())
-                    .load(event.user.photo)
+                    .load(user.getPhoto())
                     .error(android.R.drawable.stat_notify_error)
                     .into(mUserImageCallback);
         } else {
@@ -161,15 +167,15 @@ public class SettingsFragment extends PreferenceFragment
 
     @Subscribe
     public void onWallpaperChanged(WallpaperChangedEvent event) {
-        Photos photo = Photos.getCurrentPhoto();
+        Photos photo = Photos.getCurrentPhoto(mRealm);
         if (photo != null) {
-            CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
-            mCurrentPhoto.setTitle(photo.name);
-            mCurrentPhoto.setSummary("© " + photo.userName + " / 500px\n" + getString(R.string.set) +
+            CharSequence timeSet = DateUtils.getRelativeTimeSpanString(photo.getSeenAt(), System.currentTimeMillis(), 0);
+            mCurrentPhoto.setTitle(photo.getName());
+            mCurrentPhoto.setSummary("© " + photo.getUserName() + " / 500px\n" + getString(R.string.set) +
                     " " + timeSet);
             WallpaperApplication.getPicasso(getActivity())
                     .load(photo.imageUrl)
-                    .placeholder(new ColorDrawable(photo.palette))
+                    .placeholder(new ColorDrawable(photo.getPalette()))
                     .error(android.R.drawable.stat_notify_error)
                     .into(mCurrentImageCallback);
         } else {
@@ -184,7 +190,7 @@ public class SettingsFragment extends PreferenceFragment
     @Subscribe
     public void onRemainingPhotosChanged(RemainingPhotosChangedEvent event) {
         if (Settings.isEnabled(getActivity())) {
-            int photosRemaining = Photos.unseenPhotoCount(getActivity());
+            int photosRemaining = Photos.unseenPhotoCount(getActivity(), mRealm);
             if (photosRemaining > 0) {
                 mNextPhoto.setEnabled(true);
 
@@ -233,9 +239,9 @@ public class SettingsFragment extends PreferenceFragment
             runWallpaperService(true);
             return true;
         } else if (preference.getKey().equals("login")) {
-            if (User.isUserLoggedIn()) {
-                User.logout();
-                WallpaperApplication.getBus().post(new UserUpdatedEvent(null));
+            if (User.isUserLoggedIn(mRealm)) {
+                User.logout(mRealm);
+                WallpaperApplication.getBus().post(new UserUpdatedEvent());
             } else {
                 Intent intent = new Intent(getActivity(), FiveHundredPxOAuthActivity.class)
                         .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
@@ -273,7 +279,7 @@ public class SettingsFragment extends PreferenceFragment
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FIVE_HUNDRED_PX_LOGIN) {
             if (resultCode == Activity.RESULT_OK) {
-                User.newUser(getActivity(),
+                User.newUser(getActivity(), mRealm,
                         (AccessToken) data.getParcelableExtra(FiveHundredPxOAuthActivity.ACCESS_TOKEN));
             } else if (resultCode != Activity.RESULT_CANCELED) {
                 new AlertDialog.Builder(getActivity())

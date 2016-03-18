@@ -2,11 +2,6 @@ package com.lukekorth.photo_paper.models;
 
 import android.content.Context;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.From;
-import com.activeandroid.query.Select;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.photo_paper.helpers.Settings;
@@ -18,8 +13,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-@Table(name = "Photos")
-public class Photos extends Model {
+import io.realm.Realm;
+import io.realm.RealmObject;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import io.realm.Sort;
+import io.realm.annotations.Required;
+
+public class Photos extends RealmObject {
 
     public static final String BASE_URL_500PX = "http://500px.com";
 
@@ -27,82 +28,198 @@ public class Photos extends Model {
 
     @Expose
     @SerializedName("id")
-    @Column(name = "photo_id")
-    public int photo_id;
+    @Required
+    private String id;
 
     @Expose
-    @Column(name = "name")
-    public String name;
+    private String name;
 
     @Expose
-    @Column(name = "description")
-    public String description;
+    private String description;
 
     @Expose
-    @Column(name = "user_name")
-    public String userName;
+    private String userName;
 
     @Expose
-    @Column(name = "created_at")
-    public long createdAt;
+    private long createdAt;
 
     @Expose
-    @Column(name = "feature")
-    public String feature;
+    private String feature;
 
     @Expose
-    @Column(name = "search")
-    public String search;
+    private String search;
 
     @Expose
-    @Column(name = "category")
-    public int category;
+    private int category;
 
     @Expose
     @SerializedName("highest_rating")
-    @Column(name = "highest_rating")
-    public double highestRating;
+    private double highestRating;
 
     @Expose
     @SerializedName("times_viewed")
-    @Column(name = "times_viewed")
-    public int views;
+    private int views;
 
     @Expose
     @SerializedName("image_url")
-    @Column(name = "image_url")
     public String imageUrl;
 
     @Expose
     @SerializedName("url")
-    @Column(name = "url_path")
-    public String urlPath;
+    private String urlPath;
 
     @Expose
-    @Column(name = "palette")
-    public int palette;
+    private int palette;
 
     @Expose
-    @Column(name = "seen")
-    public boolean seen;
+    private boolean seen;
 
     @Expose
-    @Column(name = "seen_at")
-    public long seenAt;
+    private long seenAt;
 
     @Expose
-    @Column(name = "failed_count")
-    public int failedCount;
+    private int failedCount;
 
     @Expose
-    @Column(name = "added_at")
-    public long addedAt;
+    private long addedAt;
 
-    public Photos() {
-        super();
+    public String getPhotoId() {
+        return id;
     }
 
-    public static Photos create(Photo photo, String feature, String search) {
+    public void setPhotoId(String photoId) {
+        this.id = photoId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getFeature() {
+        return feature;
+    }
+
+    public void setFeature(String feature) {
+        this.feature = feature;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public double getHighestRating() {
+        return highestRating;
+    }
+
+    public void setHighestRating(double highestRating) {
+        this.highestRating = highestRating;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getUrlPath() {
+        return urlPath;
+    }
+
+    public void setUrlPath(String urlPath) {
+        this.urlPath = urlPath;
+    }
+
+    public int getPalette() {
+        return palette;
+    }
+
+    public void setPalette(int palette) {
+        this.palette = palette;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public long getSeenAt() {
+        return seenAt;
+    }
+
+    public void setSeenAt(long seenAt) {
+        this.seenAt = seenAt;
+    }
+
+    public int getFailedCount() {
+        return failedCount;
+    }
+
+    public void setFailedCount(int failedCount) {
+        this.failedCount = failedCount;
+    }
+
+    public long getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(long addedAt) {
+        this.addedAt = addedAt;
+    }
+
+    public static Photos create(Realm realm, Photo photo, String feature, String search) {
         Logger logger = LoggerFactory.getLogger("Photos");
 
         if (photo.nsfw) {
@@ -110,33 +227,32 @@ public class Photos extends Model {
             return null;
         }
 
-        if (new Select().from(Photos.class).where("photo_id = ?", photo.id).exists()) {
+        if (realm.where(Photos.class).equalTo("id", photo.id).count() > 0) {
             logger.debug("Photo already exists");
             return null;
         }
 
         try {
-            Photos photoModel = new Photos();
-            photoModel.photo_id = Integer.parseInt(photo.id);
-            photoModel.name = photo.name;
-            photoModel.description = photo.description;
-            photoModel.userName = photo.user.fullName;
+            realm.beginTransaction();
 
-            String createdAt = photo.createdAt;
-            photoModel.createdAt = DATE_FORMAT.parse(createdAt.substring(0, createdAt.length() - 6)).getTime();
+            Photos photoModel = realm.createObject(Photos.class);
+            photoModel.setPhotoId(photo.id);
+            photoModel.setName(photo.name);
+            photoModel.setDescription(photo.description);
+            photoModel.setUserName(photo.user.getFullName());
+            photoModel.setCreatedAt(DATE_FORMAT.parse(photo.createdAt.substring(0, photo.createdAt.length() - 6)).getTime());
+            photoModel.setFeature(feature);
+            photoModel.setSearch(search);
+            photoModel.setCategory(photo.category);
+            photoModel.setHighestRating(photo.highestRating);
+            photoModel.setViews(photo.views);
+            photoModel.setImageUrl(photo.imageUrl);
+            photoModel.setUrlPath(photo.url);
+            photoModel.setSeen(false);
+            photoModel.setSeenAt(0);
+            photoModel.setAddedAt(photoModel.addedAt = System.currentTimeMillis());
 
-            photoModel.feature = feature;
-            photoModel.search = search;
-            photoModel.category = photo.category;
-            photoModel.highestRating = photo.highestRating;
-            photoModel.views = photo.views;
-            photoModel.imageUrl = photo.imageUrl;
-            photoModel.urlPath = photo.url;
-            photoModel.seen = false;
-            photoModel.seenAt = 0;
-            photoModel.addedAt = System.currentTimeMillis();
-
-            photoModel.save();
+            realm.commitTransaction();
 
             return photoModel;
         } catch (ParseException e) {
@@ -146,59 +262,65 @@ public class Photos extends Model {
         return null;
     }
 
-    public static Photos getPhoto(int id) {
-        return new Select().from(Photos.class)
-                .where("photo_id = ?", id)
-                .executeSingle();
+    public static Photos getPhoto(Realm realm, int id) {
+        return realm.where(Photos.class)
+                .equalTo("id", id)
+                .findFirst();
     }
 
-    public static Photos getNextPhoto(Context context) {
-        return getQuery(context).executeSingle();
-    }
-
-    public static Photos getCurrentPhoto() {
-        return getRecentlySeenQuery().executeSingle();
-    }
-
-    public static List<Photos> getRecentlySeenPhotos() {
-        return getRecentlySeenQuery().execute();
-    }
-
-    public static List<Photos> getUnseenPhotos(Context context) {
-        return getQuery(context).execute();
-    }
-
-    public static int unseenPhotoCount(Context context) {
-        return getQuery(context).count();
-    }
-
-    private static From getQuery(Context context) {
-        String feature = Settings.getFeature(context);
-        From query = new Select().from(Photos.class);
-        if (feature.equals("search")) {
-            query.where("search = ?", Settings.getSearchQuery(context));
+    public static Photos getNextPhoto(Context context, Realm realm) {
+        RealmResults<Photos> photos = getQuery(context, realm);
+        if (photos.isEmpty()) {
+            return null;
         } else {
-            query.where("feature = ?", feature);
+            return photos.first();
         }
-
-        int[] categories = Settings.getCategories(context);
-        Object[] categoryArgs = new Object[categories.length];
-        String placeHolders = "";
-        for (int i = 0; i < categories.length; i++) {
-            placeHolders += "?, ";
-            categoryArgs[i] = categories[i];
-        }
-        placeHolders = placeHolders.substring(0, placeHolders.length() - 2);
-        query.where("category IN (" + placeHolders + ")", categoryArgs);
-
-        return query.where("seen = ?", false)
-                .orderBy("failed_count ASC, highest_rating DESC, times_viewed DESC, created_at ASC");
     }
 
-    private static From getRecentlySeenQuery() {
-        return new Select().from(Photos.class)
-                .where("seen = ?", true)
-                .where("seen_at > ?", System.currentTimeMillis() - 604800000) // 7 days in milliseconds
-                .orderBy("seen_at DESC");
+    public static Photos getCurrentPhoto(Realm realm) {
+        RealmResults<Photos> photos = getRecentlySeenPhotos(realm);
+        if (photos.isEmpty()) {
+            return null;
+        } else {
+            return photos.first();
+        }
+    }
+
+    public static RealmResults<Photos> getRecentlySeenPhotos(Realm realm) {
+        return realm.where(Photos.class)
+                .equalTo("seen", true)
+                .greaterThan("seenAt", System.currentTimeMillis() - 604800000) // 7 days in milliseconds
+                .findAllSorted("seenAt", Sort.DESCENDING);
+    }
+
+    public static List<Photos> getUnseenPhotos(Context context, Realm realm) {
+        return getQuery(context, realm);
+    }
+
+    public static int unseenPhotoCount(Context context, Realm realm) {
+        return getQuery(context, realm).size();
+    }
+
+    private static RealmResults<Photos> getQuery(Context context, Realm realm) {
+        String feature = Settings.getFeature(context);
+        RealmQuery<Photos> query = realm.where(Photos.class);
+        if (feature.equals("search")) {
+            query.equalTo("search", Settings.getSearchQuery(context));
+        } else {
+            query.equalTo("feature", feature);
+        }
+
+        query.beginGroup();
+        int[] categories = Settings.getCategories(context);
+        for (int i = 0; i < categories.length - 1; i++) {
+            query.equalTo("category", categories[i])
+                    .or();
+        }
+        query.equalTo("category", categories[categories.length - 1])
+                .endGroup();
+
+        return query.equalTo("seen", false)
+                .findAllSorted(new String[] { "failedCount", "highestRating", "views", "createdAt" },
+                        new Sort[] { Sort.ASCENDING, Sort.DESCENDING, Sort.DESCENDING, Sort.ASCENDING });
     }
 }

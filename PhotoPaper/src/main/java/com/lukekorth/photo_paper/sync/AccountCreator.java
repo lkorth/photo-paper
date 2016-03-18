@@ -7,6 +7,8 @@ import android.content.Context;
 
 import com.lukekorth.photo_paper.models.User;
 
+import io.realm.Realm;
+
 import static android.content.Context.ACCOUNT_SERVICE;
 
 public class AccountCreator {
@@ -29,11 +31,14 @@ public class AccountCreator {
     }
 
     public static Account getAccount() {
-        User user = User.getUser();
+        Realm realm = Realm.getDefaultInstance();
+        User user = User.getUser(realm);
+        String username = DEFAULT_ACCOUNT_NAME;
         if (user != null) {
-            return new Account(user.userName, ACCOUNT_TYPE);
-        } else {
-            return new Account(DEFAULT_ACCOUNT_NAME, ACCOUNT_TYPE);
+            username = user.getUserName();
         }
+        realm.close();
+
+        return new Account(username, ACCOUNT_TYPE);
     }
 }

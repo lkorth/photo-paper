@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import io.realm.Realm;
+
 public class UserInfoIntentService extends IntentService {
 
     public UserInfoIntentService() {
@@ -29,17 +31,20 @@ public class UserInfoIntentService extends IntentService {
                     .body()
                     .user;
 
-            User user = User.getUser();
-            user.id = userResponse.id;
-            user.userName = userResponse.userName;
-            user.firstName = userResponse.firstName;
-            user.lastName = userResponse.lastName;
-            user.photo = userResponse.photo;
-            user.save();
+            Realm realm = Realm.getDefaultInstance();
+            User user = User.getUser(realm);
+            realm.beginTransaction();
+            user.setId(userResponse.getId());
+            user.setUserName(userResponse.getUserName());
+            user.setFirstName(userResponse.getFirstName());
+            user.setLastName(userResponse.getLastName());
+            user.setPhoto(userResponse.getPhoto());
+            realm.commitTransaction();
+            realm.close();
 
             AccountCreator.createAccount(this);
 
-            WallpaperApplication.getBus().post(new UserUpdatedEvent(user));
+            WallpaperApplication.getBus().post(new UserUpdatedEvent());
         } catch (IOException e) {
             LoggerFactory.getLogger("UserInfoIntentService").error(e.getMessage());
         }

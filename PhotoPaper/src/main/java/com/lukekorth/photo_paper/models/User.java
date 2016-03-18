@@ -3,90 +3,137 @@ package com.lukekorth.photo_paper.models;
 import android.content.Context;
 import android.content.Intent;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
 import com.fivehundredpx.api.auth.AccessToken;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.photo_paper.services.UserInfoIntentService;
 
-@Table(name = "User")
-public class User extends Model {
+import io.realm.Realm;
+import io.realm.RealmObject;
+
+public class User extends RealmObject {
 
     @Expose
-    @Column(name = "user_id")
-    public int id;
+    private int id;
 
     @Expose
     @SerializedName("username")
-    @Column(name = "username")
-    public String userName;
+    private String userName;
 
     @Expose
     @SerializedName("firstname")
-    @Column(name = "firstname")
-    public String firstName;
+    private String firstName;
 
     @Expose
     @SerializedName("lastname")
-    @Column(name = "lastname")
-    public String lastName;
+    private String lastName;
 
     @Expose
     @SerializedName("fullname")
-    public String fullName;
+    private String fullName;
 
     @Expose
     @SerializedName("userpic_url")
-    @Column(name = "photo")
-    public String photo;
+    private String photo;
 
     @Expose
-    @Column(name = "access_token")
-    public String accessToken;
+    private String accessToken;
 
     @Expose
-    @Column(name = "access_token_secret")
-    public String accessTokenSecret;
+    private String accessTokenSecret;
 
-    public static User getUser() {
-        return new Select().from(User.class)
-                .executeSingle();
+    public int getId() {
+        return id;
     }
 
-    public static boolean isUserLoggedIn() {
-        return new Select().from(User.class)
-                .exists();
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public static void logout() {
-        new Select().from(User.class)
-                .executeSingle()
-                .delete();
+    public String getUserName() {
+        return userName;
     }
 
-    public static void newUser(Context context, AccessToken accessToken) {
-        User user = getUser();
-        if (user != null) {
-            user.delete();
-        }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-        user = new User();
-        user.accessToken = accessToken.getToken();
-        user.accessTokenSecret = accessToken.getTokenSecret();
-        user.save();
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getAccessTokenSecret() {
+        return accessTokenSecret;
+    }
+
+    public void setAccessTokenSecret(String accessTokenSecret) {
+        this.accessTokenSecret = accessTokenSecret;
+    }
+
+    public static User getUser(Realm realm) {
+        return realm.where(User.class).findFirst();
+    }
+
+    public static boolean isUserLoggedIn(Realm realm) {
+        return (realm.where(User.class).findFirst() != null);
+    }
+
+    public static void logout(Realm realm) {
+        realm.beginTransaction();
+        realm.where(User.class).findAll().clear();
+        realm.commitTransaction();
+    }
+
+    public static void newUser(Context context, Realm realm, AccessToken accessToken) {
+        User.logout(realm);
+
+        realm.beginTransaction();
+        User user = realm.createObject(User.class);
+        user.setAccessToken(accessToken.getToken());
+        user.setAccessTokenSecret(accessToken.getTokenSecret());
+        realm.commitTransaction();
 
         context.startService(new Intent(context, UserInfoIntentService.class));
     }
 
-    public static AccessToken getLoggedInUserAccessToken() {
-        User user = getUser();
-        if (user == null) {
-            return null;
-        }
-
-        return new AccessToken(user.accessToken, user.accessTokenSecret);
+    public static AccessToken getLoggedInUserAccessToken(Realm realm) {
+        User user = getUser(realm);
+        return (user != null ? new AccessToken(user.getAccessToken(), user.getAccessTokenSecret()) : null);
     }
 }

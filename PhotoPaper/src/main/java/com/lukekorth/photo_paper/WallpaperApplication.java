@@ -1,10 +1,10 @@
 package com.lukekorth.photo_paper;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.activeandroid.ActiveAndroid;
 import com.fivehundredpx.api.auth.AccessToken;
 import com.google.gson.GsonBuilder;
 import com.lukekorth.mailable_log.MailableLog;
@@ -24,13 +24,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
-public class WallpaperApplication extends com.activeandroid.app.Application  implements Thread.UncaughtExceptionHandler {
+public class WallpaperApplication extends Application implements Thread.UncaughtExceptionHandler {
 
     private static final String VERSION = "version";
 
@@ -49,6 +51,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         MailableLog.init(this, BuildConfig.DEBUG);
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(this).build());
         getBus().register(this);
     }
 
@@ -59,10 +62,7 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
         if (BuildConfig.VERSION_CODE > version) {
             String now = new Date().toString();
             if (version == 0) {
-                ActiveAndroid.getDatabase().delete("Photos", null, null);
                 editor.putString("install_date", now);
-            } else if (version == 1) {
-                ActiveAndroid.getDatabase().delete("Photos", null, null);
             }
 
             editor.putString("upgrade_date", now);
@@ -103,9 +103,10 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
 
     public static FiveHundredPxClient getApiClient() {
         if (sApiClient == null) {
+            Realm realm = Realm.getDefaultInstance();
             OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
-            if (User.isUserLoggedIn()) {
-                AccessToken accessToken = User.getLoggedInUserAccessToken();
+            if (User.isUserLoggedIn(realm)) {
+                AccessToken accessToken = User.getLoggedInUserAccessToken(realm);
                 OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY,
                         BuildConfig.CONSUMER_SECRET);
                 consumer.setTokenWithSecret(accessToken.getToken(), accessToken.getTokenSecret());
@@ -125,6 +126,8 @@ public class WallpaperApplication extends com.activeandroid.app.Application  imp
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(FiveHundredPxClient.class);
+
+            realm.close();
         }
 
         return sApiClient;

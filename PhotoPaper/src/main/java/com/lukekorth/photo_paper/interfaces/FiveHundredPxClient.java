@@ -18,7 +18,7 @@ public interface FiveHundredPxClient {
     Call<UsersResponse> users();
 
     @GET("photos/{id}")
-    Call<PhotoResponse> photo(@Path("id") int id);
+    Call<PhotoResponse> photo(@Path("id") String id);
 
     @GET("photos/search?image_size=2&rpp=100")
     Call<SearchResult> search(@Query("term") String term);

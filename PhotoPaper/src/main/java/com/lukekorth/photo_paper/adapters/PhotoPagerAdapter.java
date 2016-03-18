@@ -15,30 +15,33 @@ import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.views.FavoriteButton;
 import com.lukekorth.photo_paper.views.LikeButton;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PhotoPagerAdapter extends PagerAdapter {
+public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListener {
 
     private Context mContext;
     private LayoutInflater mInflater;
     private List<Photos> mPhotos;
     private boolean mLoggedIn;
 
-    public PhotoPagerAdapter(Context context) {
+    public PhotoPagerAdapter(Context context, Realm realm, RealmResults<Photos> photos) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
-        mPhotos = new ArrayList<>();
-        mLoggedIn = User.isUserLoggedIn();
+        mPhotos = photos;
+        mLoggedIn = User.isUserLoggedIn(realm);
+        realm.addChangeListener(this);
     }
 
-    public void setPhotos(List<Photos> photos) {
-        mPhotos = photos;
+    @Override
+    public void onChange() {
         notifyDataSetChanged();
     }
 
@@ -56,7 +59,7 @@ public class PhotoPagerAdapter extends PagerAdapter {
 
         if (mLoggedIn) {
             WallpaperApplication.getApiClient()
-                    .photo(photo.photo_id)
+                    .photo(photo.getPhotoId())
                     .enqueue(new Callback<PhotoResponse>() {
                         @Override
                         public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
@@ -82,6 +85,10 @@ public class PhotoPagerAdapter extends PagerAdapter {
         return mPhotos.size();
     }
 
+    public Photos getItem(int position) {
+        return mPhotos.get(position);
+    }
+
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view == object;
@@ -89,6 +96,6 @@ public class PhotoPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mPhotos.get(position).name;
+        return mPhotos.get(position).getName();
     }
 }

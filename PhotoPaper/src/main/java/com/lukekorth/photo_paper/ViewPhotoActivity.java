@@ -15,14 +15,14 @@ import android.view.WindowManager;
 import com.lukekorth.photo_paper.adapters.PhotoPagerAdapter;
 import com.lukekorth.photo_paper.models.Photos;
 
-import java.util.List;
+import io.realm.Realm;
 
 public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     public static final String PHOTO_POSITION_KEY = "com.lukekorth.photo_paper.ViewPhotoActivity.PHOTO_POSITION_KEY";
 
     private ActionBar mActionBar;
-    private List<Photos> mPhotos;
+    private Realm mRealm;
     private int mCurrentPhoto;
     private PhotoPagerAdapter mAdapter;
 
@@ -39,11 +39,11 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
 
         setContentView(R.layout.view_photo);
 
-        mPhotos = Photos.getRecentlySeenPhotos();
+        mRealm = Realm.getDefaultInstance();
+
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
 
-        mAdapter = new PhotoPagerAdapter(this);
-        mAdapter.setPhotos(mPhotos);
+        mAdapter = new PhotoPagerAdapter(this, mRealm, Photos.getRecentlySeenPhotos(mRealm));
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setOnPageChangeListener(this);
@@ -55,6 +55,12 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
         setPhotoName(mCurrentPhoto);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
     }
 
     @Override
@@ -82,22 +88,22 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
 
     private void setPhotoName(int position) {
         if (mActionBar != null) {
-            mActionBar.setTitle("  " + mPhotos.get(position).name);
-            mActionBar.setSubtitle("   " + mPhotos.get(position).userName);
+            mActionBar.setTitle("  " + mAdapter.getItem(position).getName());
+            mActionBar.setSubtitle("   " + mAdapter.getItem(position).getUserName());
         }
     }
 
     private void sharePhoto(int position) {
         Intent intent = new Intent(Intent.ACTION_SEND)
                 .setType("text/plain")
-                .putExtra(Intent.EXTRA_TEXT, Photos.BASE_URL_500PX + mPhotos.get(position).urlPath);
+                .putExtra(Intent.EXTRA_TEXT, Photos.BASE_URL_500PX + mAdapter.getItem(position).getUrlPath());
 
         startActivity(Intent.createChooser(intent, getString(R.string.share)));
     }
 
     private void launch500PxForPhoto(int position) {
         Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse(Photos.BASE_URL_500PX + mPhotos.get(position).urlPath));
+                Uri.parse(Photos.BASE_URL_500PX + mAdapter.getItem(position).getUrlPath()));
 
         startActivity(intent);
     }

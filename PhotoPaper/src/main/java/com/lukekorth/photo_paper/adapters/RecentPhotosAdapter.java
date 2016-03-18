@@ -20,6 +20,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.realm.Realm;
+
 public class RecentPhotosAdapter extends RecyclerView.Adapter<RecentPhotosAdapter.ViewHolder> {
 
     private Context mContext;
@@ -27,9 +29,9 @@ public class RecentPhotosAdapter extends RecyclerView.Adapter<RecentPhotosAdapte
     private Picasso mPicasso;
     private int mSize;
 
-    public RecentPhotosAdapter(Context context) {
+    public RecentPhotosAdapter(Context context, Realm realm) {
         mContext = context;
-        mPhotos = Photos.getRecentlySeenPhotos();
+        mPhotos = Photos.getRecentlySeenPhotos(realm);
         mPicasso = WallpaperApplication.getPicasso(context);
         mSize = Utils.dpToPx(context, 100);
     }
@@ -43,15 +45,15 @@ public class RecentPhotosAdapter extends RecyclerView.Adapter<RecentPhotosAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Photos photo = mPhotos.get(position);
-        CharSequence timeSeen = DateUtils.getRelativeTimeSpanString(photo.seenAt, System.currentTimeMillis(), 0);
+        CharSequence timeSeen = DateUtils.getRelativeTimeSpanString(photo.getSeenAt(), System.currentTimeMillis(), 0);
 
-        holder.mName.setText(photo.name);
-        holder.mPhotographer.setText("© " + photo.userName + " / 500px");
+        holder.mName.setText(photo.getName());
+        holder.mPhotographer.setText("© " + photo.getUserName() + " / 500px");
         holder.mSeenAt.setText("Seen " + timeSeen);
         mPicasso.load(photo.imageUrl)
                 .resize(mSize, mSize)
                 .centerCrop()
-                .placeholder(new ColorDrawable(photo.palette))
+                .placeholder(new ColorDrawable(photo.getPalette()))
                 .into(holder.mPhoto);
     }
 

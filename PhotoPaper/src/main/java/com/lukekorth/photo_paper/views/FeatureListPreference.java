@@ -20,7 +20,11 @@ import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 import com.lukekorth.photo_paper.sync.SyncAdapter;
 import com.squareup.otto.Subscribe;
 
+import io.realm.Realm;
+
 public class FeatureListPreference extends ListPreference implements Preference.OnPreferenceChangeListener {
+
+    private Realm mRealm;
 
     public FeatureListPreference(Context context) {
         super(context);
@@ -45,6 +49,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
     }
 
     private void init() {
+        mRealm = Realm.getDefaultInstance();
         WallpaperApplication.getBus().register(this);
         setOnPreferenceChangeListener(this);
         initEntries();
@@ -54,6 +59,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
     protected void onPrepareForRemoval() {
         super.onPrepareForRemoval();
         WallpaperApplication.getBus().unregister(this);
+        mRealm.close();
     }
 
     @Subscribe
@@ -63,7 +69,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        if (event.user == null && getValue().equals("your_favorites")) {
+        if (User.isUserLoggedIn(mRealm) && getValue().equals("your_favorites")) {
             setValue("your_favorites");
             setFeatureSummary(getValue());
         }
@@ -76,7 +82,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
     }
 
     private void initEntries() {
-        if (User.isUserLoggedIn()) {
+        if (User.isUserLoggedIn(mRealm)) {
             setEntries(R.array.logged_in_features);
             setEntryValues(R.array.logged_in_feature_index);
         } else {
@@ -89,7 +95,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
         if (Settings.getFeature(getContext()).equals("search")) {
             setSummary(getContext().getString(R.string.search) + ": " +
                     Settings.getSearchQuery(getContext()));
-        } else if (User.isUserLoggedIn()) {
+        } else if (User.isUserLoggedIn(mRealm)) {
             setSummary(Utils.getListSummary(getContext(), R.array.logged_in_feature_index,
                     R.array.logged_in_features, index, getContext().getString(R.string.popular)));
         } else {

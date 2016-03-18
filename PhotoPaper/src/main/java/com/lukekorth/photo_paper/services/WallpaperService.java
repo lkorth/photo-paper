@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import io.realm.Realm;
+
 public class WallpaperService extends IntentService {
 
     public static final String USER_PRESENT_RECEIVER_KEY = "com.lukekorth.photo_paper.services.WallpaperService.SLEEP";
@@ -57,7 +59,8 @@ public class WallpaperService extends IntentService {
             width = width / 2;
         }
 
-        Photos photo = Photos.getNextPhoto(this);
+        Realm realm = Realm.getDefaultInstance();
+        Photos photo = Photos.getNextPhoto(this, realm);
         if (photo != null) {
             try {
                 logger.debug("Setting wallpaper to " + width + "px wide by " + height + "px tall");
@@ -75,33 +78,37 @@ public class WallpaperService extends IntentService {
 
                 wallpaperManager.setBitmap(bitmap);
 
-                photo.palette = Palette.generate(bitmap).getMutedColor(getResources().getColor(R.color.brown));
-                photo.seen = true;
-                photo.seenAt = System.currentTimeMillis();
-                photo.save();
+                realm.beginTransaction();
+                photo.setPalette(Palette.generate(bitmap).getMutedColor(getResources().getColor(R.color.brown)));
+                photo.setSeen(true);
+                photo.setSeenAt(System.currentTimeMillis());
+                realm.commitTransaction();
 
                 Settings.setUpdated(this);
             } catch (IOException e) {
                 logger.error(e.getMessage());
-                photo.failedCount = photo.failedCount + 1;
-                if (photo.failedCount > 10) {
-                    photo.delete();
+                realm.beginTransaction();
+                if (photo.getFailedCount() > 10) {
+                    photo.removeFromRealm();
                 } else {
-                    photo.save();
+                    photo.setFailedCount(photo.getFailedCount() + 1);
                 }
+                realm.commitTransaction();
+
                 startService(new Intent(this, WallpaperService.class));
             }
         } else {
             logger.debug("Next photo was null");
         }
 
-        if (Utils.needMorePhotos(this)) {
+        if (Utils.needMorePhotos(this, realm)) {
             logger.debug("Getting more photos via Sync Adapter");
             SyncAdapter.requestSync();
         }
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());
 
+        realm.close();
         wakeLock.release();
     }
 }

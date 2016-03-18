@@ -29,12 +29,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Response;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private Logger mLogger;
+    private Realm mRealm;
     private Bus mBus;
     private int mErrorCount;
     private int mPage;
@@ -70,14 +72,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
-                              ContentProviderClient provider, SyncResult syncResult) {
-        if (Utils.shouldGetPhotos(getContext())) {
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider,
+                              SyncResult syncResult) {
+        mRealm = Realm.getDefaultInstance();
+
+        if (Utils.shouldGetPhotos(getContext(), mRealm)) {
             mLogger.debug("Attempting to fetch new photos");
 
             long startTime = System.currentTimeMillis();
 
-            while (Photos.unseenPhotoCount(getContext()) < 100 && mPage <= mTotalPages &&
+            while (Photos.unseenPhotoCount(getContext(), mRealm) < 100 && mPage <= mTotalPages &&
                     mErrorCount < 5 && Utils.isCurrentNetworkOk(getContext()) &&
                     (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
@@ -90,6 +94,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             mBus.post(new RemainingPhotosChangedEvent());
             mLogger.debug("Not getting photos at this time");
         }
+
+        mRealm.close();
     }
 
     private void getPhotos() {
@@ -105,7 +111,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     break;
                 case "user_favorites":
                     call = WallpaperApplication.getApiClient()
-                            .getPhotos(feature, getCategoriesForRequest(), User.getUser().userName, mPage);
+                            .getPhotos(feature, getCategoriesForRequest(), User.getUser(mRealm).getUserName(), mPage);
                     break;
                 default:
                     call = WallpaperApplication.getApiClient()
@@ -125,7 +131,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             mTotalPages = response.body().totalPages;
 
             for (int i = 0; i < response.body().photos.length; i++) {
-                if (Photos.create(response.body().photos[i], response.body().feature, search) != null) {
+                if (Photos.create(mRealm, response.body().photos[i], response.body().feature, search) != null) {
                     mLogger.debug("Added photo");
                     mBus.post(new RemainingPhotosChangedEvent());
                 }
@@ -143,7 +149,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         mLogger.debug("Caching photos");
 
         Picasso picasso = WallpaperApplication.getPicasso(getContext());
-        List<Photos> photos = Photos.getUnseenPhotos(getContext());
+        List<Photos> photos = Photos.getUnseenPhotos(getContext(), mRealm);
         for (Photos photo : photos) {
             if (Utils.isCurrentNetworkOk(getContext())) {
                 picasso.load(photo.imageUrl)
