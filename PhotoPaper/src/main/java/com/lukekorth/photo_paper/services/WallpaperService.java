@@ -15,6 +15,8 @@ import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
 import com.lukekorth.photo_paper.sync.SyncAdapter;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.RequestCreator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +62,16 @@ public class WallpaperService extends IntentService {
             try {
                 logger.debug("Setting wallpaper to " + width + "px wide by " + height + "px tall");
 
-                Bitmap bitmap = WallpaperApplication.getPicasso(this)
+                RequestCreator request = WallpaperApplication.getPicasso(this)
                         .load(photo.imageUrl)
                         .centerCrop()
-                        .resize(width, height)
-                        .get();
+                        .resize(width, height);
+
+                if (Settings.useOnlyWifi(this)) {
+                    request.networkPolicy(NetworkPolicy.OFFLINE);
+                }
+
+                Bitmap bitmap = request.get();
 
                 wallpaperManager.setBitmap(bitmap);
 
@@ -77,7 +84,7 @@ public class WallpaperService extends IntentService {
             } catch (IOException e) {
                 logger.error(e.getMessage());
                 photo.failedCount = photo.failedCount + 1;
-                if (photo.failedCount > 3) {
+                if (photo.failedCount > 10) {
                     photo.delete();
                 } else {
                     photo.save();
