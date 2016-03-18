@@ -2,6 +2,7 @@ package com.lukekorth.photo_paper.adapters;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +29,18 @@ import retrofit2.Response;
 public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListener {
 
     private Context mContext;
+    private ViewPager mViewPager;
     private LayoutInflater mInflater;
     private List<Photos> mPhotos;
+    private int mNumberOfPhotos;
     private boolean mLoggedIn;
 
-    public PhotoPagerAdapter(Context context, Realm realm, RealmResults<Photos> photos) {
+    public PhotoPagerAdapter(Context context, Realm realm, ViewPager viewPager, RealmResults<Photos> photos) {
         mContext = context;
+        mViewPager = viewPager;
         mInflater = LayoutInflater.from(context);
         mPhotos = photos;
+        mNumberOfPhotos = photos.size();
         mLoggedIn = User.isUserLoggedIn(realm);
         realm.addChangeListener(this);
     }
@@ -43,6 +48,14 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
     @Override
     public void onChange() {
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        int numberOfNewPhotos = mPhotos.size() - mNumberOfPhotos;
+        mNumberOfPhotos = mPhotos.size();
+        mViewPager.setCurrentItem(mViewPager.getCurrentItem() + numberOfNewPhotos, false);
     }
 
     @Override
@@ -78,6 +91,11 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
     @Override
     public void destroyItem(ViewGroup collection, int position, Object view) {
         collection.removeView((View) view);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     @Override

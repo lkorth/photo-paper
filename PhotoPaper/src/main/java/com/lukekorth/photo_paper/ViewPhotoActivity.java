@@ -43,10 +43,10 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
 
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
 
-        mAdapter = new PhotoPagerAdapter(this, mRealm, Photos.getRecentlySeenPhotos(mRealm));
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setOnPageChangeListener(this);
+        mAdapter = new PhotoPagerAdapter(this, mRealm, viewPager, Photos.getRecentlySeenPhotos(mRealm));
         viewPager.setAdapter(mAdapter);
         viewPager.setCurrentItem(mCurrentPhoto);
 
