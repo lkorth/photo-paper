@@ -69,7 +69,7 @@ public class WallpaperService extends IntentService {
                         .centerCrop()
                         .resize(width, height);
 
-                if (Settings.useOnlyWifi(this)) {
+                if (Settings.useOnlyWifi(this) && !Utils.isConnectedToWifi(this)) {
                     request.networkPolicy(NetworkPolicy.OFFLINE);
                 }
 
