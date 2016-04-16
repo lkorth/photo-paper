@@ -19,7 +19,7 @@ import com.lukekorth.photo_paper.adapters.GridPhotoAdapter;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.Photo;
 import com.lukekorth.photo_paper.models.SearchResult;
-import com.lukekorth.photo_paper.sync.SyncAdapter;
+import com.lukekorth.photo_paper.services.PhotoDownloadIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,7 +161,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             case R.id.save_search:
                 Settings.setFeature(this, "search");
                 Settings.setSearchQuery(this, mCurrentQuery);
-                SyncAdapter.requestSync();
+                PhotoDownloadIntentService.downloadPhotos(this);
                 finish();
                 return true;
         }

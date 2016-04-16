@@ -7,7 +7,6 @@ import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
-import com.lukekorth.photo_paper.sync.SyncAdapter;
 import com.squareup.picasso.PicassoTools;
 
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,6 @@ public class ClearCacheIntentService extends IntentService {
         Settings.clearUpdated(this);
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());
-        SyncAdapter.requestSync();
+        PhotoDownloadIntentService.downloadPhotos(this);
     }
 }

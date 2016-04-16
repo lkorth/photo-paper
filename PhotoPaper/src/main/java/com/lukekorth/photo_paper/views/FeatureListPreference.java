@@ -17,7 +17,7 @@ import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.ActivityResumedEvent;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
-import com.lukekorth.photo_paper.sync.SyncAdapter;
+import com.lukekorth.photo_paper.services.PhotoDownloadIntentService;
 import com.squareup.otto.Subscribe;
 
 import io.realm.Realm;
@@ -109,7 +109,7 @@ public class FeatureListPreference extends ListPreference implements Preference.
         if (!newValue.toString().equals("search")) {
             Settings.setFeature(getContext(), newValue.toString());
             setFeatureSummary(newValue.toString());
-            SyncAdapter.requestSync();
+            PhotoDownloadIntentService.downloadPhotos(getContext());
             return true;
         } else {
             getContext().startActivity(new Intent(getContext(), SearchActivity.class));

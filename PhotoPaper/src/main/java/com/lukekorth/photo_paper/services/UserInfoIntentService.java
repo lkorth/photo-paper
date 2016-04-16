@@ -6,7 +6,6 @@ import android.content.Intent;
 import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
-import com.lukekorth.photo_paper.sync.AccountCreator;
 
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +40,6 @@ public class UserInfoIntentService extends IntentService {
             user.setPhoto(userResponse.getPhoto());
             realm.commitTransaction();
             realm.close();
-
-            AccountCreator.createAccount(this);
 
             WallpaperApplication.getBus().post(new UserUpdatedEvent());
         } catch (IOException e) {

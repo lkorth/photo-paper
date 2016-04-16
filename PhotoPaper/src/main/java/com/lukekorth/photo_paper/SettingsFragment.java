@@ -28,8 +28,8 @@ import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
 import com.lukekorth.photo_paper.services.ClearCacheIntentService;
+import com.lukekorth.photo_paper.services.PhotoDownloadIntentService;
 import com.lukekorth.photo_paper.services.WallpaperService;
-import com.lukekorth.photo_paper.sync.SyncAdapter;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -269,7 +269,7 @@ public class SettingsFragment extends PreferenceFragment
             onWallpaperChanged(null);
         }
 
-        SyncAdapter.requestSync();
+        PhotoDownloadIntentService.downloadPhotos(getActivity());
 
         return true;
     }

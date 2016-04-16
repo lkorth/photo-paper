@@ -14,7 +14,6 @@ import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
-import com.lukekorth.photo_paper.sync.SyncAdapter;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.RequestCreator;
 
@@ -102,8 +101,8 @@ public class WallpaperService extends IntentService {
         }
 
         if (Utils.needMorePhotos(this, realm)) {
-            logger.debug("Getting more photos via Sync Adapter");
-            SyncAdapter.requestSync();
+            logger.debug("Getting more photos via PhotoDownloadIntentService");
+            PhotoDownloadIntentService.downloadPhotos(this);
         }
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());

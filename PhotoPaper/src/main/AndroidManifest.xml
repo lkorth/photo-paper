@@ -8,11 +8,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
 
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
-
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
@@ -26,42 +21,23 @@
             android:value="com.lukekorth.photo_paper.models.Photos, com.lukekorth.photo_paper.models.User" />
 
         <activity
-            android:name="com.lukekorth.photo_paper.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.lukekorth.photo_paper.SearchActivity" android:label="@string/search" />
-        <activity android:name="com.lukekorth.photo_paper.RecentPhotosActivity" android:label="@string/recent_photos" />
-        <activity android:name="com.lukekorth.photo_paper.ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
+        <activity android:name=".SearchActivity" android:label="@string/search" />
+        <activity android:name=".RecentPhotosActivity" android:label="@string/recent_photos" />
+        <activity android:name=".ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
 
-        <service android:name="com.lukekorth.photo_paper.services.UserInfoIntentService" />
-        <service android:name="com.lukekorth.photo_paper.services.WallpaperService" />
-        <service android:name="com.lukekorth.photo_paper.services.ClearCacheIntentService" />
+        <service android:name=".services.UserInfoIntentService" />
+        <service android:name=".services.PhotoDownloadIntentService" />
+        <service android:name=".services.WallpaperService" />
+        <service android:name=".services.ClearCacheIntentService" />
 
-        <service
-            android:name="com.lukekorth.photo_paper.sync.AuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-        <service
-            android:name="com.lukekorth.photo_paper.sync.SyncService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-
-        <receiver android:name="com.lukekorth.photo_paper.receivers.UserPresentReceiver">
+        <receiver android:name=".receivers.UserPresentReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
@@ -76,12 +52,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <provider
-            android:name="com.lukekorth.photo_paper.sync.StubProvider"
-            android:authorities="com.lukekorth.photo_paper.sync.provider"
-            android:exported="false"
-            android:syncable="true"/>
 
     </application>
 

@@ -1,13 +1,8 @@
-package com.lukekorth.photo_paper.sync;
+package com.lukekorth.photo_paper.services;
 
-import android.accounts.Account;
-import android.content.AbstractThreadedSyncAdapter;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
+import android.app.IntentService;
 import android.content.Context;
-import android.content.SyncResult;
-import android.os.Bundle;
-import android.os.Handler;
+import android.content.Intent;
 import android.os.SystemClock;
 
 import com.lukekorth.photo_paper.R;
@@ -33,7 +28,7 @@ import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SyncAdapter extends AbstractThreadedSyncAdapter {
+public class PhotoDownloadIntentService extends IntentService {
 
     private Logger mLogger;
     private Realm mRealm;
@@ -42,47 +37,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private int mPage;
     private int mTotalPages;
 
-    public static void requestSync() {
-        WallpaperApplication.getBus().post(new RemainingPhotosChangedEvent());
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ContentResolver.requestSync(AccountCreator.getAccount(), "com.lukekorth.android_500px.sync.provider",
-                        new Bundle());
-            }
-        }, 1000);
+    public PhotoDownloadIntentService() {
+        super(PhotoDownloadIntentService.class.getName());
     }
 
-    public SyncAdapter(Context context, boolean autoInitialize) {
-        super(context, autoInitialize);
-        init();
+    public static void downloadPhotos(Context context) {
+        context.startService(new Intent(context, PhotoDownloadIntentService.class));
     }
 
-    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
-        init();
-    }
-
-    private void init() {
-        mLogger = LoggerFactory.getLogger("SyncAdapter");
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        mLogger = LoggerFactory.getLogger("PhotoDownloadIntentService");
         mBus = WallpaperApplication.getBus();
         mErrorCount = 0;
         mPage = 1;
         mTotalPages = 1;
-    }
-
-    @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider,
-                              SyncResult syncResult) {
         mRealm = Realm.getDefaultInstance();
 
-        if (Utils.shouldGetPhotos(getContext(), mRealm)) {
+        if (Utils.shouldGetPhotos(this, mRealm)) {
             mLogger.debug("Attempting to fetch new photos");
 
             long startTime = System.currentTimeMillis();
 
-            while (Photos.unseenPhotoCount(getContext(), mRealm) < 100 && mPage <= mTotalPages &&
-                    mErrorCount < 5 && Utils.isCurrentNetworkOk(getContext()) &&
+            while (Photos.unseenPhotoCount(this, mRealm) < 100 && mPage <= mTotalPages &&
+                    mErrorCount < 5 && Utils.isCurrentNetworkOk(this) &&
                     (System.currentTimeMillis() - startTime) < 300000) {
                 getPhotos();
             }
@@ -100,14 +78,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void getPhotos() {
         try {
-            String feature = Settings.getFeature(getContext());
-            String search = feature.equals("search") ? Settings.getSearchQuery(getContext()) : "";
+            String feature = Settings.getFeature(this);
+            String search = feature.equals("search") ? Settings.getSearchQuery(this) : "";
 
             Call<PhotosResponse> call;
             switch (feature) {
                 case "search":
                     call = WallpaperApplication.getNonLoggedInApiClient()
-                            .getPhotosFromSearch(Settings.getSearchQuery(getContext()), getCategoriesForRequest(), mPage);
+                            .getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
                     break;
                 case "user_favorites":
                     call = WallpaperApplication.getApiClient()
@@ -148,10 +126,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private void cachePhotos() {
         mLogger.debug("Caching photos");
 
-        Picasso picasso = WallpaperApplication.getPicasso(getContext());
-        List<Photos> photos = Photos.getUnseenPhotos(getContext(), mRealm);
+        Picasso picasso = WallpaperApplication.getPicasso(this);
+        List<Photos> photos = Photos.getUnseenPhotos(this, mRealm);
         for (Photos photo : photos) {
-            if (Utils.isCurrentNetworkOk(getContext())) {
+            if (Utils.isCurrentNetworkOk(this)) {
                 picasso.load(photo.imageUrl)
                         .tag("PhotoCacheIntentService")
                         .fetch();
@@ -166,8 +144,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private String getCategoriesForRequest() {
-        String[] allCategories = getContext().getResources().getStringArray(R.array.categories);
-        int[] categories = Settings.getCategories(getContext());
+        String[] allCategories = getResources().getStringArray(R.array.categories);
+        int[] categories = Settings.getCategories(this);
         String filter = "";
         for (int category : categories) {
             filter += allCategories[category] + ",";
