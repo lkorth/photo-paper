@@ -1,53 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="5dp"
-    card_view:cardPreventCornerOverlap="false"
-    card_view:cardUseCompatPadding="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp">
+    <data>
+        <import type="java.lang.System"/>
+        <import type="android.text.format.DateUtils"/>
+        <variable name="photo" type="com.lukekorth.photo_paper.models.Photos" />
+    </data>
 
-        <ImageView
-            android:id="@+id/thumbnail"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true" />
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?android:attr/selectableItemBackground"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="5dp"
+        card_view:cardPreventCornerOverlap="false"
+        card_view:cardUseCompatPadding="true">
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/thumbnail"
-            android:textStyle="bold" />
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="100dp">
 
-        <TextView
-            android:id="@+id/photographer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/thumbnail" />
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true" />
 
-        <TextView
-            android:id="@+id/seen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/photographer"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/thumbnail" />
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:textStyle="bold"
+                android:text="@{photo.getName}"/>
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/photographer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/name"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="16dp"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:text="@{`©` + photo.getUserName + ` / 500px`}"/>
 
-</android.support.v7.widget.CardView>
+            <TextView
+                android:id="@+id/seen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/photographer"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="16dp"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:text="@{DateUtils.getRelativeTimeSpanString(photo.getSeenAt, System.currentTimeMillis(), 0)}"/>
 
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

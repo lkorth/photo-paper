@@ -13,6 +13,10 @@ android {
         versionName "0.4.2"
     }
 
+    dataBinding {
+        enabled = true
+    }
+
     signingConfigs {
         release {
             storeFile file(System.properties['KEYSTORE'])
