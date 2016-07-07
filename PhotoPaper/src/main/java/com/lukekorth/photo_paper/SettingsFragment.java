@@ -243,10 +243,8 @@ public class SettingsFragment extends PreferenceFragment
                 User.logout(mRealm);
                 WallpaperApplication.getBus().post(new UserUpdatedEvent());
             } else {
-                Intent intent = new Intent(getActivity(), FiveHundredPxOAuthActivity.class)
-                        .putExtra(FiveHundredPxOAuthActivity.CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
-                        .putExtra(FiveHundredPxOAuthActivity.CONSUMER_SECRET, BuildConfig.CONSUMER_SECRET);
-                startActivityForResult(intent, FIVE_HUNDRED_PX_LOGIN);
+                startActivityForResult(new Intent(getActivity(), FiveHundredPxOAuthActivity.class),
+                        FIVE_HUNDRED_PX_LOGIN);
             }
         } else if (preference.getKey().equals("contact")) {
             new LogReporting(getActivity()).collectAndSendLogs();

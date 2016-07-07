@@ -33,7 +33,7 @@
         <activity android:name=".ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
 
         <activity android:name="com.lukekorth.fivehundredpx.FiveHundredPxOAuthActivity"
-                  android:launchMode="singleTop"
+                  android:launchMode="singleTask"
                   android:theme="@style/FiveHundredPxTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 
+import com.lukekorth.photo_paper.BuildConfig;
 import com.lukekorth.photo_paper.R;
 
 import oauth.signpost.exception.OAuthCommunicationException;
@@ -17,10 +18,10 @@ import oauth.signpost.exception.OAuthNotAuthorizedException;
 public class FiveHundredPxOAuthActivity extends Activity {
 
     public static final int FAILED = 500;
-    public static final String CONSUMER_KEY = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.CONSUMER_KEY";
-    public static final String CONSUMER_SECRET = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.CONSUMER_SECRET";
     public static final String ACCESS_TOKEN = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.ACCESS_TOKEN";
     public static final String EXCEPTION = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.EXCEPTION";
+
+    private static final String EXTRA_REQUEST_MADE = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.EXTRA_REQUEST_MADE";
 
     private FiveHundredPxOAuthHelper mOAuthHelper;
 
@@ -35,16 +36,11 @@ public class FiveHundredPxOAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading);
 
-        Intent startIntent = getIntent();
-        String consumerKey = startIntent.getStringExtra(CONSUMER_KEY);
-        String consumerSecret = startIntent.getStringExtra(CONSUMER_SECRET);
-
-        if (TextUtils.isEmpty(consumerKey) || TextUtils.isEmpty(consumerSecret)) {
-            throw new IllegalArgumentException(getClass().getSimpleName() + " must be started with" +
-                    "a CONSUMER_KEY and CONSUMER_SECRET");
+        if (savedInstanceState != null) {
+            mRequestMade = savedInstanceState.getBoolean(EXTRA_REQUEST_MADE);
         }
 
-        mOAuthHelper = new FiveHundredPxOAuthHelper(consumerKey, consumerSecret);
+        mOAuthHelper = new FiveHundredPxOAuthHelper(BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);
 
         mSigningRequestTask = new OAuthSigningRequestTask();
         mSigningRequestTask.execute();
@@ -72,6 +68,12 @@ public class FiveHundredPxOAuthActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(EXTRA_REQUEST_MADE, mRequestMade);
+    }
+
     private class OAuthSigningRequestTask extends AsyncTask<Void, Void, Void> {
 
         private String mUrl;
@@ -96,7 +98,16 @@ public class FiveHundredPxOAuthActivity extends Activity {
                 finish();
             } else {
                 mRequestMade = true;
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl)));
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    Bundle extras = new Bundle();
+                    extras.putBinder("android.support.customtabs.extra.SESSION", null);
+                    intent.putExtras(extras);
+                }
+
+                startActivity(intent);
             }
         }
     }
