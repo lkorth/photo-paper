@@ -3,7 +3,7 @@ package com.lukekorth.photo_paper.models;
 import android.content.Context;
 import android.content.Intent;
 
-import com.fivehundredpx.api.auth.AccessToken;
+import com.lukekorth.fivehundredpx.AccessToken;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lukekorth.photo_paper.services.UserInfoIntentService;

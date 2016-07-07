@@ -1,2 +1,1 @@
 include ':PhotoPaper'
-include ':500px-android-sdk'

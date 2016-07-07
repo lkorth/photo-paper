@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.fivehundredpx.api.auth.AccessToken;
+import com.lukekorth.fivehundredpx.AccessToken;
 import com.google.gson.GsonBuilder;
 import com.lukekorth.mailable_log.MailableLog;
 import com.lukekorth.photo_paper.helpers.Cache;

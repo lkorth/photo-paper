@@ -16,8 +16,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.text.format.DateUtils;
 
-import com.fivehundredpx.api.auth.AccessToken;
-import com.fivehundredpx.api.auth.FiveHundredPxOAuthActivity;
+import com.lukekorth.fivehundredpx.AccessToken;
+import com.lukekorth.fivehundredpx.FiveHundredPxOAuthActivity;
 import com.lukekorth.photo_paper.helpers.LogReporting;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;

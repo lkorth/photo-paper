@@ -44,7 +44,8 @@ android.buildTypes.each { type ->
 }
 
 dependencies {
-    compile project(':500px-android-sdk')
+    compile 'oauth.signpost:signpost-core:1.2.1.2'
+    compile 'oauth.signpost:signpost-commonshttp4:1.2.1.2'
 
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:palette-v7:23.1.1'

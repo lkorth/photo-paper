@@ -32,6 +32,18 @@
         <activity android:name=".RecentPhotosActivity" android:label="@string/recent_photos" />
         <activity android:name=".ViewPhotoActivity" android:theme="@style/FullScreenPhotoTheme" />
 
+        <activity android:name="com.lukekorth.fivehundredpx.FiveHundredPxOAuthActivity"
+                  android:launchMode="singleTop"
+                  android:theme="@style/FiveHundredPxTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="com.lukekorth.photopaper" />
+            </intent-filter>
+        </activity>
+
         <service android:name=".services.UserInfoIntentService" />
         <service android:name=".services.PhotoDownloadIntentService" />
         <service android:name=".services.WallpaperService" />
