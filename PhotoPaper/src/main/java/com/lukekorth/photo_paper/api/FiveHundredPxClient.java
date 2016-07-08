@@ -10,6 +10,7 @@ import com.lukekorth.photo_paper.models.UsersResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -36,9 +37,11 @@ public interface FiveHundredPxClient {
     @GET("photos?image_size=2048&rpp=100")
     Call<PhotosResponse> getPhotos(@Query("feature") String feature, @Query("categories") String categories, @Query("username") String userName, @Query("page") int page);
 
-    @POST("photos/{id}/vote")
-    /** 0 for dislike, 1 for like */
-    Call<PhotoResponse> vote(@Path("id") String id, @Query("vote") int like);
+    @POST("photos/{id}/vote?vote=1")
+    Call<PhotoResponse> like(@Path("id") String id);
+
+    @DELETE("photos/{id}/vote")
+    Call<PhotoResponse> unlike(@Path("id") String id);
 
     @PUT("users/{user_id}/galleries/{gallery_id}/items")
     Call<ApiResponse> favorite(@Path("user_id") int userId, @Path("gallery_id") String galleryId, @Body PhotoGalleryRequest request);

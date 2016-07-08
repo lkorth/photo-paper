@@ -62,29 +62,33 @@ public class LikeButton extends Button implements View.OnClickListener {
             setBackgroundResource(R.drawable.button_action_bg_liked);
         }
 
-        WallpaperApplication.getApiClient()
-                .vote(mPhoto.id, (mPhoto.voted ? 0 : 1))
-                .enqueue(new Callback<PhotoResponse>() {
-                    @Override
-                    public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
-                        if (response.isSuccess()) {
-                            Photo photo = response.body().photo;
-                            photo.voted = !mPhoto.voted;
-                            setPhoto(response.body().photo);
-                        } else {
-                            onFailure(null, null);
-                        }
-                    }
+        Callback<PhotoResponse> callback = new Callback<PhotoResponse>() {
+            @Override
+            public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
+                if (response.isSuccess()) {
+                    Photo photo = response.body().photo;
+                    photo.voted = !mPhoto.voted;
+                    setPhoto(response.body().photo);
+                } else {
+                    onFailure(null, null);
+                }
+            }
 
-                    @Override
-                    public void onFailure(Call<PhotoResponse> call, Throwable t) {
-                        if (mPhoto.voted) {
-                            setBackgroundResource(R.drawable.button_action_bg_liked);
-                        } else {
-                            setBackgroundResource(R.drawable.button_action_bg);
-                        }
-                    }
-                });
+            @Override
+            public void onFailure(Call<PhotoResponse> call, Throwable t) {
+                if (mPhoto.voted) {
+                    setBackgroundResource(R.drawable.button_action_bg_liked);
+                } else {
+                    setBackgroundResource(R.drawable.button_action_bg);
+                }
+            }
+        };
+
+        if (mPhoto.voted) {
+            WallpaperApplication.getApiClient().unlike(mPhoto.id).enqueue(callback);
+        } else {
+            WallpaperApplication.getApiClient().like(mPhoto.id).enqueue(callback);
+        };
     }
 
     @Override
