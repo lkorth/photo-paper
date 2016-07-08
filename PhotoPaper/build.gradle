@@ -9,8 +9,8 @@ android {
         applicationId "com.lukekorth.photo_paper"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 9
-        versionName "0.4.2"
+        versionCode 10
+        versionName "0.4.3"
     }
 
     dataBinding {
