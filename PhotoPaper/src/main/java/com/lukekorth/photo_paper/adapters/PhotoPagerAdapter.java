@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
+import com.lukekorth.photo_paper.models.GalleryResponse;
 import com.lukekorth.photo_paper.models.PhotoResponse;
 import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.User;
@@ -31,6 +33,7 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
     private Context mContext;
     private ViewPager mViewPager;
     private LayoutInflater mInflater;
+    private Realm mRealm;
     private List<Photos> mPhotos;
     private int mNumberOfPhotos;
     private boolean mLoggedIn;
@@ -39,10 +42,11 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
         mContext = context;
         mViewPager = viewPager;
         mInflater = LayoutInflater.from(context);
+        mRealm = realm;
         mPhotos = photos;
         mNumberOfPhotos = photos.size();
-        mLoggedIn = User.isUserLoggedIn(realm);
-        realm.addChangeListener(this);
+        mLoggedIn = User.isUserLoggedIn(mRealm);
+        mRealm.addChangeListener(this);
     }
 
     @Override
@@ -60,7 +64,7 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-        Photos photo = mPhotos.get(position);
+        final Photos photo = mPhotos.get(position);
         final View view = mInflater.inflate(R.layout.full_screen_photo, collection, false);
         collection.addView(view);
 
@@ -71,18 +75,44 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
                 .into(((ImageViewTouch) view.findViewById(R.id.photo)));
 
         if (mLoggedIn) {
-            WallpaperApplication.getApiClient()
-                    .photo(photo.getPhotoId())
-                    .enqueue(new Callback<PhotoResponse>() {
-                        @Override
-                        public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
-                            ((FavoriteButton) view.findViewById(R.id.favorites)).setPhoto(response.body().photo);
-                            ((LikeButton) view.findViewById(R.id.votes)).setPhoto(response.body().photo);
-                        }
+            WallpaperApplication.getApiClient().photo(photo.getPhotoId()).enqueue(new Callback<PhotoResponse>() {
+                @Override
+                public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
+                    if (!response.isSuccess()) {
+                        return;
+                    }
 
-                        @Override
-                        public void onFailure(Call<PhotoResponse> call, Throwable t) {}
-                    });
+                    ((LikeButton) view.findViewById(R.id.votes)).setPhoto(response.body().photo);
+                }
+
+                @Override
+                public void onFailure(Call<PhotoResponse> call, Throwable t) {}
+            });
+
+            final String galleryId = Settings.getFavoriteGalleryId(mContext);
+            if (galleryId != null) {
+                WallpaperApplication.getApiClient().galleriesForPhoto(photo.getPhotoId(), User.getUser(mRealm).getId())
+                        .enqueue(new Callback<GalleryResponse>() {
+                            @Override
+                            public void onResponse(Call<GalleryResponse> call, Response<GalleryResponse> response) {
+                                if (!response.isSuccess()) {
+                                    return;
+                                }
+
+                                boolean favorited = false;
+                                for (GalleryResponse.Gallery gallery : response.body().galleries) {
+                                    if (galleryId.equals(gallery.id)) {
+                                        favorited = true;
+                                        break;
+                                    }
+                                }
+                                ((FavoriteButton) view.findViewById(R.id.favorites)).setup(photo.getPhotoId(), favorited);
+                            }
+
+                            @Override
+                            public void onFailure(Call<GalleryResponse> call, Throwable t) {}
+                        });
+            }
         }
 
         return view;

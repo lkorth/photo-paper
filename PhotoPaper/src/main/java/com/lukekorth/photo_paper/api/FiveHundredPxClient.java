@@ -1,14 +1,18 @@
-package com.lukekorth.photo_paper.interfaces;
+package com.lukekorth.photo_paper.api;
 
+import com.lukekorth.photo_paper.models.ApiResponse;
+import com.lukekorth.photo_paper.models.GalleryResponse;
+import com.lukekorth.photo_paper.models.PhotoGalleryRequest;
 import com.lukekorth.photo_paper.models.PhotoResponse;
 import com.lukekorth.photo_paper.models.PhotosResponse;
 import com.lukekorth.photo_paper.models.SearchResult;
 import com.lukekorth.photo_paper.models.UsersResponse;
 
 import retrofit2.Call;
-import retrofit2.http.DELETE;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -36,9 +40,15 @@ public interface FiveHundredPxClient {
     /** 0 for dislike, 1 for like */
     Call<PhotoResponse> vote(@Path("id") String id, @Query("vote") int like);
 
-    @POST("photos/{id}/favorite")
-    Call<PhotoResponse> favorite(@Path("id") String id);
+    @PUT("users/{user_id}/galleries/{gallery_id}/items")
+    Call<ApiResponse> favorite(@Path("user_id") int userId, @Path("gallery_id") String galleryId, @Body PhotoGalleryRequest request);
 
-    @DELETE("photos/{id}/favorite")
-    Call<PhotoResponse> unfavorite(@Path("id") String id);
+    @PUT("users/{user_id}/galleries/{gallery_id}/items")
+    Call<ApiResponse> unfavorite(@Path("user_id") int userId, @Path("gallery_id") String galleryId, @Body PhotoGalleryRequest request);
+
+    @GET("users/{id}/galleries?privacy=both&rpp=100")
+    Call<GalleryResponse> galleries(@Path("id") int userId);
+
+    @GET("photos/{id}/galleries?rpp=100")
+    Call<GalleryResponse> galleriesForPhoto(@Path("id") String id, @Query("user_id") int userId);
 }

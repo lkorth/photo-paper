@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 
@@ -40,6 +41,9 @@ public class UserInfoIntentService extends IntentService {
             user.setPhoto(userResponse.getPhoto());
             realm.commitTransaction();
             realm.close();
+
+            Settings.setFavoriteGallery(this, null);
+            Settings.setFavoriteGalleryId(this, null);
 
             WallpaperApplication.getBus().post(new UserUpdatedEvent());
         } catch (IOException e) {

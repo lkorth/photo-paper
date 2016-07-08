@@ -23,6 +23,11 @@
             android:title="@string/login_with_500px"
             android:summary="@string/login_with_500px_summary" />
 
+        <com.lukekorth.photo_paper.views.FavoriteGalleryPreference
+            android:key="favorite_gallery"
+            android:title="@string/favorite_gallery"
+            android:enabled="false"/>
+
         <com.lukekorth.photo_paper.views.FeatureListPreference
             android:key="feature"
             android:title="@string/feature" />

@@ -17,6 +17,10 @@
     <string name="settings_500px">500px Settings</string>
     <string name="login_with_500px">Login with 500px</string>
     <string name="login_with_500px_summary">Click to login</string>
+    <string name="favorite_gallery">Favorite Gallery</string>
+    <string name="favorite_gallery_summary">Select the gallery to use for favorites</string>
+    <string name="gallery_fetch_error">Error</string>
+    <string name="gallery_fetch_error_message">There was an error retrieving your galleries. Please try again later.</string>
     <string name="click_to_logout">Click to logout</string>
     <string name="feature">Feature</string>
     <string name="categories">Categories</string>

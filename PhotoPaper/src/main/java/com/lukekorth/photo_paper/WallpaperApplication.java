@@ -5,14 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.lukekorth.fivehundredpx.AccessToken;
 import com.google.gson.GsonBuilder;
+import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.mailable_log.MailableLog;
+import com.lukekorth.photo_paper.api.FiveHundredPxClient;
 import com.lukekorth.photo_paper.helpers.Cache;
 import com.lukekorth.photo_paper.helpers.ConsumerApiKeyInterceptor;
 import com.lukekorth.photo_paper.helpers.ThreadBus;
 import com.lukekorth.photo_paper.helpers.UserAgentInterceptor;
-import com.lukekorth.photo_paper.interfaces.FiveHundredPxClient;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 import com.squareup.otto.Bus;

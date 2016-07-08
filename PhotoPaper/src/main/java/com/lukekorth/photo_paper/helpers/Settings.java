@@ -13,6 +13,22 @@ public class Settings {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    public static String getFavoriteGallery(Context context) {
+        return getPrefs(context).getString("favorite_gallery", null);
+    }
+
+    public static String getFavoriteGalleryId(Context context) {
+        return getPrefs(context).getString("favorite_gallery_id", null);
+    }
+
+    public static void setFavoriteGallery(Context context, String gallery) {
+        getPrefs(context).edit().putString("favorite_gallery", gallery).apply();
+    }
+
+    public static void setFavoriteGalleryId(Context context, String id) {
+        getPrefs(context).edit().putString("favorite_gallery_id", id).apply();
+    }
+
     public static String getFeature(Context context) {
         return getPrefs(context).getString("feature", "popular");
     }
