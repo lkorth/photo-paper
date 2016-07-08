@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.v7.graphics.Palette;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.helpers.Settings;
@@ -84,6 +85,8 @@ public class WallpaperService extends IntentService {
                 realm.commitTransaction();
 
                 Settings.setUpdated(this);
+
+                FirebaseAnalytics.getInstance(this).logEvent("wallpaper_updated", null);
             } catch (IOException e) {
                 logger.error(e.getMessage());
                 realm.beginTransaction();

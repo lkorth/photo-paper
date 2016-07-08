@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.helpers.Settings;
@@ -81,6 +82,7 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                         public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                             if (response.isSuccess()) {
                                 setup(mPhotoId, false);
+                                FirebaseAnalytics.getInstance(getContext()).logEvent("unfavorited", null);
                             } else {
                                 onFailure(null, null);
                             }
@@ -101,6 +103,7 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                         public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                             if (response.isSuccess()) {
                                 setup(mPhotoId, true);
+                                FirebaseAnalytics.getInstance(getContext()).logEvent("favorited", null);
                             } else {
                                 onFailure(null, null);
                             }

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "683793778339",
+    "firebase_url": "https://photo-paper-82bf0.firebaseio.com",
+    "project_id": "photo-paper-82bf0",
+    "storage_bucket": "photo-paper-82bf0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683793778339:android:8e4d70709bc5abee",
+        "android_client_info": {
+          "package_name": "com.lukekorth.photo_paper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "683793778339-0n3umgmpolrh3vf47p32u28e4obgsggn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtM-LmCBQOU1vAEqYNJo5-agW5-uXh7pY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

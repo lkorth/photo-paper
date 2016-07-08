@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.models.Photo;
@@ -69,6 +70,8 @@ public class LikeButton extends Button implements View.OnClickListener {
                     Photo photo = response.body().photo;
                     photo.voted = !mPhoto.voted;
                     setPhoto(response.body().photo);
+
+                    FirebaseAnalytics.getInstance(getContext()).logEvent((photo.voted ? "liked" : "unliked"), null);
                 } else {
                     onFailure(null, null);
                 }

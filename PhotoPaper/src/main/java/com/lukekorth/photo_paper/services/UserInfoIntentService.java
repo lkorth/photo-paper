@@ -3,6 +3,7 @@ package com.lukekorth.photo_paper.services;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.User;
@@ -44,6 +45,8 @@ public class UserInfoIntentService extends IntentService {
 
             Settings.setFavoriteGallery(this, null);
             Settings.setFavoriteGalleryId(this, null);
+
+            FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.LOGIN, null);
 
             WallpaperApplication.getBus().post(new UserUpdatedEvent());
         } catch (IOException e) {
