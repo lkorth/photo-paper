@@ -34,8 +34,8 @@ public interface FiveHundredPxClient {
     @GET("photos?image_size=2048&rpp=100")
     Call<PhotosResponse> getPhotos(@Query("feature") String feature, @Query("categories") String categories, @Query("page") int page);
 
-    @GET("photos?image_size=2048&rpp=100")
-    Call<PhotosResponse> getPhotos(@Query("feature") String feature, @Query("categories") String categories, @Query("username") String userName, @Query("page") int page);
+    @GET("users/{user_id}/galleries/{gallery_id}/items?image_size=2048&rpp=100")
+    Call<PhotosResponse> getFavorites(@Path("user_id") int userId, @Path("gallery_id") String galleryId, @Query("only") String categories, @Query("page") int page);
 
     @POST("photos/{id}/vote?vote=1")
     Call<PhotoResponse> like(@Path("id") String id);

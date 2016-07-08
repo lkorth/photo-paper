@@ -88,12 +88,11 @@ public class PhotoDownloadIntentService extends IntentService {
                             .getPhotosFromSearch(Settings.getSearchQuery(this), getCategoriesForRequest(), mPage);
                     break;
                 case "user_favorites":
-                    call = WallpaperApplication.getApiClient()
-                            .getPhotos(feature, getCategoriesForRequest(), User.getUser(mRealm).getUserName(), mPage);
+                    call = WallpaperApplication.getApiClient().getFavorites(User.getUser(mRealm).getId(),
+                            Settings.getFavoriteGalleryId(this), getCategoriesForRequest(), mPage);
                     break;
                 default:
-                    call = WallpaperApplication.getApiClient()
-                            .getPhotos(feature, getCategoriesForRequest(), mPage);
+                    call = WallpaperApplication.getApiClient().getPhotos(feature, getCategoriesForRequest(), mPage);
                     break;
             }
 
@@ -109,7 +108,7 @@ public class PhotoDownloadIntentService extends IntentService {
             mTotalPages = response.body().totalPages;
 
             for (int i = 0; i < response.body().photos.length; i++) {
-                if (Photos.create(mRealm, response.body().photos[i], response.body().feature, search) != null) {
+                if (Photos.create(mRealm, response.body().photos[i], feature, search) != null) {
                     mLogger.debug("Added photo");
                     mBus.post(new RemainingPhotosChangedEvent());
                 }
