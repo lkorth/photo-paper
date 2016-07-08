@@ -51,6 +51,7 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
         MailableLog.init(this, BuildConfig.DEBUG);
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
+        DebugUtils.setup(this);
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder(this).build());
         getBus().register(this);
     }
@@ -117,6 +118,10 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
 
             okHttpBuilder.addInterceptor(new UserAgentInterceptor());
 
+            if (BuildConfig.DEBUG) {
+                okHttpBuilder.addNetworkInterceptor(DebugUtils.getDebugNetworkInterceptor());
+            }
+
             sApiClient = new Retrofit.Builder()
                     .baseUrl("https://api.500px.com/v1/")
                     .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
@@ -138,6 +143,10 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
             OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                     .addInterceptor(new ConsumerApiKeyInterceptor())
                     .addInterceptor(new UserAgentInterceptor());
+
+            if (BuildConfig.DEBUG) {
+                okHttpBuilder.addNetworkInterceptor(DebugUtils.getDebugNetworkInterceptor());
+            }
 
             sNonLoggedInApiClient = new Retrofit.Builder()
                     .baseUrl("https://api.500px.com/v1/")
