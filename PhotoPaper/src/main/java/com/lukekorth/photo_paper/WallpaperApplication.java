@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.gson.GsonBuilder;
+import com.jakewharton.picasso.OkHttp3Downloader;
 import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.mailable_log.MailableLog;
 import com.lukekorth.photo_paper.api.FiveHundredPxClient;
-import com.lukekorth.photo_paper.helpers.Cache;
 import com.lukekorth.photo_paper.helpers.ConsumerApiKeyInterceptor;
 import com.lukekorth.photo_paper.helpers.ThreadBus;
 import com.lukekorth.photo_paper.helpers.UserAgentInterceptor;
@@ -172,7 +172,7 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
     public static Picasso getPicasso(Context context) {
         if (sPicasso == null) {
             sPicasso = new Picasso.Builder(context.getApplicationContext())
-                    .downloader(Cache.createCacheDownloader(context.getApplicationContext()))
+                    .downloader(new OkHttp3Downloader(context.getApplicationContext(), 512000000)) // 512mb
                     .indicatorsEnabled(BuildConfig.DEBUG)
                     .build();
         }
