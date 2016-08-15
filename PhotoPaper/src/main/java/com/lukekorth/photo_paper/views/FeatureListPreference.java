@@ -69,9 +69,9 @@ public class FeatureListPreference extends ListPreference implements Preference.
 
     @Subscribe
     public void onUserUpdated(UserUpdatedEvent event) {
-        if (User.isUserLoggedIn(mRealm) && getValue().equals("your_favorites")) {
+        if (User.isUserLoggedIn(mRealm) && Settings.getFeature(getContext()).equals("your_favorites")) {
             setValue("your_favorites");
-            setFeatureSummary(getValue());
+            setFeatureSummary(Settings.getFeature(getContext()));
         }
     }
 
