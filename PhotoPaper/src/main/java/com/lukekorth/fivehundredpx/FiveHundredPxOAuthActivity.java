@@ -17,9 +17,7 @@ import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 public class FiveHundredPxOAuthActivity extends Activity {
 
-    public static final int FAILED = 500;
     public static final String ACCESS_TOKEN = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.ACCESS_TOKEN";
-    public static final String EXCEPTION = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.EXCEPTION";
 
     private static final String EXTRA_REQUEST_MADE = "com.lukekorth.fivehundredpx.fivehundredpxoauthactivity.EXTRA_REQUEST_MADE";
 
@@ -77,24 +75,24 @@ public class FiveHundredPxOAuthActivity extends Activity {
     private class OAuthSigningRequestTask extends AsyncTask<Void, Void, Void> {
 
         private String mUrl;
-        private FiveHundredException mException;
+        private boolean mFailed;
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
                 mUrl = mOAuthHelper.getAuthorizationUrl();
-            } catch (OAuthNotAuthorizedException | OAuthExpectationFailedException | OAuthMessageSignerException |
-                    OAuthCommunicationException e) {
-                mException = new FiveHundredException(e.getMessage(), e);
+                mFailed = false;
+            } catch (OAuthNotAuthorizedException | OAuthExpectationFailedException |
+                    OAuthMessageSignerException | OAuthCommunicationException e) {
+                mFailed = true;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mException != null) {
-                Intent resultIntent = new Intent().putExtra(EXCEPTION, mException);
-                setResult(FAILED, resultIntent);
+            if (mFailed) {
+                setResult(Activity.RESULT_FIRST_USER);
                 finish();
             } else {
                 mRequestMade = true;
@@ -115,24 +113,24 @@ public class FiveHundredPxOAuthActivity extends Activity {
     private class OAuthAccessTokenRequestTask extends AsyncTask<Void, Void, Void> {
 
         private AccessToken mAccessToken;
-        private FiveHundredException mException;
+        private boolean mFailed;
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
                 mAccessToken = mOAuthHelper.getAccessToken();
-            } catch (OAuthCommunicationException | OAuthExpectationFailedException | OAuthMessageSignerException |
-                    OAuthNotAuthorizedException e) {
-                mException = new FiveHundredException(e.getMessage(), e);
+                mFailed = false;
+            } catch (OAuthCommunicationException | OAuthExpectationFailedException |
+                    OAuthMessageSignerException | OAuthNotAuthorizedException e) {
+                mFailed = true;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mException != null) {
-                Intent resultIntent = new Intent().putExtra(EXCEPTION, mException);
-                setResult(FAILED, resultIntent);
+            if (mFailed) {
+                setResult(Activity.RESULT_FIRST_USER);
                 finish();
             } else {
                 Intent resultIntent = new Intent().putExtra(ACCESS_TOKEN, mAccessToken);
