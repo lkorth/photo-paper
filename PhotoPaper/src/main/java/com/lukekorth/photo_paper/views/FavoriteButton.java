@@ -30,44 +30,41 @@ public class FavoriteButton extends Button implements View.OnClickListener {
 
     public FavoriteButton(Context context) {
         super(context);
-        init();
     }
 
     public FavoriteButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public FavoriteButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public FavoriteButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
-    }
-
-    private void init() {
-        Realm realm = Realm.getDefaultInstance();
-        mUserId = User.getUser(realm).getId();
-        realm.close();
     }
 
     public void setup(String photoId, boolean favorited) {
-        mPhotoId = photoId;
-        mFavorited = favorited;
+        Realm realm = Realm.getDefaultInstance();
 
-        setCompoundDrawablesWithIntrinsicBounds(R.drawable.button_action_favorite, 0, 0, 0);
-        if (mFavorited) {
-            setBackgroundResource(R.drawable.button_action_bg_favorited);
-        } else {
-            setBackgroundResource(R.drawable.button_action_bg);
+        if (User.isUserLoggedIn(realm)) {
+            mUserId = User.getUser(realm).getId();
+            mPhotoId = photoId;
+            mFavorited = favorited;
+
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.button_action_favorite, 0, 0, 0);
+            if (mFavorited) {
+                setBackgroundResource(R.drawable.button_action_bg_favorited);
+            } else {
+                setBackgroundResource(R.drawable.button_action_bg);
+            }
+
+            setOnClickListener(this);
+            setVisibility(View.VISIBLE);
         }
 
-        setOnClickListener(this);
-        setVisibility(View.VISIBLE);
+        realm.close();
     }
 
     @Override
