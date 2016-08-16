@@ -18,6 +18,7 @@
     <com.lukekorth.photo_paper.views.LikeButton
         android:id="@+id/votes"
         style="@style/button"
-        android:layout_toLeftOf="@id/favorites" />
+        android:layout_toLeftOf="@id/favorites"
+        android:layout_alignWithParentIfMissing="true"/>
 
 </RelativeLayout>
