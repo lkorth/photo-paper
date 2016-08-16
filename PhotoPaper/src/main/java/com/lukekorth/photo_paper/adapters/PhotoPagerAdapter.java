@@ -18,8 +18,6 @@ import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.views.FavoriteButton;
 import com.lukekorth.photo_paper.views.LikeButton;
 
-import java.util.List;
-
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -28,13 +26,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListener {
+public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListener<RealmResults<Photos>> {
 
     private Context mContext;
     private ViewPager mViewPager;
     private LayoutInflater mInflater;
     private Realm mRealm;
-    private List<Photos> mPhotos;
+    private RealmResults<Photos> mPhotos;
     private int mNumberOfPhotos;
     private boolean mLoggedIn;
 
@@ -46,11 +44,11 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
         mPhotos = photos;
         mNumberOfPhotos = photos.size();
         mLoggedIn = User.isUserLoggedIn(mRealm);
-        mRealm.addChangeListener(this);
+        mPhotos.addChangeListener(this);
     }
 
     @Override
-    public void onChange() {
+    public void onChange(RealmResults results) {
         notifyDataSetChanged();
     }
 

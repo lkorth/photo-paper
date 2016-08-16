@@ -91,7 +91,7 @@ public class WallpaperService extends IntentService {
                 logger.error(e.getMessage());
                 realm.beginTransaction();
                 if (photo.getFailedCount() > 10) {
-                    photo.removeFromRealm();
+                    photo.deleteFromRealm();
                 } else {
                     photo.setFailedCount(photo.getFailedCount() + 1);
                 }
