@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.v7.graphics.Palette;
@@ -76,7 +77,12 @@ public class WallpaperService extends IntentService {
 
                 Bitmap bitmap = request.get();
 
-                wallpaperManager.setBitmap(bitmap);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    wallpaperManager.setBitmap(bitmap, null, false, WallpaperManager.FLAG_SYSTEM);
+                    wallpaperManager.setBitmap(bitmap, null, false, WallpaperManager.FLAG_LOCK);
+                } else {
+                    wallpaperManager.setBitmap(bitmap);
+                }
 
                 realm.beginTransaction();
                 photo.setPalette(Palette.generate(bitmap).getMutedColor(getResources().getColor(R.color.brown)));
