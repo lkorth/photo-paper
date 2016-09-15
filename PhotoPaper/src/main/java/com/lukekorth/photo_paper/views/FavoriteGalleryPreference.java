@@ -84,7 +84,7 @@ public class FavoriteGalleryPreference extends Preference implements Preference.
         WallpaperApplication.getApiClient().galleries(User.getUser(mRealm).getId()).enqueue(new Callback<GalleryResponse>() {
             @Override
             public void onResponse(Call<GalleryResponse> call, Response<GalleryResponse> response) {
-                if (!response.isSuccess()) {
+                if (!response.isSuccessful()) {
                     onFailure(call, new FiveHundredException(response.code()));
                     return;
                 }

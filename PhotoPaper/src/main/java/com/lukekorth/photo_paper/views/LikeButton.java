@@ -66,7 +66,7 @@ public class LikeButton extends Button implements View.OnClickListener {
         Callback<PhotoResponse> callback = new Callback<PhotoResponse>() {
             @Override
             public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
-                if (response.isSuccess()) {
+                if (response.isSuccessful()) {
                     Photo photo = response.body().photo;
                     photo.voted = !mPhoto.voted;
                     setPhoto(response.body().photo);

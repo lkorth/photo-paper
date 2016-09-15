@@ -76,7 +76,7 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
             WallpaperApplication.getApiClient().photo(photo.getPhotoId()).enqueue(new Callback<PhotoResponse>() {
                 @Override
                 public void onResponse(Call<PhotoResponse> call, Response<PhotoResponse> response) {
-                    if (!response.isSuccess()) {
+                    if (!response.isSuccessful()) {
                         return;
                     }
 
@@ -93,7 +93,7 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
                         .enqueue(new Callback<GalleryResponse>() {
                             @Override
                             public void onResponse(Call<GalleryResponse> call, Response<GalleryResponse> response) {
-                                if (!response.isSuccess()) {
+                                if (!response.isSuccessful()) {
                                     return;
                                 }
 

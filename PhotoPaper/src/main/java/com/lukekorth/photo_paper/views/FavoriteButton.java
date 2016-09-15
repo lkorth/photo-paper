@@ -77,7 +77,7 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                     .enqueue(new Callback<ApiResponse>() {
                         @Override
                         public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                            if (response.isSuccess()) {
+                            if (response.isSuccessful()) {
                                 setup(mPhotoId, false);
                                 FirebaseAnalytics.getInstance(getContext()).logEvent("unfavorited", null);
                             } else {
@@ -98,7 +98,7 @@ public class FavoriteButton extends Button implements View.OnClickListener {
                     .enqueue(new Callback<ApiResponse>() {
                         @Override
                         public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                            if (response.isSuccess()) {
+                            if (response.isSuccessful()) {
                                 setup(mPhotoId, true);
                                 FirebaseAnalytics.getInstance(getContext()).logEvent("favorited", null);
                             } else {
