@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.lukekorth.photo_paper"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 24
         versionCode 11
         versionName "0.4.4"
@@ -58,7 +58,7 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup:otto:1.3.8'
 
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.5'
     compile 'com.lukekorth:mailable_log:0.1.3'
     compile 'fr.nicolaspomepuy:discreetapprate:2.0.4@aar'
 
