@@ -116,7 +116,7 @@ public class User extends RealmObject {
 
     public static void logout(Realm realm) {
         realm.beginTransaction();
-        realm.where(User.class).findAll().clear();
+        realm.where(User.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
     }
 
