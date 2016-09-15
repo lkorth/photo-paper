@@ -56,7 +56,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
-    compile 'com.squareup:otto:1.3.5'
+    compile 'com.squareup:otto:1.3.8'
 
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'com.lukekorth:mailable_log:0.1.3'
