@@ -45,6 +45,7 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager.setOffscreenPageLimit(4);
         viewPager.setPageTransformer(false, new ParallaxPagerTransformer(R.id.photo));
         viewPager.setOnPageChangeListener(this);
         mAdapter = new PhotoPagerAdapter(this, mRealm, viewPager, Photos.getRecentlySeenPhotos(mRealm));
