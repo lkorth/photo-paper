@@ -7,6 +7,7 @@ import android.os.SystemClock;
 
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photos;
@@ -125,7 +126,7 @@ public class PhotoDownloadIntentService extends IntentService {
     private void cachePhotos() {
         mLogger.debug("Caching photos");
 
-        Picasso picasso = WallpaperApplication.getPicasso(this);
+        Picasso picasso = PicassoHelper.getPicasso(this);
         List<Photos> photos = Photos.getUnseenPhotos(this, mRealm);
         for (Photos photo : photos) {
             if (Utils.isCurrentNetworkOk(this)) {

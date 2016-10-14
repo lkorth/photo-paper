@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.GalleryResponse;
@@ -17,6 +18,7 @@ import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.views.FavoriteButton;
 import com.lukekorth.photo_paper.views.LikeButton;
+import com.squareup.picasso.Picasso;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -31,15 +33,18 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
     private Context mContext;
     private ViewPager mViewPager;
     private LayoutInflater mInflater;
+    private Picasso mPicasso;
     private Realm mRealm;
     private RealmResults<Photos> mPhotos;
     private int mNumberOfPhotos;
     private boolean mLoggedIn;
 
-    public PhotoPagerAdapter(Context context, Realm realm, ViewPager viewPager, RealmResults<Photos> photos) {
+    public PhotoPagerAdapter(Context context, Realm realm, ViewPager viewPager,
+                             RealmResults<Photos> photos) {
         mContext = context;
         mViewPager = viewPager;
         mInflater = LayoutInflater.from(context);
+        mPicasso = PicassoHelper.getPicasso(mContext);
         mRealm = realm;
         mPhotos = photos;
         mNumberOfPhotos = photos.size();
@@ -66,8 +71,7 @@ public class PhotoPagerAdapter extends PagerAdapter implements RealmChangeListen
         final View view = mInflater.inflate(R.layout.full_screen_photo, collection, false);
         collection.addView(view);
 
-        WallpaperApplication.getPicasso(mContext)
-                .load(photo.imageUrl)
+        mPicasso.load(photo.imageUrl)
                 .resize(Utils.getScreenWidth(mContext), Utils.getScreenHeight(mContext))
                 .centerInside()
                 .into(((ImageViewTouch) view.findViewById(R.id.photo)));

@@ -12,6 +12,7 @@ import android.support.v7.graphics.Palette;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photos;
@@ -66,7 +67,7 @@ public class WallpaperService extends IntentService {
             try {
                 logger.debug("Setting wallpaper to " + width + "px wide by " + height + "px tall");
 
-                RequestCreator request = WallpaperApplication.getPicasso(this)
+                RequestCreator request = PicassoHelper.getPicasso(this)
                         .load(photo.imageUrl)
                         .centerCrop()
                         .resize(width, height);

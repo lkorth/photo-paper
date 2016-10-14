@@ -4,10 +4,10 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.Photos;
 import com.lukekorth.photo_paper.models.WallpaperChangedEvent;
-import com.squareup.picasso.PicassoTools;
 
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class ClearCacheIntentService extends IntentService {
         realm.commitTransaction();
         realm.close();
 
-        PicassoTools.clearCache(WallpaperApplication.getPicasso(this));
+        PicassoHelper.clearCache(this);
         Settings.clearUpdated(this);
 
         WallpaperApplication.getBus().post(new WallpaperChangedEvent());

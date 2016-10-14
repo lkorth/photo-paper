@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 
 import com.lukekorth.photo_paper.R;
 import com.lukekorth.photo_paper.ViewPhotoActivity;
-import com.lukekorth.photo_paper.WallpaperApplication;
 import com.lukekorth.photo_paper.databinding.PhotoCardBinding;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photos;
 import com.squareup.picasso.Picasso;
@@ -29,7 +29,7 @@ public class RecentPhotosAdapter extends RecyclerView.Adapter<RecentPhotosAdapte
 
     public RecentPhotosAdapter(Context context, Realm realm) {
         mPhotos = Photos.getRecentlySeenPhotos(realm);
-        mPicasso = WallpaperApplication.getPicasso(context);
+        mPicasso = PicassoHelper.getPicasso(context);
         mSize = Utils.dpToPx(context, 100);
     }
 

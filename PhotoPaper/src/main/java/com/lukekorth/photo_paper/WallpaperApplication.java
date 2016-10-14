@@ -1,12 +1,10 @@
 package com.lukekorth.photo_paper;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.gson.GsonBuilder;
-import com.jakewharton.picasso.OkHttp3Downloader;
 import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.mailable_log.MailableLog;
 import com.lukekorth.photo_paper.api.FiveHundredPxClient;
@@ -17,7 +15,6 @@ import com.lukekorth.photo_paper.models.User;
 import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,6 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
     private static FiveHundredPxClient sApiClient;
     private static FiveHundredPxClient sNonLoggedInApiClient;
     private static ThreadBus sBus;
-    private static Picasso sPicasso;
 
     @Override
     public void onCreate() {
@@ -171,16 +167,6 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
             sBus = new ThreadBus();
         }
         return sBus;
-    }
-
-    public static Picasso getPicasso(Context context) {
-        if (sPicasso == null) {
-            sPicasso = new Picasso.Builder(context.getApplicationContext())
-                    .downloader(new OkHttp3Downloader(context.getApplicationContext(), 512000000)) // 512mb
-                    .indicatorsEnabled(BuildConfig.DEBUG)
-                    .build();
-        }
-        return sPicasso;
     }
 }
 

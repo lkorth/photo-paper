@@ -19,6 +19,7 @@ import android.text.format.DateUtils;
 import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.fivehundredpx.FiveHundredPxOAuthActivity;
 import com.lukekorth.photo_paper.helpers.LogReporting;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.ActivityResumedEvent;
@@ -154,7 +155,7 @@ public class SettingsFragment extends PreferenceFragment
             mLogin.setTitle(user.getUserName());
             mLogin.setSummary(getString(R.string.click_to_logout));
 
-            WallpaperApplication.getPicasso(getActivity())
+            PicassoHelper.getPicasso(getActivity())
                     .load(user.getPhoto())
                     .error(android.R.drawable.stat_notify_error)
                     .into(mUserImageCallback);
@@ -173,7 +174,7 @@ public class SettingsFragment extends PreferenceFragment
             mCurrentPhoto.setTitle(photo.getName());
             mCurrentPhoto.setSummary("© " + photo.getUserName() + " / 500px\n" + getString(R.string.set) +
                     " " + timeSet);
-            WallpaperApplication.getPicasso(getActivity())
+            PicassoHelper.getPicasso(getActivity())
                     .load(photo.imageUrl)
                     .placeholder(new ColorDrawable(photo.getPalette()))
                     .error(android.R.drawable.stat_notify_error)

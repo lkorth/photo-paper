@@ -20,6 +20,7 @@ import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.models.Photo;
 import com.lukekorth.photo_paper.models.SearchResult;
 import com.lukekorth.photo_paper.services.PhotoDownloadIntentService;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.lukekorth.photo_paper.helpers.PicassoHelper.getPicasso;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
         AbsListView.OnScrollListener, View.OnClickListener {
@@ -36,12 +39,15 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private SearchView mSearchView;
     private GridPhotoAdapter mAdapter;
     private String mCurrentQuery;
+    private Picasso mPicasso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grid_view);
+
+        mPicasso = getPicasso(this);
 
         if (savedInstanceState != null) {
             mCurrentQuery = savedInstanceState.getString(QUERY_KEY);
@@ -146,9 +152,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-            WallpaperApplication.getPicasso(this).resumeTag(GridPhotoAdapter.TAG);
+            mPicasso.resumeTag(GridPhotoAdapter.TAG);
         } else {
-            WallpaperApplication.getPicasso(this).pauseTag(GridPhotoAdapter.TAG);
+            mPicasso.pauseTag(GridPhotoAdapter.TAG);
         }
     }
 

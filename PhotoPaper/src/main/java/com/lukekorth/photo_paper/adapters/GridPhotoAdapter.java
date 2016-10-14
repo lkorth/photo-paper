@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.lukekorth.photo_paper.R;
-import com.lukekorth.photo_paper.WallpaperApplication;
+import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Utils;
 import com.lukekorth.photo_paper.models.Photo;
 import com.lukekorth.photo_paper.views.SquareImageView;
@@ -29,7 +29,7 @@ public class GridPhotoAdapter extends BaseAdapter {
     public GridPhotoAdapter(Context context, ArrayList<Photo> photos) {
         mContext = context;
         mPhotos = photos;
-        mPicasso = WallpaperApplication.getPicasso(context);
+        mPicasso = PicassoHelper.getPicasso(context);
         mOneDpInPx = Utils.dpToPx(mContext, 0.5);
     }
 
