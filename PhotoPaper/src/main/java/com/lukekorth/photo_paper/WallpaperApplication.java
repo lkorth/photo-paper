@@ -52,7 +52,11 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
         DebugUtils.setup(this);
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(this).build());
+
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
+        Realm.setDefaultConfiguration(realmConfiguration);
+
         getBus().register(this);
     }
 
