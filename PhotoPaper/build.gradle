@@ -16,21 +16,6 @@ android {
     dataBinding {
         enabled = true
     }
-
-    signingConfigs {
-        release {
-            storeFile file(System.properties['KEYSTORE'])
-            storePassword ""
-            keyAlias System.properties['KEYSTORE_EMAIL']
-            keyPassword ""
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
 }
 
 android.buildTypes.each { type ->
@@ -66,25 +51,6 @@ dependencies {
     debugCompile 'com.facebook.stetho:stetho:1.4.1'
     debugCompile 'com.uphyca:stetho_realm:2.0.0'
     debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.1'
-}
-
-// borrowed from https://www.timroes.de/2014/01/19/using-password-prompts-with-gradle-build-files/
-// and https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
-gradle.taskGraph.whenReady { taskGraph ->
-    // Only execute when we are trying to assemble a release build
-    if (taskGraph.hasTask(':PhotoPaper:assembleRelease') || taskGraph.hasTask(':PhotoPaper:installRelease')) {
-        def password = System.console().readPassword("\nPlease enter key passphrase: ")
-        if (password.size() <= 0) {
-            throw new InvalidUserDataException("You must enter a password to proceed.")
-        }
-
-        // Must create String because System.readPassword() returns char[]
-        // (and assigning that below fails silently)
-        password = new String(password)
-
-        android.signingConfigs.release.storePassword = password
-        android.signingConfigs.release.keyPassword = password
-    }
 }
 
 apply plugin: 'com.google.gms.google-services'
