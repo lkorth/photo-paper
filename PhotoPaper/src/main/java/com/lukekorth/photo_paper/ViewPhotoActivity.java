@@ -14,6 +14,7 @@ import android.view.WindowManager;
 
 import com.lukekorth.photo_paper.adapters.PhotoPagerAdapter;
 import com.lukekorth.photo_paper.models.Photos;
+import com.xgc1986.parallaxPagerTransformer.ParallaxPagerTransformer;
 
 import io.realm.Realm;
 
@@ -43,8 +44,8 @@ public class ViewPhotoActivity extends AppCompatActivity implements ViewPager.On
 
         mCurrentPhoto = getIntent().getIntExtra(PHOTO_POSITION_KEY, 0);
 
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager.setPageTransformer(false, new ParallaxPagerTransformer(R.id.photo));
         viewPager.setOnPageChangeListener(this);
         mAdapter = new PhotoPagerAdapter(this, mRealm, viewPager, Photos.getRecentlySeenPhotos(mRealm));
         viewPager.setAdapter(mAdapter);
