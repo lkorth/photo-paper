@@ -48,9 +48,9 @@ dependencies {
     compile 'com.lukekorth:mailable_log:0.1.5'
     compile 'fr.nicolaspomepuy:discreetapprate:2.0.4@aar'
 
-    debugCompile 'com.facebook.stetho:stetho:1.4.1'
+    debugCompile 'com.facebook.stetho:stetho:1.4.2'
     debugCompile 'com.uphyca:stetho_realm:2.0.0'
-    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.1'
+    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
 }
 
 apply plugin: 'com.google.gms.google-services'
