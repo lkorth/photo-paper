@@ -16,9 +16,6 @@ import com.lukekorth.photo_paper.models.UserUpdatedEvent;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 
 import io.realm.Realm;
@@ -29,11 +26,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
-public class WallpaperApplication extends Application implements Thread.UncaughtExceptionHandler {
+public class WallpaperApplication extends Application {
 
     private static final String VERSION = "version";
-
-    private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
 
     private static FiveHundredPxClient sApiClient;
     private static FiveHundredPxClient sNonLoggedInApiClient;
@@ -45,8 +40,6 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
 
         migrate();
         MailableLog.init(this, BuildConfig.DEBUG);
-        mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(this);
         DebugUtils.setup(this);
 
         Realm.init(this);
@@ -72,29 +65,6 @@ public class WallpaperApplication extends Application implements Thread.Uncaught
 
             MailableLog.clearLog(this);
         }
-    }
-
-    @Override
-    public void uncaughtException(Thread thread, Throwable ex) {
-        Logger logger = LoggerFactory.getLogger("Exception");
-
-        logger.error("thread.toString(): " + thread.toString());
-        logger.error("Exception: " + ex.toString());
-        logger.error("Exception stacktrace:");
-        for (StackTraceElement trace : ex.getStackTrace()) {
-            logger.error(trace.toString());
-        }
-
-        logger.error("");
-
-        logger.error("cause.toString(): " + ex.getCause().toString());
-        logger.error("Cause: " + ex.getCause().toString());
-        logger.error("Cause stacktrace:");
-        for (StackTraceElement trace : ex.getCause().getStackTrace()) {
-            logger.error(trace.toString());
-        }
-
-        mDefaultExceptionHandler.uncaughtException(thread, ex);
     }
 
     @Subscribe
