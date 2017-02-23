@@ -95,7 +95,16 @@ public class WallpaperService extends IntentService {
 
                 FirebaseAnalytics.getInstance(this).logEvent("wallpaper_updated", null);
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                logger.error(e.toString());
+                for (StackTraceElement trace : e.getStackTrace()) {
+                    logger.error(trace.toString());
+                }
+
+                logger.error(e.getCause().toString());
+                for (StackTraceElement trace : e.getCause().getStackTrace()) {
+                    logger.error(trace.toString());
+                }
+
                 realm.beginTransaction();
                 if (photo.getFailedCount() > 10) {
                     photo.deleteFromRealm();
