@@ -100,9 +100,11 @@ public class WallpaperService extends IntentService {
                     logger.error(trace.toString());
                 }
 
-                logger.error(e.getCause().toString());
-                for (StackTraceElement trace : e.getCause().getStackTrace()) {
-                    logger.error(trace.toString());
+                if (e.getCause() != null) {
+                    logger.error(e.getCause().toString());
+                    for (StackTraceElement trace : e.getCause().getStackTrace()) {
+                        logger.error(trace.toString());
+                    }
                 }
 
                 realm.beginTransaction();
