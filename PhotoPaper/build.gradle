@@ -45,7 +45,7 @@ dependencies {
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.5'
     compile 'com.xgc1986.android:parallaxpagertransformer:1.0.4'
 
-    compile 'com.lukekorth:mailable_log:0.1.5'
+    compile 'com.lukekorth:mailable_log:0.1.6'
     compile 'fr.nicolaspomepuy:discreetapprate:2.0.4@aar'
 
     debugCompile 'com.facebook.stetho:stetho:1.5.0'
