@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import retrofit2.Call;
@@ -73,6 +74,14 @@ public class PhotoDownloadIntentService extends IntentService {
             mBus.post(new RemainingPhotosChangedEvent());
             mLogger.debug("Not getting photos at this time");
         }
+
+        mRealm.beginTransaction();
+        mRealm.where(Photos.class)
+                .equalTo("seen", true)
+                .lessThan("seenAt", System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30))
+                .findAll()
+                .deleteAllFromRealm();
+        mRealm.commitTransaction();
 
         mRealm.close();
     }
