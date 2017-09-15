@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -289,7 +290,7 @@ public class Photos extends RealmObject {
     public static RealmResults<Photos> getRecentlySeenPhotos(Realm realm) {
         return realm.where(Photos.class)
                 .equalTo("seen", true)
-                .greaterThan("seenAt", System.currentTimeMillis() - 604800000) // 7 days in milliseconds
+                .greaterThan("seenAt", System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7))
                 .findAllSorted("seenAt", Sort.DESCENDING);
     }
 
