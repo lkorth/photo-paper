@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.support.v7.graphics.Palette;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -29,9 +28,6 @@ import io.realm.Realm;
 
 public class WallpaperService extends IntentService {
 
-    public static final String USER_PRESENT_RECEIVER_KEY = "com.lukekorth.photo_paper.services.WallpaperService.SLEEP";
-    public static final String SKIP_WALLPAPER_KEY = "com.lukekorth.photo_paper.services.WallpaperService.SKIP";
-
     public WallpaperService() {
         super("WallpaperService");
     }
@@ -40,19 +36,14 @@ public class WallpaperService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Logger logger = LoggerFactory.getLogger("WallpaperService");
 
-        if (!Utils.shouldUpdateWallpaper(this) && !intent.getBooleanExtra(SKIP_WALLPAPER_KEY, false)) {
-            logger.debug("App is not enabled or wallpaper does not need to be updated");
+        if (!Settings.isEnabled(this)) {
+            logger.debug("App is not enabled");
             return;
         }
 
         PowerManager.WakeLock wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
         wakeLock.acquire();
-
-        if (intent.getBooleanExtra(USER_PRESENT_RECEIVER_KEY, false)) {
-            logger.debug("User present, waiting 2 seconds and then setting wallpaper");
-            SystemClock.sleep(2000);
-        }
 
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         int width = wallpaperManager.getDesiredMinimumWidth();

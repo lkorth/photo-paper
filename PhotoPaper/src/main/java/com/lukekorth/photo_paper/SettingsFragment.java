@@ -18,6 +18,7 @@ import android.text.format.DateUtils;
 
 import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.fivehundredpx.FiveHundredPxOAuthActivity;
+import com.lukekorth.photo_paper.helpers.AlarmHelper;
 import com.lukekorth.photo_paper.helpers.LogReporting;
 import com.lukekorth.photo_paper.helpers.PicassoHelper;
 import com.lukekorth.photo_paper.helpers.Settings;
@@ -105,10 +106,6 @@ public class SettingsFragment extends PreferenceFragment
         super.onResume();
         onWallpaperChanged(null);
         WallpaperApplication.getBus().post(new ActivityResumedEvent());
-
-        if (Utils.shouldUpdateWallpaper(getActivity())) {
-            runWallpaperService(false);
-        }
     }
 
     @Override
@@ -237,7 +234,8 @@ public class SettingsFragment extends PreferenceFragment
         } else if (preference.getKey().equals(mNextPhoto.getKey())) {
             mNextPhoto.setTitle(R.string.loading);
             mNextPhoto.setSummary("");
-            runWallpaperService(true);
+            getActivity().startService(new Intent(getActivity(), WallpaperService.class));
+            AlarmHelper.scheduleWallpaperAlarm(getActivity());
             return true;
         } else if (preference.getKey().equals("login")) {
             if (User.isUserLoggedIn(mRealm)) {
@@ -258,10 +256,20 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-        if (key.equals(mCategories.getKey())) {
+        if (key.equals("enable")) {
+            if ((boolean) newValue) {
+                AlarmHelper.scheduleWallpaperAlarm(getActivity());
+            } else {
+                AlarmHelper.removeWallpaperAlarm(getActivity());
+            }
+        } else if (key.equals(mCategories.getKey())) {
             Settings.setCategories(getActivity(), (Set<String>) newValue);
             setCategoriesSummary((Set<String>) newValue);
         } else if (key.equals(mInterval.getKey())) {
+            if (Settings.isEnabled(getActivity())) {
+                AlarmHelper.scheduleWallpaperAlarm(getActivity(), Integer.parseInt((String) newValue));
+            }
+
             Settings.setUpdateInterval(getActivity(), newValue.toString());
             mInterval.setSummary(Utils.getListSummary(getActivity(), R.array.interval_index,
                     R.array.intervals, newValue.toString(), getString(R.string.one_hour)));
@@ -301,11 +309,5 @@ public class SettingsFragment extends PreferenceFragment
             }
             mCategories.setSummary(summary.substring(0, summary.length() - 2));
         }
-    }
-
-    private void runWallpaperService(boolean skip) {
-        Intent intent = new Intent(getActivity(), WallpaperService.class)
-                .putExtra(WallpaperService.SKIP_WALLPAPER_KEY, skip);
-        getActivity().startService(intent);
     }
 }

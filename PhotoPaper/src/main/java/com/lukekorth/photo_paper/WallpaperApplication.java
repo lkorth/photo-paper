@@ -8,7 +8,9 @@ import com.google.gson.GsonBuilder;
 import com.lukekorth.fivehundredpx.AccessToken;
 import com.lukekorth.mailable_log.MailableLog;
 import com.lukekorth.photo_paper.api.FiveHundredPxClient;
+import com.lukekorth.photo_paper.helpers.AlarmHelper;
 import com.lukekorth.photo_paper.helpers.ConsumerApiKeyInterceptor;
+import com.lukekorth.photo_paper.helpers.Settings;
 import com.lukekorth.photo_paper.helpers.ThreadBus;
 import com.lukekorth.photo_paper.helpers.UserAgentInterceptor;
 import com.lukekorth.photo_paper.models.User;
@@ -47,6 +49,10 @@ public class WallpaperApplication extends Application {
         Realm.setDefaultConfiguration(realmConfiguration);
 
         getBus().register(this);
+
+        if (Settings.isEnabled(this) && !AlarmHelper.isAlarmSet(this)) {
+            AlarmHelper.scheduleWallpaperAlarm(this);
+        }
     }
 
     private void migrate() {
