@@ -193,7 +193,7 @@ public class SettingsFragment extends PreferenceFragment
                 mNextPhoto.setEnabled(true);
 
                 long nextPhotoTime = Settings.getLastUpdated(getActivity()) + (Settings.getUpdateInterval(getActivity()) * 1000);
-                if (nextPhotoTime + 59000 < System.currentTimeMillis()) {
+                if (nextPhotoTime - 59000 < System.currentTimeMillis()) {
                     mNextPhoto.setTitle(getString(R.string.next_photo) + " " + getString(R.string.soon));
                 } else {
                     CharSequence nextTime = DateUtils.getRelativeTimeSpanString(nextPhotoTime, System.currentTimeMillis(), 0);
