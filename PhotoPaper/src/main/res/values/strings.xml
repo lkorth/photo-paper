@@ -6,7 +6,7 @@
     <string name="current_photo">Current Photo</string>
     <string name="no_current_photo">No current photo</string>
     <string name="next_photo">Next Photo</string>
-    <string name="next_unlock">after next unlock</string>
+    <string name="soon">soon</string>
     <string name="remaining_photos">photos remain\nClick to set the next photo now</string>
     <string name="disabled">Disabled</string>
     <string name="enable_below">You must enable Photo Paper before wallpapers will be set</string>
