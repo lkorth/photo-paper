@@ -25,7 +25,7 @@ public class ClearCacheIntentService extends IntentService {
 
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        realm.where(Photos.class).findAll().clear();
+        realm.where(Photos.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.close();
 
