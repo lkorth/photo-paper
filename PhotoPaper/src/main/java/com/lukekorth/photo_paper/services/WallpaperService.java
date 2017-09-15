@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 
@@ -43,7 +44,7 @@ public class WallpaperService extends IntentService {
 
         PowerManager.WakeLock wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "500pxApiService");
-        wakeLock.acquire();
+        wakeLock.acquire(TimeUnit.MINUTES.toMillis(1));
 
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         int width = wallpaperManager.getDesiredMinimumWidth();
