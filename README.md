@@ -1,6 +1,8 @@
-![](images/banner.png)
-
 # Photo Paper for Android
+
+## Photo Paper is dead
+
+On June 15th 2018 500px [shut off their API](https://support.500px.com/hc/en-us/articles/360002435653-API-). This app no longer functions without access to the 500px API.
 
 ## Why
 
